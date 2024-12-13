@@ -1,0 +1,10 @@
+{
+  "appName": "Infiora",
+  "androidMinimumVersion": "1.1.8",
+  "iOSMinimumVersion": "1.1.5",
+  "maintenance": false,
+  "iOSAppUrl": "https://apps.apple.com/us/app/infiora-digital-business-card/id6475076150",
+  "androidAppUrl": "https://play.google.com/store/apps/details?id=com.xertk.infiora",
+  "privacyUrl": "https://infiora.hr/policies/privacy-policy",
+  "termsUrl": "https://infiora.hr/policies/terms-of-service"
+}
