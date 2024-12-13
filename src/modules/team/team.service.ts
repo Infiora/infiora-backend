@@ -7,7 +7,6 @@ import { IOptions, QueryResult } from '../paginate/paginate';
 import User from '../user/user.model';
 import { emailService } from '../email';
 import { tokenService } from '../token';
-import { stripeService } from '../stripe';
 import { generateString, uploadFile } from '../utils';
 import * as userService from '../user/user.service';
 
@@ -110,7 +109,6 @@ export const addMembers = async (teamId: mongoose.Types.ObjectId, body: any) => 
     const totalMembers = await User.countDocuments({ team: team.id });
     Object.assign(team, { totalMembers });
     await team.save();
-    await stripeService.createUsageRecord(team.stripeSubscription, totalMembers);
   }
 };
 
@@ -138,7 +136,6 @@ export const joinTeam = async (token: string): Promise<string | undefined> => {
     if (isNew) resetPasswordToken = await tokenService.generateResetPasswordToken(email);
     Object.assign(team, { totalMembers: team.totalMembers + 1 });
     await team.save();
-    await stripeService.createUsageRecord(team.stripeSubscription, team.totalMembers);
   } else {
     throw new ApiError(httpStatus.BAD_REQUEST, 'Invalid link, please check again!');
   }
@@ -163,7 +160,6 @@ export const removeMember = async (teamId: mongoose.Types.ObjectId, userId: mong
   await User.findByIdAndUpdate(user.id, { $unset: { team: 1 }, isLocked: false });
   Object.assign(team, { totalMember: team.totalMembers - 1 });
   await team.save();
-  await stripeService.createUsageRecord(team.stripeSubscription, team.totalMembers);
 };
 
 /**
@@ -175,6 +171,6 @@ export const cancelPlan = async (teamId: mongoose.Types.ObjectId) => {
   if (!team) {
     throw new ApiError(httpStatus.NOT_FOUND, 'Team not found');
   }
-  await stripeService.cancelSubscription(team.stripeSubscription);
+
   await team.deleteOne();
 };

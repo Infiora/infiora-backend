@@ -6,7 +6,6 @@ import ApiError from '../errors/ApiError';
 import { IOptions, QueryResult } from '../paginate/paginate';
 import { NewCreatedUser, IUserDoc, UpdateUserBody } from './user.interfaces';
 import Profile from '../profile/profile.model';
-import { stripeService } from '../stripe';
 import { generateUsername } from '../utils';
 
 const generateUniqueUsername = async (): Promise<string> => {
@@ -69,9 +68,8 @@ export const createUser = async (userBody: NewCreatedUser): Promise<IUserDoc> =>
     user: user.id,
     ...body,
   });
-  const stripeCustomer = await stripeService.createCustomer({ email: body.email, name: body.name });
+
   user.live = profile.id;
-  user.stripeCustomer = stripeCustomer.id;
   await user.save().then((t) => t.populate(populate));
   return user;
 };

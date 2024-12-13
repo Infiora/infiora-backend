@@ -7,12 +7,9 @@ import pick from '../utils/pick';
 import { IOptions } from '../paginate/paginate';
 import * as userService from './user.service';
 import match from '../utils/match';
-import { revenuecatService } from '../revenuecat';
 import { Activity } from '../activity';
 import Link from '../link/link.model';
 import Tag from '../tag/tag.model';
-import { stripeService } from '../stripe';
-import * as teamService from '../team/team.service';
 import { leadService } from '../lead';
 import { toDate } from '../utils';
 import User from './user.model';
@@ -22,17 +19,8 @@ export const getMe = catchAsync(async (req: Request, res: Response) => {
   if (!user) {
     throw new ApiError(httpStatus.NOT_FOUND, 'User not found');
   }
-  let isPro = user?.subscription !== '';
+  const isPro = user?.subscription !== '';
   let isPaid;
-
-  const subscriber = await revenuecatService.getSubscriberById(user);
-  if (subscriber) {
-    isPro = !!subscriber?.entitlements?.pro || isPro;
-  }
-  if (user.team && user.stripeSubscription) {
-    isPaid = await stripeService.checkInvoices(user.stripeSubscription);
-    isPro = true;
-  }
 
   res.send({ ...user?.toJSON(), isPro, isPaid });
 });
@@ -168,48 +156,28 @@ export const getInsights = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
-export const getPaymentMethod = catchAsync(async (req: Request, res: Response) => {
-  const paymentMethod = await stripeService.getPaymentMethod(req.user.stripeCustomer);
-  res.send(paymentMethod);
+export const getPaymentMethod = catchAsync(async (_req: Request, res: Response) => {
+  res.send({});
 });
 
-export const createPaymentMethod = catchAsync(async (req: Request, res: Response) => {
-  const paymentMethod = await stripeService.createPaymentMethod(req.user.stripeCustomer, req.body);
-  res.send(paymentMethod);
+export const createPaymentMethod = catchAsync(async (_req: Request, res: Response) => {
+  res.send({});
 });
 
-export const updatePaymentMethod = catchAsync(async (req: Request, res: Response) => {
-  let paymentMethod = await stripeService.getPaymentMethod(req.user.stripeCustomer);
-  if (!paymentMethod) {
-    throw new ApiError(httpStatus.NOT_FOUND, 'Payment method not found');
-  }
-  paymentMethod = await stripeService.updatePaymentMethod(paymentMethod.id, req.body);
-  res.send(paymentMethod);
+export const updatePaymentMethod = catchAsync(async (_req: Request, res: Response) => {
+  res.send({});
 });
 
 export const getPrices = catchAsync(async (_req: Request, res: Response) => {
-  const prices = await stripeService.getPrices();
-  res.send(prices);
+  res.send([]);
 });
 
 export const subscribe = catchAsync(async (req: Request, res: Response) => {
-  const subscription = await stripeService.createSubscription(req.user.stripeCustomer, {
-    ...req.body,
-    isFreeAccess: req.user.subscription === 'team' || req.user.subscription === 'premium',
-  });
-  const team = await teamService.createTeam({
-    superAdmin: req.user.id,
-    stripeSubscription: subscription.id,
-    stripeCustomer: req.user.stripeCustomer,
-    totalMembers: 1,
-  });
-  const user = await userService.updateUserById(req.user.id, { stripeSubscription: subscription.id, team: team.id });
-  res.send(user);
+  res.send(req.user);
 });
 
-export const getInvoices = catchAsync(async (req: Request, res: Response) => {
-  const paymentMethod = await stripeService.getInvoices(req.user.stripeCustomer);
-  res.send(paymentMethod);
+export const getInvoices = catchAsync(async (_req: Request, res: Response) => {
+  res.send({});
 });
 
 export const addIntegration = catchAsync(async (req: Request, res: Response) => {
