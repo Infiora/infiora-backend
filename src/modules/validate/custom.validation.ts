@@ -16,17 +16,3 @@ export const password = (value: string, helpers: CustomHelpers) => {
   }
   return value;
 };
-
-export const username = (value: string, helpers: CustomHelpers) => {
-  if (!value.match(/^[a-zA-Z0-9_.-]*$/)) {
-    return helpers.message({ custom: 'invalid username' });
-  }
-  return value;
-};
-
-export const customId = (value: string, helpers: CustomHelpers) => {
-  if (!value.match(/^[a-zA-Z0-9_-]+$/)) {
-    return helpers.message({ custom: 'invalid custom Id' });
-  }
-  return value;
-};

@@ -1,16 +1,11 @@
 import Joi from 'joi';
-import { password, username } from '../validate/custom.validation';
+import { password } from '../validate/custom.validation';
 import { NewRegisteredUser } from '../user/user.interfaces';
 
 const registerBody: Record<keyof NewRegisteredUser, any> = {
   email: Joi.string().required().email(),
   password: Joi.string().required().custom(password),
-  username: Joi.string().custom(username),
-  name: Joi.string().allow(null, ''),
-  jobTitle: Joi.string().allow(null, ''),
-  company: Joi.string().allow(null, ''),
-  linkEmail: Joi.string().allow(null, ''),
-  linkPhone: Joi.string().allow(null, ''),
+  name: Joi.string().required(),
 };
 
 export const register = {
@@ -21,6 +16,18 @@ export const login = {
   body: Joi.object().keys({
     email: Joi.string().required(),
     password: Joi.string().required(),
+  }),
+};
+
+export const logout = {
+  body: Joi.object().keys({
+    refreshToken: Joi.string().required(),
+  }),
+};
+
+export const refreshTokens = {
+  body: Joi.object().keys({
+    refreshToken: Joi.string().required(),
   }),
 };
 

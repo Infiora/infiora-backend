@@ -16,5 +16,3 @@ dist
 
 # docker volume
 data
-
-.DS_Store

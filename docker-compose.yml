@@ -6,7 +6,7 @@ services:
     image: mongo:4.2.1-bionic
     restart: always
     ports:
-      - '27018:27017'
+      - "27018:27017"
     networks:
       - backend
   app:

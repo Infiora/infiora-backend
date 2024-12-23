@@ -9,7 +9,7 @@
       "watch": false,
       "time": true,
       "env": {
-        "NODE_ENV": "prod"
+        "NODE_ENV": "production"
       }
     }
   ]

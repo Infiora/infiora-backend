@@ -50,7 +50,7 @@ export const refreshAuth = async (refreshToken: string): Promise<IUserWithTokens
     const tokens = await generateAuthTokens(user);
     return { user, tokens };
   } catch (error) {
-    throw new ApiError(httpStatus.UNAUTHORIZED, 'Your session has expired, please log in again.');
+    throw new ApiError(httpStatus.UNAUTHORIZED, 'Please authenticate');
   }
 };
 

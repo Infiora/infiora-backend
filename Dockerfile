@@ -17,7 +17,7 @@ FROM base as production
 
 WORKDIR /usr/prod/app
 
-ENV NODE_ENV=prod
+ENV NODE_ENV=production
 
 COPY package.json yarn.lock ecosystem.config.json ./
 

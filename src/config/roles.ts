@@ -1,19 +1,6 @@
 const allRoles = {
   user: [],
-  admin: [
-    'getUsers',
-    'manageUsers',
-    'getProfiles',
-    'getLeads',
-    'getCategories',
-    'manageCategories',
-    'getPlatforms',
-    'managePlatforms',
-    'getBatches',
-    'manageBatches',
-    'getTags',
-    'manageTags',
-  ],
+  admin: ['getUsers', 'manageUsers'],
 };
 
 export const roles: string[] = Object.keys(allRoles);

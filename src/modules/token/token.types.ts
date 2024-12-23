@@ -3,5 +3,4 @@ export default {
   REFRESH: 'refresh',
   RESET_PASSWORD: 'resetPassword',
   VERIFY_EMAIL: 'verifyEmail',
-  TEAM_INVITE: 'teamInvite',
 };

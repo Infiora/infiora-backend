@@ -8,7 +8,7 @@ import ApiError from '../errors/ApiError';
 import tokenTypes from './token.types';
 import { AccessAndRefreshTokens, ITokenDoc } from './token.interfaces';
 import { IUserDoc } from '../user/user.interfaces';
-import User from '../user/user.model';
+import { userService } from '../user';
 
 /**
  * Generate token
@@ -113,7 +113,7 @@ export const generateAuthTokens = async (user: IUserDoc): Promise<AccessAndRefre
  * @returns {Promise<string>}
  */
 export const generateResetPasswordToken = async (email: string): Promise<string> => {
-  const user = await User.findOne({ email });
+  const user = await userService.getUserByEmail(email);
   if (!user) {
     throw new ApiError(httpStatus.NO_CONTENT, '');
   }
@@ -133,34 +133,4 @@ export const generateVerifyEmailToken = async (user: IUserDoc): Promise<string> 
   const verifyEmailToken = generateToken(user.id, expires, tokenTypes.VERIFY_EMAIL);
   await saveToken(verifyEmailToken, user.id, expires, tokenTypes.VERIFY_EMAIL);
   return verifyEmailToken;
-};
-
-/**
- * Generate team invite token
- * @param {string} sub
- * @returns {Promise<string>}
- */
-export const generateTeamInviteToken = async (sub: string): Promise<string> => {
-  const expires = moment().add(config.jwt.verifyEmailExpirationMinutes, 'minutes');
-  const payload = {
-    sub,
-    iat: moment().unix(),
-    exp: expires.unix(),
-    type: tokenTypes.TEAM_INVITE,
-  };
-  const teamInviteToken = jwt.sign(payload, config.jwt.secret);
-  return teamInviteToken;
-};
-
-/**
- * Verify token
- * @param {string} token
- * @returns {Promise<string | jwt.JwtPayload>}
- */
-export const verifyTeamToken = async (token: string): Promise<string | jwt.JwtPayload> => {
-  const payload = jwt.verify(token, config.jwt.secret);
-  if (typeof payload.sub !== 'string') {
-    throw new ApiError(httpStatus.BAD_REQUEST, 'bad token');
-  }
-  return payload;
 };

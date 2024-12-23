@@ -73,7 +73,7 @@ components:
             $ref: '#/components/schemas/Error'
           example:
             code: 401
-            message: Your session has expired, please log in again.
+            message: Please authenticate
     Forbidden:
       description: Forbidden
       content:

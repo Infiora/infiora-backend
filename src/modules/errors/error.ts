@@ -20,7 +20,7 @@ export const errorConverter = (err: any, _req: Request, _res: Response, next: Ne
 // eslint-disable-next-line no-unused-vars
 export const errorHandler = (err: ApiError, _req: Request, res: Response, _next: NextFunction) => {
   let { statusCode, message } = err;
-  if (config.env === 'prod' && !err.isOperational) {
+  if (config.env === 'production' && !err.isOperational) {
     statusCode = httpStatus.INTERNAL_SERVER_ERROR;
     message = 'Internal Server Error';
   }
@@ -30,10 +30,10 @@ export const errorHandler = (err: ApiError, _req: Request, res: Response, _next:
   const response = {
     code: statusCode,
     message,
-    ...(config.env === 'dev' && { stack: err.stack }),
+    ...(config.env === 'development' && { stack: err.stack }),
   };
 
-  if (config.env === 'dev') {
+  if (config.env === 'development') {
     logger.error(err);
   }
 
