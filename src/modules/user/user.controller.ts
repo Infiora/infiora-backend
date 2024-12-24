@@ -7,6 +7,10 @@ import pick from '../utils/pick';
 import { IOptions } from '../paginate/paginate';
 import * as userService from './user.service';
 
+export const getCurrentUser = catchAsync(async (req: Request, res: Response) => {
+  res.send(req.user);
+});
+
 export const createUser = catchAsync(async (req: Request, res: Response) => {
   const user = await userService.createUser(req.body);
   res.status(httpStatus.CREATED).send(user);

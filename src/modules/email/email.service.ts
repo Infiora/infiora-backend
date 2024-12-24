@@ -84,7 +84,7 @@ export const sendSuccessfulRegistration = async (to: string, token: string, name
   // replace this url with the link to the email verification page of your front-end app
   const verificationEmailUrl = `http://${config.clientUrl}/verify-email?token=${token}`;
   const text = `Hi ${name},
-  Congratulations! Your account has been created. 
+  Congratulations! Your account has been created.
   You are almost there. Complete the final step by verifying your email at: ${verificationEmailUrl}
   Don't hesitate to contact us if you face any problems
   Regards,
@@ -109,7 +109,7 @@ export const sendAccountCreated = async (to: string, name: string): Promise<void
   // replace this url with the link to the email verification page of your front-end app
   const loginUrl = `http://${config.clientUrl}/auth/login`;
   const text = `Hi ${name},
-  Congratulations! Your account has been created successfully. 
+  Congratulations! Your account has been created successfully.
   You can now login at: ${loginUrl}
   Don't hesitate to contact us if you face any problems
   Regards,
@@ -120,5 +120,28 @@ export const sendAccountCreated = async (to: string, name: string): Promise<void
   <p>Don't hesitate to contact us if you face any problems</p>
   <p>Regards,</p>
   <p><strong>Team</strong></p></div>`;
+  await sendEmail(to, subject, text, html);
+};
+
+/**
+ * Send a ticket email with the details provided.
+ * @param {SupportDetails} support - The support ticket details.
+ * @returns {Promise<void>}
+ */
+export const sendTicketEmail = async (support: any): Promise<void> => {
+  const to = 'support@infiora.hr'; // Define the recipient email
+  const subject = 'New Message Received'; // Define the email subject
+
+  // Define the plain text and HTML content
+  const text = `New Message Received\n\nFrom: ${support.user.email}\nSubject: ${support.subject}\nMessage: ${support.message}`;
+  const html = `
+    <div>
+      <h4><strong>New Message Received</strong></h4>
+      <p><strong>From:</strong> ${support.user.email}</p>
+      <p><strong>Subject:</strong> ${support.subject}</p>
+      <p><strong>Message:</strong> ${support.message}</p>
+    </div>
+  `;
+
   await sendEmail(to, subject, text, html);
 };
