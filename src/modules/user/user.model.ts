@@ -46,6 +46,10 @@ const userSchema = new mongoose.Schema<IUserDoc, IUserModel>(
       type: Boolean,
       default: false,
     },
+    language: {
+      type: String,
+      default: 'en',
+    },
   },
   {
     timestamps: true,
