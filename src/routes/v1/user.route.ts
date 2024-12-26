@@ -8,15 +8,16 @@ const router: Router = express.Router();
 
 router
   .route('/')
+  .get(auth('getUsers'), validate(userValidation.getUsers), userController.getUsers)
   .post(auth('manageUsers'), validate(userValidation.createUser), userController.createUser)
-  .get(auth('getUsers'), validate(userValidation.getUsers), userController.getUsers);
+  .patch(auth(), isOwner, validate(userValidation.updateUser), userController.updateUser);
 
 router.route('/me').get(auth(), userController.getCurrentUser);
 
 router
   .route('/:userId')
   .get(auth('getUsers'), validate(userValidation.getUser), userController.getUser)
-  .patch(auth(), isOwner, validate(userValidation.updateUserById), userController.updateUserById)
+  .patch(auth('manageUsers'), validate(userValidation.updateUserById), userController.updateUserById)
   .delete(auth('manageUsers'), validate(userValidation.deleteUser), userController.deleteUser);
 
 export default router;

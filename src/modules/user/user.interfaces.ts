@@ -9,6 +9,7 @@ export interface IUser {
   role: string;
   isEmailVerified: boolean;
   language?: string;
+  isActive?: boolean;
 }
 
 export interface IUserDoc extends IUser, Document {
@@ -22,9 +23,9 @@ export interface IUserModel extends Model<IUserDoc> {
 
 export type UpdateUserBody = Partial<IUser>;
 
-export type NewRegisteredUser = Omit<IUser, 'role' | 'isEmailVerified' | 'language'>;
+export type NewRegisteredUser = Omit<IUser, 'role' | 'isEmailVerified' | 'language' | 'isActive'>;
 
-export type NewCreatedUser = Omit<IUser, 'isEmailVerified' | 'language'>;
+export type NewCreatedUser = Omit<IUser, 'isEmailVerified' | 'language' | 'isActive'>;
 
 export interface IUserWithTokens {
   user: IUserDoc;

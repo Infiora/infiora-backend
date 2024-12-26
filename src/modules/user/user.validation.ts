@@ -39,6 +39,22 @@ export const updateUserById = {
       email: Joi.string().email(),
       password: Joi.string().custom(password),
       name: Joi.string(),
+      role: Joi.string().valid('user', 'admin'),
+      language: Joi.string(),
+      isActive: Joi.boolean(),
+    })
+    .min(1),
+};
+
+export const updateUser = {
+  params: Joi.object().keys({
+    userId: Joi.required().custom(objectId),
+  }),
+  body: Joi.object()
+    .keys({
+      email: Joi.string().email(),
+      password: Joi.string().custom(password),
+      name: Joi.string(),
       language: Joi.string(),
     })
     .min(1),

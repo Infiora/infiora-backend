@@ -11,7 +11,7 @@ router
   .post(auth('manageTags'), validate(tagValidation.createTag), tagController.createTag)
   .get(auth(), isOwner, validate(tagValidation.getTags), tagController.getTags);
 
-router.route('/export-csv').get(auth('getTags'), validate(tagValidation.exportTags), tagController.exportTags);
+router.route('/export').get(auth('getTags'), validate(tagValidation.exportTags), tagController.exportTags);
 router.route('/link/:tagId').post(auth(), validate(tagValidation.linkTag), tagController.linkTag);
 router.route('/unlink/:tagId').post(auth(), validate(tagValidation.unlinkTag), isTagOwner, tagController.unlinkTag);
 

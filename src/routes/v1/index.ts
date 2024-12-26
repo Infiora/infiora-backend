@@ -6,6 +6,7 @@ import ticketRoute from './ticket.route';
 import batchRoute from './batch.route';
 import tagRoute from './tag.route';
 import hotelRoute from './hotel.route';
+import roomRoute from './room.route';
 import config from '../../config/config';
 
 const router = express.Router();
@@ -39,6 +40,10 @@ const defaultIRoute: IRoute[] = [
   {
     path: '/hotels',
     route: hotelRoute,
+  },
+  {
+    path: '/rooms',
+    route: roomRoute,
   },
 ];
 

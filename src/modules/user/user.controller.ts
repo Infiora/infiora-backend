@@ -39,6 +39,12 @@ export const updateUserById = catchAsync(async (req: Request, res: Response) => 
   res.send(user);
 });
 
+export const updateUser = catchAsync(async (req: Request, res: Response) => {
+  const userId = req.user.id;
+  const user = await userService.updateUserById(userId, req.body);
+  res.send(user);
+});
+
 export const deleteUser = catchAsync(async (req: Request, res: Response) => {
   const userId = toObjectId(req.params['userId']);
   await userService.deleteUserById(userId);

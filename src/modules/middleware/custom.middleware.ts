@@ -3,6 +3,7 @@ import httpStatus from 'http-status';
 import { ApiError } from '../errors';
 import { Hotel } from '../hotel';
 import Tag from '../tag/tag.model';
+import { Room } from '../room';
 
 const isAdmin = (reqUser: any): boolean => {
   return reqUser.role === 'admin';
@@ -33,6 +34,16 @@ export const isOwner = (req: Request, _res: Response, next: NextFunction): void 
   return next(new ApiError(httpStatus.FORBIDDEN, 'Forbidden'));
 };
 
+export const isTagOwner = async (req: Request, _res: Response, next: NextFunction) => {
+  try {
+    const tag = await Tag.findById(req.params['tagId']).populate('user');
+    if (!isAdmin(req.user)) await validateOwnership(req.user, tag?.user);
+    return next();
+  } catch (error) {
+    return next(error);
+  }
+};
+
 export const isHotelOwner = async (req: Request, _res: Response, next: NextFunction): Promise<void> => {
   try {
     const hotel = await Hotel.findById(req.params['hotelId']).populate('user');
@@ -44,10 +55,11 @@ export const isHotelOwner = async (req: Request, _res: Response, next: NextFunct
   }
 };
 
-export const isTagOwner = async (req: Request, _res: Response, next: NextFunction) => {
+export const isRoomOwner = async (req: Request, _res: Response, next: NextFunction): Promise<void> => {
   try {
-    const tag = await Tag.findById(req.params['tagId']).populate('user');
-    if (!isAdmin(req.user)) await validateOwnership(req.user, tag?.user);
+    const room: any = await Room.findById(req.params['roomId']).populate('hotel.user');
+
+    await validateOwnership(req.user, room?.hotel?.user);
     return next();
   } catch (error) {
     return next(error);
