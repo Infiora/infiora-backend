@@ -5,28 +5,35 @@ import { tokenService } from '../token';
 import { userService } from '../user';
 import * as authService from './auth.service';
 import { emailService } from '../email';
+import config from '../../config/config';
 
 export const register = catchAsync(async (req: Request, res: Response) => {
-  const user = await userService.registerUser(req.body);
+  const user = await userService.createUser(req.body);
   const tokens = await tokenService.generateAuthTokens(user);
-  res.status(httpStatus.CREATED).send({ user, tokens });
+  res.cookie('accessToken', tokens.access.token, config.jwt.cookieOptions);
+  res.cookie('refreshToken', tokens.refresh.token, config.jwt.cookieOptions);
+  res.status(httpStatus.CREATED).send(user);
 });
 
 export const login = catchAsync(async (req: Request, res: Response) => {
   const { email, password } = req.body;
   const user = await authService.loginUserWithEmailAndPassword(email, password);
   const tokens = await tokenService.generateAuthTokens(user);
-  res.send({ user, tokens });
+  res.cookie('accessToken', tokens.access.token, config.jwt.cookieOptions);
+  res.cookie('refreshToken', tokens.refresh.token, config.jwt.cookieOptions);
+  res.send(user);
 });
 
 export const logout = catchAsync(async (req: Request, res: Response) => {
-  await authService.logout(req.body.refreshToken);
+  await authService.logout((req.signedCookies as any).refreshToken);
   res.status(httpStatus.NO_CONTENT).send();
 });
 
 export const refreshTokens = catchAsync(async (req: Request, res: Response) => {
-  const userWithTokens = await authService.refreshAuth(req.body.refreshToken);
-  res.send({ ...userWithTokens });
+  const { tokens } = await authService.refreshAuth((req.signedCookies as any).refreshToken);
+  res.cookie('accessToken', tokens.access.token, config.jwt.cookieOptions);
+  res.cookie('refreshToken', tokens.refresh.token, config.jwt.cookieOptions);
+  res.status(httpStatus.NO_CONTENT).send();
 });
 
 export const forgotPassword = catchAsync(async (req: Request, res: Response) => {

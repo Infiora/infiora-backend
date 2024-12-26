@@ -14,7 +14,7 @@ export const createTicket = {
 
 export const getTickets = {
   query: Joi.object().keys({
-    user: Joi.string(),
+    user: Joi.custom(objectId),
     sortBy: Joi.string(),
     projectBy: Joi.string(),
     limit: Joi.number().integer(),
@@ -24,11 +24,11 @@ export const getTickets = {
 
 export const getTicket = {
   params: Joi.object().keys({
-    ticketId: Joi.string().custom(objectId),
+    ticketId: Joi.required().custom(objectId),
   }),
 };
 
-export const updateTicketById = {
+export const updateTicket = {
   params: Joi.object().keys({
     ticketId: Joi.required().custom(objectId),
   }),
@@ -39,6 +39,6 @@ export const updateTicketById = {
 
 export const deleteTicket = {
   params: Joi.object().keys({
-    ticketId: Joi.string().custom(objectId),
+    ticketId: Joi.required().custom(objectId),
   }),
 };

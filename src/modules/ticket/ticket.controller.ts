@@ -31,7 +31,7 @@ export const getTicket = catchAsync(async (req: Request, res: Response) => {
   }
 });
 
-export const updateTicketById = catchAsync(async (req: Request, res: Response) => {
+export const updateTicket = catchAsync(async (req: Request, res: Response) => {
   if (typeof req.params['ticketId'] === 'string') {
     const ticket = await ticketService.updateTicketById(new mongoose.Types.ObjectId(req.params['ticketId']), req.body);
     res.send(ticket);

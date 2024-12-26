@@ -4,10 +4,19 @@ import config from '../../config/config';
 import User from '../user/user.model';
 import { IPayload } from '../token/token.interfaces';
 
+const cookieExtractor = (req: any) => {
+  let token = null;
+  if (req && req.signedCookies) {
+    token = req.signedCookies.accessToken;
+  }
+
+  return token;
+};
+
 const jwtStrategy = new JwtStrategy(
   {
     secretOrKey: config.jwt.secret,
-    jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
+    jwtFromRequest: cookieExtractor || ExtractJwt.fromAuthHeaderAsBearerToken(),
   },
   async (payload: IPayload, done) => {
     try {

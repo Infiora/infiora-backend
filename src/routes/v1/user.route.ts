@@ -16,7 +16,7 @@ router.route('/me').get(auth(), userController.getCurrentUser);
 router
   .route('/:userId')
   .get(auth('getUsers'), validate(userValidation.getUser), userController.getUser)
-  .patch(auth(), isOwner, validate(userValidation.updateUser), userController.updateUser)
+  .patch(auth(), isOwner, validate(userValidation.updateUserById), userController.updateUserById)
   .delete(auth('manageUsers'), validate(userValidation.deleteUser), userController.deleteUser);
 
 export default router;

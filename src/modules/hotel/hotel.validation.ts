@@ -28,13 +28,13 @@ export const getHotel = {
   }),
 };
 
-export const updateHotelById = {
+export const updateHotel = {
   params: Joi.object().keys({
     hotelId: Joi.required().custom(objectId),
   }),
   body: Joi.object().keys({
     name: Joi.string(),
-    isActive: Joi.string(),
+    isActive: Joi.boolean(),
   }),
 };
 

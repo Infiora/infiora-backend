@@ -9,7 +9,7 @@ const verifyCallback =
   (req: Request, resolve: any, reject: any, requiredRights: string[]) =>
   async (err: Error, user: IUserDoc, info: string) => {
     if (err || info || !user) {
-      return reject(new ApiError(httpStatus.UNAUTHORIZED, 'Please authenticate'));
+      return reject(new ApiError(httpStatus.UNAUTHORIZED, 'Your session has expired, please log in again.'));
     }
     req.user = user;
 

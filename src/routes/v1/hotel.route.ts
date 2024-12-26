@@ -14,7 +14,7 @@ router
 router
   .route('/:hotelId')
   .get(auth(), isHotelOwner, validate(hotelValidation.getHotel), hotelController.getHotel)
-  .patch(auth(), isHotelOwner, validate(hotelValidation.updateHotelById), hotelController.updateHotelById)
+  .patch(auth(), isHotelOwner, validate(hotelValidation.updateHotel), hotelController.updateHotel)
   .delete(auth('manageHotels'), validate(hotelValidation.deleteHotel), hotelController.deleteHotel);
 
 export default router;

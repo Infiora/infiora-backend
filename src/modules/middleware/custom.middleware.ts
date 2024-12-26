@@ -2,6 +2,7 @@ import { Request, Response, NextFunction } from 'express';
 import httpStatus from 'http-status';
 import { ApiError } from '../errors';
 import { Hotel } from '../hotel';
+import Tag from '../tag/tag.model';
 
 const isAdmin = (reqUser: any): boolean => {
   return reqUser.role === 'admin';
@@ -37,6 +38,16 @@ export const isHotelOwner = async (req: Request, _res: Response, next: NextFunct
     const hotel = await Hotel.findById(req.params['hotelId']).populate('user');
 
     await validateOwnership(req.user, hotel?.user);
+    return next();
+  } catch (error) {
+    return next(error);
+  }
+};
+
+export const isTagOwner = async (req: Request, _res: Response, next: NextFunction) => {
+  try {
+    const tag = await Tag.findById(req.params['tagId']).populate('user');
+    if (!isAdmin(req.user)) await validateOwnership(req.user, tag?.user);
     return next();
   } catch (error) {
     return next(error);

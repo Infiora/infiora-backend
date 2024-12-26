@@ -28,7 +28,7 @@ export const createHotel = catchAsync(async (req: Request, res: Response) => {
   res.status(httpStatus.CREATED).send(hotel);
 });
 
-export const updateHotelById = catchAsync(async (req: Request, res: Response) => {
+export const updateHotel = catchAsync(async (req: Request, res: Response) => {
   const hotelId = toObjectId(req.params['hotelId']);
   const hotel = await hotelService.updateHotelById(hotelId, req.body);
   res.send(hotel);

@@ -3,31 +3,7 @@ import mongoose from 'mongoose';
 import User from './user.model';
 import ApiError from '../errors/ApiError';
 import { IOptions, QueryResult } from '../paginate/paginate';
-import { NewCreatedUser, UpdateUserBody, IUserDoc, NewRegisteredUser } from './user.interfaces';
-
-/**
- * Create a user
- * @param {NewCreatedUser} userBody
- * @returns {Promise<IUserDoc>}
- */
-export const createUser = async (userBody: NewCreatedUser): Promise<IUserDoc> => {
-  if (await User.isEmailTaken(userBody.email)) {
-    throw new ApiError(httpStatus.BAD_REQUEST, 'Email already taken');
-  }
-  return User.create(userBody);
-};
-
-/**
- * Register a user
- * @param {NewRegisteredUser} userBody
- * @returns {Promise<IUserDoc>}
- */
-export const registerUser = async (userBody: NewRegisteredUser): Promise<IUserDoc> => {
-  if (await User.isEmailTaken(userBody.email)) {
-    throw new ApiError(httpStatus.BAD_REQUEST, 'Email already taken');
-  }
-  return User.create(userBody);
-};
+import { NewCreatedUser, UpdateUserBody, IUserDoc } from './user.interfaces';
 
 /**
  * Query for users
@@ -53,6 +29,18 @@ export const getUserById = async (id: mongoose.Types.ObjectId): Promise<IUserDoc
  * @returns {Promise<IUserDoc | null>}
  */
 export const getUserByEmail = async (email: string): Promise<IUserDoc | null> => User.findOne({ email });
+
+/**
+ * Create a user
+ * @param {NewCreatedUser} userBody
+ * @returns {Promise<IUserDoc>}
+ */
+export const createUser = async (userBody: NewCreatedUser): Promise<IUserDoc> => {
+  if (await User.isEmailTaken(userBody.email)) {
+    throw new ApiError(httpStatus.BAD_REQUEST, 'Email already taken');
+  }
+  return User.create(userBody);
+};
 
 /**
  * Update user by id

@@ -15,7 +15,7 @@ export const createUser = {
 
 export const getUsers = {
   query: Joi.object().keys({
-    name: Joi.string(),
+    search: Joi.string(),
     role: Joi.string(),
     sortBy: Joi.string(),
     projectBy: Joi.string(),
@@ -26,11 +26,11 @@ export const getUsers = {
 
 export const getUser = {
   params: Joi.object().keys({
-    userId: Joi.string().custom(objectId),
+    userId: Joi.required().custom(objectId),
   }),
 };
 
-export const updateUser = {
+export const updateUserById = {
   params: Joi.object().keys({
     userId: Joi.required().custom(objectId),
   }),
@@ -46,6 +46,6 @@ export const updateUser = {
 
 export const deleteUser = {
   params: Joi.object().keys({
-    userId: Joi.string().custom(objectId),
+    userId: Joi.required().custom(objectId),
   }),
 };

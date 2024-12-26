@@ -13,7 +13,7 @@ router
 router
   .route('/:ticketId')
   .get(auth('getTickets'), validate(ticketValidation.getTicket), ticketController.getTicket)
-  .patch(auth('manageTickets'), validate(ticketValidation.updateTicketById), ticketController.updateTicketById)
+  .patch(auth('manageTickets'), validate(ticketValidation.updateTicket), ticketController.updateTicket)
   .delete(auth('manageTickets'), validate(ticketValidation.deleteTicket), ticketController.deleteTicket);
 
 export default router;
