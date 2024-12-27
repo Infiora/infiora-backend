@@ -24,15 +24,13 @@ export const getLink = catchAsync(async (req: Request, res: Response) => {
 });
 
 export const createLink = catchAsync(async (req: Request, res: Response) => {
-  const file = req.file as Express.Multer.File;
-  const link = await linkService.createLink(req.body, file);
+  const link = await linkService.createLink(req.body);
   res.status(httpStatus.CREATED).send(link);
 });
 
 export const updateLink = catchAsync(async (req: Request, res: Response) => {
   const linkId = toObjectId(req.params['linkId']);
-  const file = req.file as Express.Multer.File;
-  const link = await linkService.updateLinkById(linkId, req.body, file);
+  const link = await linkService.updateLinkById(linkId, req.body);
   res.send(link);
 });
 

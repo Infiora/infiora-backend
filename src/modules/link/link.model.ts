@@ -15,10 +15,7 @@ const linkSchema = new mongoose.Schema<ILinkDoc, ILinkModel>(
       ref: 'Group',
     },
     title: String,
-    image: String,
-    description: String,
     url: String,
-    price: String,
     isActive: { type: Boolean, default: true },
   },
   {
