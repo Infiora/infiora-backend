@@ -3,13 +3,15 @@ import { QueryResult } from '../paginate/paginate';
 
 export interface IRoom {
   hotel: ObjectId;
-  number: string;
+  number?: string;
   name?: string;
   description?: string;
   type?: string;
   capacity?: number;
   amenities?: string[];
-  pricePerNight?: string;
+  price?: string;
+  layout?: string;
+  theme?: string;
   images?: string[];
   isActive?: boolean;
 }

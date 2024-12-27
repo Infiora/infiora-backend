@@ -12,7 +12,6 @@ const roomSchema = new mongoose.Schema<IRoomDoc, IRoomModel>(
     },
     number: {
       type: String,
-      required: true,
     },
     name: {
       type: String,
@@ -29,7 +28,13 @@ const roomSchema = new mongoose.Schema<IRoomDoc, IRoomModel>(
     amenities: {
       type: [String],
     },
-    pricePerNight: {
+    price: {
+      type: String,
+    },
+    theme: {
+      type: String,
+    },
+    layout: {
       type: String,
     },
     images: {

@@ -5,12 +5,14 @@ import { NewCreatedRoom } from './room.interfaces';
 const createRoomBody: Record<keyof NewCreatedRoom, any> = {
   hotel: Joi.custom(objectId),
   number: Joi.string(),
-  name: Joi.string(),
+  name: Joi.string().allow(null, ''),
   description: Joi.string().allow(null, ''),
-  type: Joi.string(),
-  capacity: Joi.number(),
+  type: Joi.string().allow(null, ''),
+  capacity: Joi.number().allow(null, ''),
   amenities: Joi.array().items(Joi.string()),
-  pricePerNight: Joi.string(),
+  price: Joi.string().allow(null, ''),
+  theme: Joi.string().allow(null, ''),
+  layout: Joi.string().allow(null, ''),
   images: Joi.any(),
 };
 
@@ -41,12 +43,14 @@ export const updateRoom = {
   }),
   body: Joi.object().keys({
     number: Joi.string(),
-    name: Joi.string(),
-    description: Joi.string(),
-    type: Joi.string(),
-    capacity: Joi.number(),
+    name: Joi.string().allow(null, ''),
+    description: Joi.string().allow(null, ''),
+    type: Joi.string().allow(null, ''),
+    capacity: Joi.number().allow(null, ''),
     amenities: Joi.array().items(Joi.string()),
-    pricePerNight: Joi.string(),
+    price: Joi.string().allow(null, ''),
+    theme: Joi.string().allow(null, ''),
+    layout: Joi.string().allow(null, ''),
     images: Joi.any(),
   }),
 };
