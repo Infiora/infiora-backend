@@ -4,6 +4,7 @@ import Hotel from './hotel.model';
 import ApiError from '../errors/ApiError';
 import { NewCreatedHotel, UpdateHotelBody, IHotelDoc } from './hotel.interfaces';
 import { IOptions, QueryResult } from '../paginate/paginate';
+import { uploadToS3 } from '../utils/awsS3Utils';
 
 /**
  * Query for hotels
@@ -26,28 +27,34 @@ export const getHotelById = async (id: mongoose.Types.ObjectId): Promise<IHotelD
 /**
  * Create a hotel
  * @param {NewCreatedHotel} hotelBody
+ * @param {Express.Multer.File} file
  * @returns {Promise<IHotelDoc>}
  */
-export const createHotel = async (hotelBody: NewCreatedHotel): Promise<IHotelDoc> => {
-  return Hotel.create(hotelBody);
+export const createHotel = async (hotelBody: NewCreatedHotel, file?: Express.Multer.File): Promise<IHotelDoc> => {
+  const body = { ...hotelBody };
+  if (file) body.image = await uploadToS3(file, 'hotel');
+  return Hotel.create(body);
 };
 
 /**
  * Update hotel by id
  * @param {mongoose.Types.ObjectId} hotelId
- * @param {UpdateHotelBody} updateBody
+ * @param {UpdateHotelBody} hotelBody
+ * @param {Express.Multer.File} file
  * @returns {Promise<IHotelDoc | null>}
  */
 export const updateHotelById = async (
   hotelId: mongoose.Types.ObjectId,
-  updateBody: UpdateHotelBody
+  hotelBody: UpdateHotelBody,
+  file?: Express.Multer.File
 ): Promise<IHotelDoc | null> => {
+  const body = { ...hotelBody };
   const hotel = await getHotelById(hotelId);
   if (!hotel) {
     throw new ApiError(httpStatus.NOT_FOUND, 'Hotel not found');
   }
-
-  Object.assign(hotel, updateBody);
+  if (file) body.image = await uploadToS3(file, 'hotel');
+  Object.assign(hotel, body);
   await hotel.save();
   return hotel;
 };

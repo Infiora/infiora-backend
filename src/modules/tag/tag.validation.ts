@@ -14,7 +14,7 @@ export const getTags = {
   query: Joi.object().keys({
     search: Joi.string(),
     batch: Joi.custom(objectId),
-    user: Joi.custom(objectId),
+    room: Joi.custom(objectId),
     sortBy: Joi.string(),
     projectBy: Joi.string(),
     limit: Joi.number().integer(),
@@ -49,7 +49,7 @@ export const linkTag = {
     tagId: Joi.required().custom(objectId),
   }),
   body: Joi.object().keys({
-    user: Joi.required().custom(objectId),
+    room: Joi.required().custom(objectId),
     type: Joi.string(),
   }),
 };
@@ -63,6 +63,6 @@ export const unlinkTag = {
 export const exportTags = {
   query: Joi.object().keys({
     batch: Joi.custom(objectId),
-    user: Joi.custom(objectId),
+    room: Joi.custom(objectId),
   }),
 };

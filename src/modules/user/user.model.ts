@@ -5,6 +5,7 @@ import toJSON from '../toJSON/toJSON';
 import paginate from '../paginate/paginate';
 import { roles } from '../../config/roles';
 import { IUserDoc, IUserModel } from './user.interfaces';
+import { Hotel } from '../hotel';
 
 const userSchema = new mongoose.Schema<IUserDoc, IUserModel>(
   {
@@ -91,6 +92,12 @@ userSchema.pre('save', async function (next) {
     user.password = await bcrypt.hash(user.password, 8);
   }
   next();
+});
+
+userSchema.pre('deleteOne', { document: true, query: false }, async function () {
+  const user = this;
+  const hotels = await Hotel.find({ user: user._id });
+  await Promise.all(hotels.map((h) => h.deleteOne()));
 });
 
 const User = mongoose.model<IUserDoc, IUserModel>('User', userSchema);

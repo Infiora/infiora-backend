@@ -11,9 +11,9 @@ const tagSchema = new mongoose.Schema<ITagDoc, ITagModel>(
       required: true,
       ref: 'Batch',
     },
-    user: {
+    room: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: 'User',
+      ref: 'Room',
     },
     name: {
       type: String,

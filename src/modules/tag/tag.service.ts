@@ -74,7 +74,7 @@ export const linkTagById = async (tagId: mongoose.Types.ObjectId, body: any): Pr
   if (!tag) {
     throw new ApiError(httpStatus.NOT_FOUND, 'Tag not found');
   }
-  if (tag.user) {
+  if (tag.room) {
     throw new ApiError(httpStatus.NOT_FOUND, 'This device is already activated.');
   }
   if (!tag.isActive) {

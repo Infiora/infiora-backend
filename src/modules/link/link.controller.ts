@@ -8,7 +8,11 @@ import { IOptions } from '../paginate/paginate';
 import { toObjectId } from '../utils/mongoUtils';
 
 export const getLinks = catchAsync(async (req: Request, res: Response) => {
-  const filter = { ...match(req.query, ['room', 'group', 'title']) };
+  const { room, group } = pick(req.query, ['room', 'group']);
+  const filter = {
+    $or: [room && { room }, group && { group }].filter(Boolean),
+    ...match(req.query, ['title']),
+  };
   const options: IOptions = pick(req.query, ['sortBy', 'limit', 'page', 'projectBy']);
   const result = await linkService.queryLinks(filter, options);
   res.send(result);

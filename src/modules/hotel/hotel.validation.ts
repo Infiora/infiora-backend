@@ -3,8 +3,10 @@ import { objectId } from '../validate/custom.validation';
 import { NewCreatedHotel } from './hotel.interfaces';
 
 const createHotelBody: Record<keyof NewCreatedHotel, any> = {
-  user: Joi.required().custom(objectId),
+  user: Joi.custom(objectId),
   name: Joi.string(),
+  description: Joi.string(),
+  image: Joi.any(),
 };
 
 export const createHotel = {
@@ -34,6 +36,8 @@ export const updateHotel = {
   }),
   body: Joi.object().keys({
     name: Joi.string(),
+    description: Joi.string(),
+    image: Joi.any(),
     isActive: Joi.boolean(),
   }),
 };

@@ -14,7 +14,7 @@ router
 
 router
   .route('/:roomId')
-  .get(auth(), validate(roomValidation.getRoom), roomController.getRoom)
+  .get(validate(roomValidation.getRoom), roomController.getRoom)
   .patch(
     auth(),
     isRoomOwner,

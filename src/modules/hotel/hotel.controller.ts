@@ -24,13 +24,15 @@ export const getHotel = catchAsync(async (req: Request, res: Response) => {
 });
 
 export const createHotel = catchAsync(async (req: Request, res: Response) => {
-  const hotel = await hotelService.createHotel(req.body);
+  const file = req.file as Express.Multer.File;
+  const hotel = await hotelService.createHotel(req.body, file);
   res.status(httpStatus.CREATED).send(hotel);
 });
 
 export const updateHotel = catchAsync(async (req: Request, res: Response) => {
   const hotelId = toObjectId(req.params['hotelId']);
-  const hotel = await hotelService.updateHotelById(hotelId, req.body);
+  const file = req.file as Express.Multer.File;
+  const hotel = await hotelService.updateHotelById(hotelId, req.body, file);
   res.send(hotel);
 });
 

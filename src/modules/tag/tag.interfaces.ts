@@ -3,7 +3,7 @@ import { QueryResult } from '../paginate/paginate';
 
 export interface ITag {
   batch: ObjectId;
-  user?: ObjectId;
+  room?: ObjectId;
   name?: string;
   url?: string;
   type?: string;
@@ -18,4 +18,4 @@ export interface ITagModel extends Model<ITagDoc> {
 
 export type UpdateTagBody = Partial<ITag>;
 
-export type NewCreatedTag = Omit<ITag, 'user' | 'name' | 'url' | 'isActive' | 'type'>;
+export type NewCreatedTag = Omit<ITag, 'room' | 'name' | 'url' | 'isActive' | 'type'>;

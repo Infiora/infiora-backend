@@ -5,6 +5,7 @@ import { Hotel } from '../hotel';
 import Tag from '../tag/tag.model';
 import { Room } from '../room';
 import { Link } from '../link';
+import { Group } from '../group';
 
 const isAdmin = (reqUser: any): boolean => {
   return reqUser.role === 'admin';
@@ -91,6 +92,16 @@ export const isLinkOwner = async (req: Request, _res: Response, next: NextFuncti
     ]);
 
     await validateOwnership(req.user, link?.room?.hotel?.user || link?.group?.hotel?.user);
+    return next();
+  } catch (error) {
+    return next(error);
+  }
+};
+
+export const isGroupOwner = async (req: Request, _res: Response, next: NextFunction): Promise<void> => {
+  try {
+    const group: any = await Group.findById(req.params['groupId']).populate('hotel');
+    await validateOwnership(req.user, group?.hotel?.user);
     return next();
   } catch (error) {
     return next(error);

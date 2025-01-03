@@ -1,10 +1,9 @@
 import Joi from 'joi';
 import { objectId } from '../validate/custom.validation';
-import { NewCreatedRoom } from './room.interfaces';
+import { NewCreatedGroup } from './group.interfaces';
 
-const createRoomBody: Record<keyof NewCreatedRoom, any> = {
+const createGroupBody: Record<keyof NewCreatedGroup, any> = {
   hotel: Joi.custom(objectId),
-  number: Joi.string(),
   name: Joi.string().allow(null, ''),
   description: Joi.string().allow(null, ''),
   type: Joi.string().allow(null, ''),
@@ -16,11 +15,11 @@ const createRoomBody: Record<keyof NewCreatedRoom, any> = {
   images: Joi.any(),
 };
 
-export const createRoom = {
-  body: Joi.object().keys(createRoomBody),
+export const createGroup = {
+  body: Joi.object().keys(createGroupBody),
 };
 
-export const getRooms = {
+export const getGroups = {
   query: Joi.object().keys({
     hotel: Joi.custom(objectId),
     search: Joi.string(),
@@ -31,15 +30,15 @@ export const getRooms = {
   }),
 };
 
-export const getRoom = {
+export const getGroup = {
   params: Joi.object().keys({
-    roomId: Joi.required().custom(objectId),
+    groupId: Joi.required().custom(objectId),
   }),
 };
 
-export const updateRoom = {
+export const updateGroup = {
   params: Joi.object().keys({
-    roomId: Joi.required().custom(objectId),
+    groupId: Joi.required().custom(objectId),
   }),
   body: Joi.object().keys({
     number: Joi.string(),
@@ -52,12 +51,11 @@ export const updateRoom = {
     theme: Joi.string().allow(null, ''),
     layout: Joi.string().allow(null, ''),
     images: Joi.any(),
-    group: Joi.custom(objectId).allow(null, ''),
   }),
 };
 
-export const deleteRoom = {
+export const deleteGroup = {
   params: Joi.object().keys({
-    roomId: Joi.required().custom(objectId),
+    groupId: Joi.required().custom(objectId),
   }),
 };

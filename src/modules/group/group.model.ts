@@ -1,18 +1,15 @@
 import mongoose from 'mongoose';
 import toJSON from '../toJSON/toJSON';
 import paginate from '../paginate/paginate';
-import { IRoomDoc, IRoomModel } from './room.interfaces';
+import { IGroupDoc, IGroupModel } from './group.interfaces';
 import { Link } from '../link';
 
-const roomSchema = new mongoose.Schema<IRoomDoc, IRoomModel>(
+const groupSchema = new mongoose.Schema<IGroupDoc, IGroupModel>(
   {
     hotel: {
       type: mongoose.Schema.Types.ObjectId,
       required: true,
       ref: 'Hotel',
-    },
-    number: {
-      type: String,
     },
     name: {
       type: String,
@@ -45,10 +42,6 @@ const roomSchema = new mongoose.Schema<IRoomDoc, IRoomModel>(
       type: Boolean,
       default: true,
     },
-    group: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: 'Group',
-    },
   },
   {
     timestamps: true,
@@ -56,16 +49,16 @@ const roomSchema = new mongoose.Schema<IRoomDoc, IRoomModel>(
 );
 
 // Add plugins to the schema
-roomSchema.plugin(toJSON);
-roomSchema.plugin(paginate);
+groupSchema.plugin(toJSON);
+groupSchema.plugin(paginate);
 
-roomSchema.pre('deleteOne', { document: true, query: false }, async function () {
-  const room = this;
-  const links = await Link.find({ room: room._id });
+groupSchema.pre('deleteOne', { document: true, query: false }, async function () {
+  const group = this;
+  const links = await Link.find({ group: group._id });
   await Promise.all(links.map((l) => l.deleteOne()));
 });
 
 // Create the model
-const Room = mongoose.model<IRoomDoc, IRoomModel>('Room', roomSchema);
+const Group = mongoose.model<IGroupDoc, IGroupModel>('Group', groupSchema);
 
-export default Room;
+export default Group;

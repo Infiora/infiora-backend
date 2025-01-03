@@ -8,6 +8,7 @@ import tagRoute from './tag.route';
 import hotelRoute from './hotel.route';
 import roomRoute from './room.route';
 import linkRoute from './link.route';
+import groupRoute from './group.route';
 import config from '../../config/config';
 
 const router = express.Router();
@@ -49,6 +50,10 @@ const defaultIRoute: IRoute[] = [
   {
     path: '/links',
     route: linkRoute,
+  },
+  {
+    path: '/groups',
+    route: groupRoute,
   },
 ];
 

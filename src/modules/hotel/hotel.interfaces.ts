@@ -4,6 +4,8 @@ import { QueryResult } from '../paginate/paginate';
 export interface IHotel {
   user: ObjectId;
   name?: string;
+  description?: string;
+  image?: string;
   isActive?: boolean;
 }
 

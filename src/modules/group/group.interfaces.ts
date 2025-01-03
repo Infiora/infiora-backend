@@ -2,9 +2,8 @@ import { Model, Document } from 'mongoose';
 import { QueryResult } from '../paginate/paginate';
 import { IHotelDoc } from '../hotel/hotel.interfaces';
 
-export interface IRoom {
+export interface IGroup {
   hotel: IHotelDoc;
-  number?: string;
   name?: string;
   description?: string;
   type?: string;
@@ -15,20 +14,19 @@ export interface IRoom {
   theme?: string;
   images?: string[];
   isActive?: boolean;
-  group?: any;
 }
 
-export interface IRoomDoc extends IRoom, Document {}
+export interface IGroupDoc extends IGroup, Document {}
 
-export interface IRoomModel extends Model<IRoomDoc> {
+export interface IGroupModel extends Model<IGroupDoc> {
   paginate(filter: Record<string, any>, options: Record<string, any>): Promise<QueryResult>;
 }
 
-export type UpdateRoomBody = Partial<IRoom>;
+export type UpdateGroupBody = Partial<IGroup>;
 
-export type NewCreatedRoom = Omit<IRoom, 'isActive' | 'group'>;
+export type NewCreatedGroup = Omit<IGroup, 'isActive'>;
 
-export const roomPopulate = [
+export const groupPopulate = [
   {
     path: 'hotel',
   },

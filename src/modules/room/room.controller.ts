@@ -16,7 +16,8 @@ export const getRooms = catchAsync(async (req: Request, res: Response) => {
 
 export const getRoom = catchAsync(async (req: Request, res: Response) => {
   const roomId = toObjectId(req.params['roomId']);
-  const room = await roomService.getRoomById(roomId);
+  const { action } = pick(req.query, ['action']);
+  const room = await roomService.getRoom(roomId, action);
   if (!room) {
     throw new ApiError(httpStatus.NOT_FOUND, 'Room not found');
   }
