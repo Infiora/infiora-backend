@@ -6,6 +6,8 @@ import * as linkService from './link.service';
 import { pick, match } from '../utils';
 import { IOptions } from '../paginate/paginate';
 import { toObjectId } from '../utils/mongoUtils';
+import { Activity } from '../activity';
+import Room from '../room/room.model';
 
 export const getLinks = catchAsync(async (req: Request, res: Response) => {
   const { room, group } = pick(req.query, ['room', 'group']);
@@ -23,6 +25,23 @@ export const getLink = catchAsync(async (req: Request, res: Response) => {
   const link = await linkService.getLinkById(linkId);
   if (!link) {
     throw new ApiError(httpStatus.NOT_FOUND, 'Link not found');
+  }
+  const { room: roomId } = pick(req.query, ['room']);
+  if (roomId) {
+    const room = await Room.findById(roomId).populate('hotel');
+    if (room) {
+      await Activity.create({
+        user: room.hotel.user,
+        action: 'tap',
+        details: {
+          image: room.hotel.image,
+          title: room.hotel.name,
+          headline: `Room ${room.number}'s ${link.title} was tapped`,
+          room: room.id,
+          link: link.id,
+        },
+      });
+    }
   }
   res.send(link);
 });

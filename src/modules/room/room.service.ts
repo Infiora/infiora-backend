@@ -8,7 +8,7 @@ import { uploadToS3 } from '../utils/awsS3Utils';
 import { removeNullFields, toPopulateString } from '../utils/miscUtils';
 import { tagService } from '../tag';
 import { Activity } from '../activity';
-import { Link } from '../link';
+import Link from '../link/link.model';
 import { reorderItems } from '../utils/arrayUtils';
 
 /**
@@ -37,7 +37,6 @@ export const getRoomById = async (id: mongoose.Types.ObjectId): Promise<IRoomDoc
  * @returns {Promise<any>}
  */
 export const getRoom = async (id: mongoose.Types.ObjectId, action?: string): Promise<any> => {
-  let updatedAction = action;
   let tag;
   let room = await getRoomById(id);
 
@@ -45,7 +44,6 @@ export const getRoom = async (id: mongoose.Types.ObjectId, action?: string): Pro
     tag = await tagService.getTagById(id);
     if (tag && tag.room) {
       room = await getRoomById(new mongoose.Types.ObjectId(`${tag.room}`));
-      updatedAction = 'tap';
     }
   }
 
@@ -53,10 +51,10 @@ export const getRoom = async (id: mongoose.Types.ObjectId, action?: string): Pro
     throw new ApiError(httpStatus.NOT_FOUND, 'Room not found');
   }
 
-  if (updatedAction) {
+  if (action) {
     await Activity.create({
       user: room.hotel.user,
-      action: updatedAction,
+      action,
       details: {
         image: room.hotel.image,
         title: room.hotel.name,

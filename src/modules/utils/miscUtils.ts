@@ -52,3 +52,14 @@ export const toPopulateString = (populate1: any): string => {
   traverse(populate1);
   return paths.join(',');
 };
+
+export const toDate = ({ startDate, endDate }: { startDate?: string; endDate?: string }) => {
+  // Parse and validate the start date
+  const start = startDate && !Number.isNaN(Date.parse(startDate)) ? new Date(startDate) : new Date(2023, 0, 1);
+
+  // Parse and validate the end date
+  const end = endDate && !Number.isNaN(Date.parse(endDate)) ? new Date(endDate) : new Date();
+  end.setHours(23, 59, 59, 999); // Ensure end date is at the end of the day
+
+  return { start, end };
+};

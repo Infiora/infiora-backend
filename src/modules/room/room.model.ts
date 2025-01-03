@@ -2,7 +2,7 @@ import mongoose from 'mongoose';
 import toJSON from '../toJSON/toJSON';
 import paginate from '../paginate/paginate';
 import { IRoomDoc, IRoomModel } from './room.interfaces';
-import { Link } from '../link';
+import Link from '../link/link.model';
 
 const roomSchema = new mongoose.Schema<IRoomDoc, IRoomModel>(
   {
