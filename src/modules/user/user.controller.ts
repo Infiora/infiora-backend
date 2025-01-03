@@ -77,26 +77,24 @@ export const getInsights = catchAsync(async (req: Request, res: Response) => {
     view: {},
   };
 
-  activities
-    .filter((a) => a.details.room)
-    .forEach(({ action, createdAt }) => {
-      const date = new Date(createdAt).toISOString().split('T')[0];
-      if (date && stats[action]) {
-        stats[action]![date] = (stats[action]![date] || 0) + 1;
-      }
-    });
+  activities.forEach(({ action, createdAt }) => {
+    const date = new Date(createdAt).toISOString().split('T')[0];
+    if (date && stats[action]) {
+      stats[action]![date] = (stats[action]![date] || 0) + 1;
+    }
+  });
 
   const updatedLinks = links.map((link) => ({
     ...link.toJSON(),
     taps: activities.reduce((sum, activity) => {
-      return activity.action === 'tap' && activity.details.link.id === link.id ? sum + 1 : sum;
+      return activity.action === 'tap' && activity.details.link === link.id ? sum + 1 : sum;
     }, 0),
   }));
 
   const updatedTags = tags.map((tag) => ({
     ...tag.toJSON(),
-    taps: activities.reduce((sum, activity) => {
-      return activity.action === 'tap' && activity.details.tag.id === tag.id ? sum + 1 : sum;
+    views: activities.reduce((sum, activity) => {
+      return activity.action === 'view' && activity.details.tag === tag.id ? sum + 1 : sum;
     }, 0),
   }));
 

@@ -29,6 +29,9 @@ export const getLink = {
   params: Joi.object().keys({
     linkId: Joi.required().custom(objectId),
   }),
+  query: Joi.object().keys({
+    room: Joi.custom(objectId),
+  }),
 };
 
 export const updateLink = {

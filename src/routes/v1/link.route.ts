@@ -18,7 +18,7 @@ router
 
 router
   .route('/:linkId')
-  .get(auth(), validate(linkValidation.getLink), linkController.getLink)
+  .get(validate(linkValidation.getLink), linkController.getLink)
   .patch(auth(), validate(linkValidation.updateLink), isLinkOwner, multerUpload.array('images'), linkController.updateLink)
   .delete(auth(), validate(linkValidation.deleteLink), isLinkOwner, linkController.deleteLink);
 
