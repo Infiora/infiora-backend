@@ -4,7 +4,6 @@ import Room from './room.model';
 import ApiError from '../errors/ApiError';
 import { NewCreatedRoom, UpdateRoomBody, IRoomDoc, roomPopulate } from './room.interfaces';
 import { IOptions, QueryResult } from '../paginate/paginate';
-import { uploadToS3 } from '../utils/awsS3Utils';
 import { removeNullFields, toPopulateString } from '../utils/miscUtils';
 import { tagService } from '../tag';
 import { Activity } from '../activity';
@@ -75,15 +74,10 @@ export const getRoom = async (id: mongoose.Types.ObjectId, action?: string): Pro
 /**
  * Create a room
  * @param {NewCreatedRoom} roomBody
- * @param {Express.Multer.File[]} files
  * @returns {Promise<IRoomDoc>}
  */
-export const createRoom = async (roomBody: NewCreatedRoom, files?: Express.Multer.File[]): Promise<IRoomDoc> => {
-  const body = { ...roomBody };
-  if (files && files.length > 0) {
-    body.images = await Promise.all(files.map((file) => uploadToS3(file, 'room')));
-  }
-  return Room.create(body).then((t) => t.populate(roomPopulate));
+export const createRoom = async (roomBody: NewCreatedRoom): Promise<IRoomDoc> => {
+  return Room.create(roomBody).then((t) => t.populate(roomPopulate));
 };
 
 /**
@@ -95,18 +89,13 @@ export const createRoom = async (roomBody: NewCreatedRoom, files?: Express.Multe
  */
 export const updateRoomById = async (
   roomId: mongoose.Types.ObjectId,
-  roomBody: UpdateRoomBody,
-  files?: Express.Multer.File[]
+  roomBody: UpdateRoomBody
 ): Promise<IRoomDoc | null> => {
-  const body = { ...roomBody };
   const room = await getRoomById(roomId);
   if (!room) {
     throw new ApiError(httpStatus.NOT_FOUND, 'Room not found');
   }
-  if (files && files.length > 0) {
-    body.images = await Promise.all(files.map((file) => uploadToS3(file, 'room')));
-  }
-  Object.assign(room, body);
+  Object.assign(room, roomBody);
   await room.save().then((t) => t.populate(roomPopulate));
   return room;
 };

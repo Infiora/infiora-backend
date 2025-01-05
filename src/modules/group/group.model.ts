@@ -11,32 +11,23 @@ const groupSchema = new mongoose.Schema<IGroupDoc, IGroupModel>(
       required: true,
       ref: 'Hotel',
     },
-    name: {
+    title: {
       type: String,
+      default: 'Group',
     },
     description: {
       type: String,
     },
-    type: {
-      type: String,
+    background: {
+      color: { type: String },
+      direction: { type: String },
+      type: { type: String },
     },
-    capacity: {
-      type: Number,
-    },
-    amenities: {
-      type: [String],
-    },
-    price: {
-      type: String,
-    },
-    theme: {
-      type: String,
-    },
-    layout: {
-      type: String,
-    },
-    images: {
-      type: [String],
+    button: {
+      color: { type: String },
+      backgroundColor: { type: String },
+      variant: { type: String },
+      borderRadius: { type: String },
     },
     isActive: {
       type: Boolean,

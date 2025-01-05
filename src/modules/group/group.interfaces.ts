@@ -4,15 +4,19 @@ import { IHotelDoc } from '../hotel/hotel.interfaces';
 
 export interface IGroup {
   hotel: IHotelDoc;
-  name?: string;
+  title?: string;
   description?: string;
-  type?: string;
-  capacity?: number;
-  amenities?: string[];
-  price?: string;
-  layout?: string;
-  theme?: string;
-  images?: string[];
+  background?: {
+    color?: string;
+    direction?: string;
+    type?: string;
+  };
+  button?: {
+    color?: string;
+    backgroundColor?: string;
+    variant?: string;
+    borderRadius?: string;
+  };
   isActive?: boolean;
 }
 

@@ -5,15 +5,18 @@ import { NewCreatedRoom } from './room.interfaces';
 const createRoomBody: Record<keyof NewCreatedRoom, any> = {
   hotel: Joi.custom(objectId),
   number: Joi.string(),
-  name: Joi.string().allow(null, ''),
   description: Joi.string().allow(null, ''),
-  type: Joi.string().allow(null, ''),
-  capacity: Joi.number().allow(null, ''),
-  amenities: Joi.array().items(Joi.string()),
-  price: Joi.string().allow(null, ''),
-  theme: Joi.string().allow(null, ''),
-  layout: Joi.string().allow(null, ''),
-  images: Joi.any(),
+  background: Joi.object().keys({
+    color: Joi.string().allow(null, ''),
+    direction: Joi.string().allow(null, ''),
+    type: Joi.string().allow(null, ''),
+  }),
+  button: Joi.object().keys({
+    color: Joi.string().allow(null, ''),
+    backgroundColor: Joi.string().allow(null, ''),
+    variant: Joi.string().allow(null, ''),
+    borderRadius: Joi.string().allow(null, ''),
+  }),
 };
 
 export const createRoom = {
@@ -43,16 +46,19 @@ export const updateRoom = {
   }),
   body: Joi.object().keys({
     number: Joi.string(),
-    name: Joi.string().allow(null, ''),
     description: Joi.string().allow(null, ''),
-    type: Joi.string().allow(null, ''),
-    capacity: Joi.number().allow(null, ''),
-    amenities: Joi.array().items(Joi.string()),
-    price: Joi.string().allow(null, ''),
-    theme: Joi.string().allow(null, ''),
-    layout: Joi.string().allow(null, ''),
-    images: Joi.any(),
     group: Joi.custom(objectId).allow(null, ''),
+    background: Joi.object().keys({
+      color: Joi.string().allow(null, ''),
+      direction: Joi.string().allow(null, ''),
+      type: Joi.string().allow(null, ''),
+    }),
+    button: Joi.object().keys({
+      color: Joi.string().allow(null, ''),
+      backgroundColor: Joi.string().allow(null, ''),
+      variant: Joi.string().allow(null, ''),
+      borderRadius: Joi.string().allow(null, ''),
+    }),
   }),
 };
 

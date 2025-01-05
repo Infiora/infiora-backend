@@ -25,15 +25,13 @@ export const getRoom = catchAsync(async (req: Request, res: Response) => {
 });
 
 export const createRoom = catchAsync(async (req: Request, res: Response) => {
-  const files = req.files as Express.Multer.File[];
-  const room = await roomService.createRoom(req.body, files);
+  const room = await roomService.createRoom(req.body);
   res.status(httpStatus.CREATED).send(room);
 });
 
 export const updateRoom = catchAsync(async (req: Request, res: Response) => {
   const roomId = toObjectId(req.params['roomId']);
-  const files = req.files as Express.Multer.File[];
-  const room = await roomService.updateRoomById(roomId, req.body, files);
+  const room = await roomService.updateRoomById(roomId, req.body);
   res.send(room);
 });
 

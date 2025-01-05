@@ -14,32 +14,8 @@ const roomSchema = new mongoose.Schema<IRoomDoc, IRoomModel>(
     number: {
       type: String,
     },
-    name: {
-      type: String,
-    },
     description: {
       type: String,
-    },
-    type: {
-      type: String,
-    },
-    capacity: {
-      type: Number,
-    },
-    amenities: {
-      type: [String],
-    },
-    price: {
-      type: String,
-    },
-    theme: {
-      type: String,
-    },
-    layout: {
-      type: String,
-    },
-    images: {
-      type: [String],
     },
     isActive: {
       type: Boolean,
@@ -48,6 +24,17 @@ const roomSchema = new mongoose.Schema<IRoomDoc, IRoomModel>(
     group: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'Group',
+    },
+    background: {
+      color: { type: String },
+      direction: { type: String },
+      type: { type: String },
+    },
+    button: {
+      color: { type: String },
+      backgroundColor: { type: String },
+      variant: { type: String },
+      borderRadius: { type: String },
     },
   },
   {

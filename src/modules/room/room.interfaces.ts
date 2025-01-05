@@ -5,17 +5,20 @@ import { IHotelDoc } from '../hotel/hotel.interfaces';
 export interface IRoom {
   hotel: IHotelDoc;
   number?: string;
-  name?: string;
   description?: string;
-  type?: string;
-  capacity?: number;
-  amenities?: string[];
-  price?: string;
-  layout?: string;
-  theme?: string;
-  images?: string[];
   isActive?: boolean;
   group?: any;
+  background?: {
+    color?: string;
+    direction?: string;
+    type?: string;
+  };
+  button?: {
+    color?: string;
+    backgroundColor?: string;
+    variant?: string;
+    borderRadius?: string;
+  };
 }
 
 export interface IRoomDoc extends IRoom, Document {}

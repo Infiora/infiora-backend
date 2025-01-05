@@ -24,15 +24,13 @@ export const getGroup = catchAsync(async (req: Request, res: Response) => {
 });
 
 export const createGroup = catchAsync(async (req: Request, res: Response) => {
-  const files = req.files as Express.Multer.File[];
-  const group = await groupService.createGroup(req.body, files);
+  const group = await groupService.createGroup(req.body);
   res.status(httpStatus.CREATED).send(group);
 });
 
 export const updateGroup = catchAsync(async (req: Request, res: Response) => {
   const groupId = toObjectId(req.params['groupId']);
-  const files = req.files as Express.Multer.File[];
-  const group = await groupService.updateGroupById(groupId, req.body, files);
+  const group = await groupService.updateGroupById(groupId, req.body);
   res.send(group);
 });
 
