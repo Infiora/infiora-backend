@@ -4,6 +4,7 @@ import { QueryResult } from '../paginate/paginate';
 interface IBaseLink {
   title?: string;
   url: string;
+  icon?: string;
   isActive: boolean;
 }
 

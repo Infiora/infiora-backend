@@ -16,6 +16,7 @@ const linkSchema = new mongoose.Schema<ILinkDoc, ILinkModel>(
     },
     title: String,
     url: String,
+    icon: String,
     isActive: { type: Boolean, default: true },
   },
   {

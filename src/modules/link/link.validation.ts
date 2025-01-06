@@ -7,6 +7,7 @@ const createLinkBody: Record<keyof NewCreatedLink, any> = {
   group: Joi.custom(objectId),
   title: Joi.string(),
   url: Joi.string(),
+  icon: Joi.string(),
 };
 
 export const createLink = {
@@ -41,6 +42,7 @@ export const updateLink = {
   body: Joi.object().keys({
     title: Joi.string(),
     url: Joi.string(),
+    icon: Joi.string(),
     isActive: Joi.boolean(),
   }),
 };
