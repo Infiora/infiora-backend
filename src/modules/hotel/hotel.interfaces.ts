@@ -6,6 +6,7 @@ export interface IHotel {
   name?: string;
   description?: string;
   image?: string;
+  socialLinks?: string[];
   isActive?: boolean;
 }
 

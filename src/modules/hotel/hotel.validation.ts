@@ -7,6 +7,7 @@ const createHotelBody: Record<keyof NewCreatedHotel, any> = {
   name: Joi.string(),
   description: Joi.string(),
   image: Joi.any(),
+  socialLinks: Joi.any(),
 };
 
 export const createHotel = {
@@ -38,6 +39,7 @@ export const updateHotel = {
     name: Joi.string(),
     description: Joi.string(),
     image: Joi.any(),
+    socialLinks: Joi.any(),
     isActive: Joi.boolean(),
   }),
 };

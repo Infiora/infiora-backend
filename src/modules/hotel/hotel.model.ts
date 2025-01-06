@@ -21,6 +21,10 @@ const hotelSchema = new mongoose.Schema<IHotelDoc, IHotelModel>(
     image: {
       type: String,
     },
+    socialLinks: {
+      type: [String],
+      default: [],
+    },
     isActive: {
       type: Boolean,
       default: true,
