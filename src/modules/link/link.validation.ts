@@ -10,6 +10,7 @@ const createLinkBody: Record<keyof NewCreatedLink, any> = {
   type: Joi.string(),
   items: Joi.any(),
   icon: Joi.string(),
+  data: Joi.any(),
 };
 
 export const createLink = {
@@ -49,6 +50,7 @@ export const updateLink = {
     items: Joi.any(),
     icon: Joi.string(),
     isActive: Joi.boolean(),
+    data: Joi.any(),
   }),
 };
 

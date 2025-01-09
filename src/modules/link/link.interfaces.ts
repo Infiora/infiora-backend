@@ -6,6 +6,7 @@ export interface IItem {
   title: string;
   value: string;
   type: string;
+  data?: any;
 }
 interface IBaseLink {
   title?: string;
@@ -14,6 +15,7 @@ interface IBaseLink {
   items?: IItem[];
   icon?: string;
   isActive: boolean;
+  data?: any;
 }
 
 export interface ILink extends IBaseLink {

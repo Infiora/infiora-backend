@@ -5,8 +5,9 @@ import { ILinkDoc, ILinkModel } from './link.interfaces';
 
 const itemSchema = new mongoose.Schema({
   title: { type: String, required: true },
-  value: { type: String, required: true },
+  value: String,
   type: { type: String, required: true },
+  data: Object,
 });
 itemSchema.plugin(toJSON);
 
@@ -26,6 +27,7 @@ const linkSchema = new mongoose.Schema<ILinkDoc, ILinkModel>(
     type: { type: String, required: true },
     icon: String,
     items: [itemSchema],
+    data: Object,
     isActive: { type: Boolean, default: true },
   },
   {
