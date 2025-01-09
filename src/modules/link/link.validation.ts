@@ -6,7 +6,9 @@ const createLinkBody: Record<keyof NewCreatedLink, any> = {
   room: Joi.custom(objectId),
   group: Joi.custom(objectId),
   title: Joi.string(),
-  url: Joi.string(),
+  value: Joi.string(),
+  type: Joi.string(),
+  items: Joi.any(),
   icon: Joi.string(),
 };
 
@@ -32,6 +34,7 @@ export const getLink = {
   }),
   query: Joi.object().keys({
     room: Joi.custom(objectId),
+    item: Joi.custom(objectId),
   }),
 };
 
@@ -41,7 +44,9 @@ export const updateLink = {
   }),
   body: Joi.object().keys({
     title: Joi.string(),
-    url: Joi.string(),
+    value: Joi.string(),
+    type: Joi.string(),
+    items: Joi.any(),
     icon: Joi.string(),
     isActive: Joi.boolean(),
   }),

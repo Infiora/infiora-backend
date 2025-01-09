@@ -3,6 +3,13 @@ import toJSON from '../toJSON/toJSON';
 import paginate from '../paginate/paginate';
 import { ILinkDoc, ILinkModel } from './link.interfaces';
 
+const itemSchema = new mongoose.Schema({
+  title: { type: String, required: true },
+  value: { type: String, required: true },
+  type: { type: String, required: true },
+});
+itemSchema.plugin(toJSON);
+
 const linkSchema = new mongoose.Schema<ILinkDoc, ILinkModel>(
   {
     position: { type: Number, default: 0 },
@@ -14,9 +21,11 @@ const linkSchema = new mongoose.Schema<ILinkDoc, ILinkModel>(
       type: mongoose.Schema.Types.ObjectId,
       ref: 'Group',
     },
-    title: String,
-    url: String,
+    title: { type: String, required: true },
+    value: String,
+    type: { type: String, required: true },
     icon: String,
+    items: [itemSchema],
     isActive: { type: Boolean, default: true },
   },
   {

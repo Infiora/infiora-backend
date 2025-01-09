@@ -26,19 +26,21 @@ export const getLink = catchAsync(async (req: Request, res: Response) => {
   if (!link) {
     throw new ApiError(httpStatus.NOT_FOUND, 'Link not found');
   }
-  const { room: roomId } = pick(req.query, ['room']);
+  const { room: roomId, item: itemId } = pick(req.query, ['room', 'item']);
   if (roomId) {
     const room = await Room.findById(roomId).populate('hotel');
     if (room) {
+      const item = link.items?.find((i) => String(i.id) === String(itemId));
       await Activity.create({
         user: room.hotel.user,
         action: 'tap',
         details: {
           image: room.hotel.image,
           title: room.hotel.name,
-          headline: `Room ${room.number}'s ${link.title} was tapped`,
+          headline: `Room ${room.number}'s ${item?.title || link.title} was tapped`,
           room: room.id,
           link: link.id,
+          item: item?.id,
         },
       });
     }

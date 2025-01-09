@@ -1,9 +1,17 @@
 import { Model, Document } from 'mongoose';
 import { QueryResult } from '../paginate/paginate';
 
+export interface IItem {
+  id: string;
+  title: string;
+  value: string;
+  type: string;
+}
 interface IBaseLink {
   title?: string;
-  url: string;
+  value: string;
+  type: string;
+  items?: IItem[];
   icon?: string;
   isActive: boolean;
 }
