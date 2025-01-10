@@ -23,6 +23,9 @@ const groupSchema = new mongoose.Schema<IGroupDoc, IGroupModel>(
       direction: { type: String },
       type: { type: String },
     },
+    font: {
+      color: { type: String },
+    },
     button: {
       color: { type: String },
       backgroundColor: { type: String },

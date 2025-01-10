@@ -11,6 +11,9 @@ const createGroupBody: Record<keyof NewCreatedGroup, any> = {
     direction: Joi.string().allow(null, ''),
     type: Joi.string().allow(null, ''),
   }),
+  font: Joi.object().keys({
+    color: Joi.string().allow(null, ''),
+  }),
   button: Joi.object().keys({
     color: Joi.string().allow(null, ''),
     backgroundColor: Joi.string().allow(null, ''),
@@ -51,6 +54,9 @@ export const updateGroup = {
       color: Joi.string().allow(null, ''),
       direction: Joi.string().allow(null, ''),
       type: Joi.string().allow(null, ''),
+    }),
+    font: Joi.object().keys({
+      color: Joi.string().allow(null, ''),
     }),
     button: Joi.object().keys({
       color: Joi.string().allow(null, ''),

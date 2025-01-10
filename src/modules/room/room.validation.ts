@@ -41,6 +41,9 @@ export const updateRoom = {
       direction: Joi.string().allow(null, ''),
       type: Joi.string().allow(null, ''),
     }),
+    font: Joi.object().keys({
+      color: Joi.string().allow(null, ''),
+    }),
     button: Joi.object().keys({
       color: Joi.string().allow(null, ''),
       backgroundColor: Joi.string().allow(null, ''),

@@ -30,6 +30,9 @@ const roomSchema = new mongoose.Schema<IRoomDoc, IRoomModel>(
       direction: { type: String },
       type: { type: String },
     },
+    font: {
+      color: { type: String },
+    },
     button: {
       color: { type: String },
       backgroundColor: { type: String },

@@ -11,6 +11,9 @@ export interface IGroup {
     direction?: string;
     type?: string;
   };
+  font?: {
+    color?: string;
+  };
   button?: {
     color?: string;
     backgroundColor?: string;
