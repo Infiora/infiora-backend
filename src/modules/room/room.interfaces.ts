@@ -29,7 +29,7 @@ export interface IRoomModel extends Model<IRoomDoc> {
 
 export type UpdateRoomBody = Partial<IRoom>;
 
-export type NewCreatedRoom = Omit<IRoom, 'isActive' | 'group'>;
+export type NewCreatedRoom = { hotel: string; quantity: number };
 
 export const roomPopulate = [
   {
