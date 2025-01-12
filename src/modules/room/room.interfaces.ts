@@ -38,4 +38,7 @@ export const roomPopulate = [
   {
     path: 'hotel',
   },
+  {
+    path: 'group',
+  },
 ];

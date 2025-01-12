@@ -4,6 +4,7 @@ import Link from './link.model';
 import ApiError from '../errors/ApiError';
 import { NewCreatedLink, UpdateLinkBody, ILinkDoc } from './link.interfaces';
 import { IOptions, QueryResult } from '../paginate/paginate';
+import { toObjectId } from '../utils/mongoUtils';
 
 /**
  * Query for links
@@ -74,7 +75,7 @@ export const deleteLinkById = async (linkId: mongoose.Types.ObjectId): Promise<I
 export const reorderLinks = async (id: mongoose.Types.ObjectId, body: any): Promise<void> => {
   await Promise.all(
     Array.from(body.orderedLinks, async (linkId: string, i) => {
-      const link = await getLinkById(new mongoose.Types.ObjectId(linkId));
+      const link = await getLinkById(toObjectId(linkId));
       if (link && (link.room?.toString() === id.toString() || link.group?.toString() === id.toString())) {
         link.position = i;
         await link.save();

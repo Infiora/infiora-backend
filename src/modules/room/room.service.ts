@@ -5,7 +5,6 @@ import ApiError from '../errors/ApiError';
 import { NewCreatedRoom, UpdateRoomBody, IRoomDoc, roomPopulate } from './room.interfaces';
 import { IOptions, QueryResult } from '../paginate/paginate';
 import { removeNullFields, toPopulateString } from '../utils/miscUtils';
-import { tagService } from '../tag';
 import { Activity } from '../activity';
 import Link from '../link/link.model';
 import { reorderItems } from '../utils/arrayUtils';
@@ -36,16 +35,7 @@ export const getRoomById = async (id: mongoose.Types.ObjectId): Promise<IRoomDoc
  * @returns {Promise<any>}
  */
 export const getRoom = async (id: mongoose.Types.ObjectId, action?: string): Promise<any> => {
-  let tag;
-  let room = await getRoomById(id);
-
-  if (!room) {
-    tag = await tagService.getTagById(id);
-    if (tag && tag.room) {
-      room = await getRoomById(new mongoose.Types.ObjectId(`${tag.room}`));
-    }
-  }
-
+  const room = await getRoomById(id);
   if (!room) {
     throw new ApiError(httpStatus.NOT_FOUND, 'Room not found');
   }
@@ -59,16 +49,15 @@ export const getRoom = async (id: mongoose.Types.ObjectId, action?: string): Pro
         title: room.hotel.name,
         headline: `Room ${room.number} was viewed.`,
         room: room.id,
-        tag: tag?.id,
       },
     });
   }
 
   const links = await Link.find({
-    $or: [{ room }, room.group && { group: room.group }].filter(Boolean),
+    $or: [{ room }, room.group && { group: room.group.id }].filter(Boolean),
   });
-
-  return { ...room.toJSON(), ...removeNullFields(room.group), links: reorderItems(links.filter((l) => l.isActive)) };
+  const json: any = room.toJSON();
+  return { ...json, ...removeNullFields(json.group), id: json.id, links: reorderItems(links.filter((l) => l.isActive)) };
 };
 
 /**
