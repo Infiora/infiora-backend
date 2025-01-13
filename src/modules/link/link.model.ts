@@ -25,7 +25,12 @@ const linkSchema = new mongoose.Schema<ILinkDoc, ILinkModel>(
     title: { type: String, required: true },
     value: String,
     type: { type: String, default: 'link' },
-    icon: String,
+    image: String,
+    imageType: {
+      type: String,
+      enum: ['none', 'icon', 'image', 'url'],
+      default: 'none',
+    },
     items: [itemSchema],
     data: Object,
     isActive: { type: Boolean, default: true },

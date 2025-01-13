@@ -5,6 +5,7 @@ import ApiError from '../errors/ApiError';
 import { NewCreatedLink, UpdateLinkBody, ILinkDoc } from './link.interfaces';
 import { IOptions, QueryResult } from '../paginate/paginate';
 import { toObjectId } from '../utils/mongoUtils';
+import { uploadToS3 } from '../utils/awsS3Utils';
 
 /**
  * Query for links
@@ -27,27 +28,34 @@ export const getLinkById = async (id: mongoose.Types.ObjectId): Promise<ILinkDoc
 /**
  * Create a link
  * @param {NewCreatedLink} linkBody
+ * @param {Express.Multer.File | undefined} file
  * @returns {Promise<ILinkDoc>}
  */
-export const createLink = async (linkBody: NewCreatedLink): Promise<ILinkDoc> => {
-  return Link.create(linkBody);
+export const createLink = async (linkBody: NewCreatedLink, file?: Express.Multer.File): Promise<ILinkDoc> => {
+  const body = { ...linkBody };
+  if (file) body.image = await uploadToS3(file, 'link');
+  return Link.create(body);
 };
 
 /**
  * Update link by id
  * @param {mongoose.Types.ObjectId} linkId
  * @param {UpdateLinkBody} linkBody
+ * @param {Express.Multer.File | undefined} file
  * @returns {Promise<ILinkDoc | null>}
  */
 export const updateLinkById = async (
   linkId: mongoose.Types.ObjectId,
-  linkBody: UpdateLinkBody
+  linkBody: UpdateLinkBody,
+  file?: Express.Multer.File
 ): Promise<ILinkDoc | null> => {
+  const body = { ...linkBody };
   const link = await getLinkById(linkId);
   if (!link) {
     throw new ApiError(httpStatus.NOT_FOUND, 'Link not found');
   }
-  Object.assign(link, linkBody);
+  if (file) body.image = await uploadToS3(file, 'link');
+  Object.assign(link, body);
   await link.save();
   return link;
 };

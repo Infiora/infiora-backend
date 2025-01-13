@@ -9,7 +9,8 @@ const createLinkBody: Record<keyof NewCreatedLink, any> = {
   value: Joi.string(),
   type: Joi.string(),
   items: Joi.any(),
-  icon: Joi.string(),
+  imageType: Joi.string().valid('none', 'icon', 'image', 'url'),
+  image: Joi.any(),
   data: Joi.any(),
 };
 
@@ -48,7 +49,8 @@ export const updateLink = {
     value: Joi.string(),
     type: Joi.string(),
     items: Joi.any(),
-    icon: Joi.string(),
+    imageType: Joi.string().valid('none', 'icon', 'image', 'url'),
+    image: Joi.any(),
     isActive: Joi.boolean(),
     data: Joi.any(),
   }),

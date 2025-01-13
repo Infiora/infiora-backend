@@ -13,7 +13,8 @@ interface IBaseLink {
   value: string;
   type: string;
   items?: IItem[];
-  icon?: string;
+  image?: string;
+  imageType?: 'image' | 'icon' | 'url';
   isActive: boolean;
   data?: any;
 }

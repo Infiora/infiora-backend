@@ -27,7 +27,7 @@ export const getHotelById = async (id: mongoose.Types.ObjectId): Promise<IHotelD
 /**
  * Create a hotel
  * @param {NewCreatedHotel} hotelBody
- * @param {Express.Multer.File} file
+ * @param {Express.Multer.File | undefined} file
  * @returns {Promise<IHotelDoc>}
  */
 export const createHotel = async (hotelBody: NewCreatedHotel, file?: Express.Multer.File): Promise<IHotelDoc> => {
@@ -40,7 +40,7 @@ export const createHotel = async (hotelBody: NewCreatedHotel, file?: Express.Mul
  * Update hotel by id
  * @param {mongoose.Types.ObjectId} hotelId
  * @param {UpdateHotelBody} hotelBody
- * @param {Express.Multer.File} file
+ * @param {Express.Multer.File | undefined} file
  * @returns {Promise<IHotelDoc | null>}
  */
 export const updateHotelById = async (
