@@ -25,6 +25,7 @@ const groupSchema = new mongoose.Schema<IGroupDoc, IGroupModel>(
     },
     font: {
       color: { type: String },
+      family: { type: String },
     },
     button: {
       color: { type: String },

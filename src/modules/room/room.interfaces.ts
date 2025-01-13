@@ -15,6 +15,7 @@ export interface IRoom {
   };
   font?: {
     color?: string;
+    family?: string;
   };
   button?: {
     color?: string;

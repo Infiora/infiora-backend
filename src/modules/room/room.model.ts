@@ -32,6 +32,7 @@ const roomSchema = new mongoose.Schema<IRoomDoc, IRoomModel>(
     },
     font: {
       color: { type: String },
+      family: { type: String },
     },
     button: {
       color: { type: String },

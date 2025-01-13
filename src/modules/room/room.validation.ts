@@ -43,6 +43,7 @@ export const updateRoom = {
     }),
     font: Joi.object().keys({
       color: Joi.string().allow(null, ''),
+      family: Joi.string().allow(null, ''),
     }),
     button: Joi.object().keys({
       color: Joi.string().allow(null, ''),

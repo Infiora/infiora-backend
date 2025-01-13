@@ -13,6 +13,7 @@ export interface IGroup {
   };
   font?: {
     color?: string;
+    family?: string;
   };
   button?: {
     color?: string;
