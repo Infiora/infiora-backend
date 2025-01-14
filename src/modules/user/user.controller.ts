@@ -90,17 +90,17 @@ export const getInsights = catchAsync(async (req: Request, res: Response) => {
   const updatedLinks = links.map((link) => ({
     ...link.toJSON(),
     taps: activities.reduce((sum, a) => {
-      return a.action === 'tap' && a.details.link === link.id ? sum + 1 : sum;
+      return a.action === 'tap' && a.details.link === String(link.id) ? sum + 1 : sum;
     }, 0),
   }));
 
   const updatedRooms = rooms.map((room) => ({
     ...room.toJSON(),
     views: activities.reduce((sum, a) => {
-      return a.action === 'view' && a.details.room === room.id ? sum + 1 : sum;
+      return a.action === 'view' && a.details.room === String(room.id) ? sum + 1 : sum;
     }, 0),
     timeSpent: activities.reduce((sum, a) => {
-      return a.action === 'view' && a.details.room === room.id ? sum + Number(a.details.time || 0) : sum;
+      return a.action === 'view' && a.details.room === String(room.id) ? sum + Number(a.details.time || 0) : sum;
     }, 0),
   }));
 
