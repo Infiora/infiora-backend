@@ -9,9 +9,9 @@ import { match } from '../utils';
 import { toObjectId } from '../utils/mongoUtils';
 import { Room } from '../room';
 import { Link } from '../link';
-import Tag from '../tag/tag.model';
 import { Activity } from '../activity';
 import { toDate } from '../utils/miscUtils';
+import { Group } from '../group';
 
 export const getCurrentUser = catchAsync(async (req: Request, res: Response) => {
   res.send(req.user);
@@ -64,10 +64,13 @@ export const getInsights = catchAsync(async (req: Request, res: Response) => {
 
   const rooms = await Room.find({ hotel });
   const roomIds = rooms.map((r) => r.id);
+  const groups = await Group.find({ hotel });
+  const groupsIds = groups.map((g) => g.id);
   // Fetch links and activities
-  const [links, tags, activities] = await Promise.all([
-    Link.find({ room: { $in: roomIds } }).populate([{ path: 'room' }]),
-    Tag.find({ room: { $in: roomIds } }),
+  const [links, activities] = await Promise.all([
+    Link.find({
+      $or: [{ room: { $in: roomIds } }, { group: { $in: groupsIds } }],
+    }).populate([{ path: 'room' }]),
     Activity.find({ user: { $in: req.user.id }, createdAt: { $gte: start, $lte: end } }).sort({ createdAt: -1 }),
   ]);
 
@@ -86,15 +89,18 @@ export const getInsights = catchAsync(async (req: Request, res: Response) => {
 
   const updatedLinks = links.map((link) => ({
     ...link.toJSON(),
-    taps: activities.reduce((sum, activity) => {
-      return activity.action === 'tap' && activity.details.link === link.id ? sum + 1 : sum;
+    taps: activities.reduce((sum, a) => {
+      return a.action === 'tap' && a.details.link === link.id ? sum + 1 : sum;
     }, 0),
   }));
 
-  const updatedTags = tags.map((tag) => ({
-    ...tag.toJSON(),
-    views: activities.reduce((sum, activity) => {
-      return activity.action === 'view' && activity.details.tag === tag.id ? sum + 1 : sum;
+  const updatedRooms = rooms.map((room) => ({
+    ...room.toJSON(),
+    views: activities.reduce((sum, a) => {
+      return a.action === 'view' && a.details.room === room.id ? sum + 1 : sum;
+    }, 0),
+    timeSpent: activities.reduce((sum, a) => {
+      return a.action === 'view' && a.details.room === room.id ? sum + Number(a.details.time || 0) : sum;
     }, 0),
   }));
 
@@ -102,6 +108,6 @@ export const getInsights = catchAsync(async (req: Request, res: Response) => {
     activities,
     stats,
     links: updatedLinks,
-    tags: updatedTags,
+    rooms: updatedRooms,
   });
 });
