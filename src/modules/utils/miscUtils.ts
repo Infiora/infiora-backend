@@ -55,11 +55,13 @@ export const toPopulateString = (populate1: any): string => {
 
 export const toDate = ({ startDate, endDate }: { startDate?: string; endDate?: string }) => {
   // Parse and validate the start date
-  const start = startDate && !Number.isNaN(Date.parse(startDate)) ? new Date(startDate) : new Date(2023, 0, 1);
+  const start = startDate && !Number.isNaN(Date.parse(startDate)) ? new Date(startDate) : new Date(Date.UTC(2023, 0, 1)); // Default to January 1, 2023, in UTC
 
   // Parse and validate the end date
   const end = endDate && !Number.isNaN(Date.parse(endDate)) ? new Date(endDate) : new Date();
-  end.setHours(23, 59, 59, 999); // Ensure end date is at the end of the day
 
-  return { start, end };
+  // Set end time to the last millisecond of the day in UTC
+  end.setUTCHours(23, 59, 59, 999);
+
+  return { start: new Date(start.toISOString()), end: new Date(end.toISOString()) };
 };
