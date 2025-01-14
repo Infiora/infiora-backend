@@ -25,6 +25,7 @@ const roomSchema = new mongoose.Schema<IRoomDoc, IRoomModel>(
       type: mongoose.Schema.Types.ObjectId,
       ref: 'Group',
     },
+    orderedLinks: [String],
     background: {
       color: { type: String },
       direction: { type: String },

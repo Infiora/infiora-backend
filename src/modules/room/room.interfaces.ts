@@ -8,6 +8,7 @@ export interface IRoom {
   description?: string;
   isActive?: boolean;
   group?: any;
+  orderedLinks?: string[];
   background?: {
     color?: string;
     direction?: string;

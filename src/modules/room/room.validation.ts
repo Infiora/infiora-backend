@@ -36,6 +36,7 @@ export const updateRoom = {
     number: Joi.string(),
     description: Joi.string().allow(null, ''),
     group: Joi.custom(objectId).allow(null, ''),
+    orderedLinks: Joi.array().items(Joi.custom(objectId)),
     background: Joi.object().keys({
       color: Joi.string().allow(null, ''),
       direction: Joi.string().allow(null, ''),
