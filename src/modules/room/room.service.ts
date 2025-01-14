@@ -5,7 +5,6 @@ import ApiError from '../errors/ApiError';
 import { NewCreatedRoom, UpdateRoomBody, IRoomDoc, roomPopulate } from './room.interfaces';
 import { IOptions, QueryResult } from '../paginate/paginate';
 import { removeNullFields, toPopulateString } from '../utils/miscUtils';
-import { Activity } from '../activity';
 import Link from '../link/link.model';
 import { reorderItems } from '../utils/arrayUtils';
 
@@ -34,23 +33,10 @@ export const getRoomById = async (id: mongoose.Types.ObjectId): Promise<IRoomDoc
  * @param {string | undefined} action
  * @returns {Promise<any>}
  */
-export const getRoom = async (id: mongoose.Types.ObjectId, action?: string): Promise<any> => {
+export const getRoom = async (id: mongoose.Types.ObjectId): Promise<any> => {
   const room = await getRoomById(id);
   if (!room) {
     throw new ApiError(httpStatus.NOT_FOUND, 'Room not found');
-  }
-
-  if (action) {
-    await Activity.create({
-      user: room.hotel.user,
-      action,
-      details: {
-        image: room.hotel.image,
-        title: room.hotel.name,
-        headline: `Room ${room.number} was viewed.`,
-        room: room.id,
-      },
-    });
   }
 
   const links = await Link.find({

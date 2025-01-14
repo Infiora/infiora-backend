@@ -26,6 +26,11 @@ export const getRoom = {
   params: Joi.object().keys({
     roomId: Joi.required().custom(objectId),
   }),
+  query: Joi.object().keys({
+    action: Joi.string(),
+    time: Joi.string(),
+    activityId: Joi.custom(objectId),
+  }),
 };
 
 export const updateRoom = {

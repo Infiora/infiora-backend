@@ -6,6 +6,7 @@ import * as roomService from './room.service';
 import { pick, match } from '../utils';
 import { IOptions } from '../paginate/paginate';
 import { toObjectId } from '../utils/mongoUtils';
+import { Activity } from '../activity';
 
 export const getRooms = catchAsync(async (req: Request, res: Response) => {
   const filter = { ...pick(req.query, ['hotel']), ...match(req.query, ['name', 'number']) };
@@ -16,12 +17,35 @@ export const getRooms = catchAsync(async (req: Request, res: Response) => {
 
 export const getRoom = catchAsync(async (req: Request, res: Response) => {
   const roomId = toObjectId(req.params['roomId']);
-  const { action } = pick(req.query, ['action']);
-  const room = await roomService.getRoom(roomId, action);
+  const { action, time, activityId } = pick(req.query, ['action', 'time', 'activityId']);
+  const room = await roomService.getRoom(roomId);
   if (!room) {
     throw new ApiError(httpStatus.NOT_FOUND, 'Room not found');
   }
-  res.send(room);
+  let activity;
+  if (action) {
+    const ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress;
+    activity = await Activity.create({
+      user: room.hotel.user,
+      action,
+      details: {
+        ip,
+        time,
+        image: room.hotel.image,
+        title: room.hotel.name,
+        headline: `Room ${room.number} was viewed.`,
+        room: room.id,
+      },
+    });
+  }
+  if (activityId) {
+    await Activity.findByIdAndUpdate(activityId, {
+      $set: {
+        'details.time': time,
+      },
+    });
+  }
+  res.send({ ...room, activityId: activity?.id });
 });
 
 export const createRoom = catchAsync(async (req: Request, res: Response) => {
