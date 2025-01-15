@@ -57,51 +57,71 @@ export const deleteUser = catchAsync(async (req: Request, res: Response) => {
 });
 
 export const getInsights = catchAsync(async (req: Request, res: Response) => {
+  // Extract query parameters
   const { hotel } = pick(req.query, ['hotel']);
-  const dates = pick(req.query, ['startDate', 'endDate', 'hotel']);
+  const { startDate, endDate } = pick(req.query, ['startDate', 'endDate']);
+  const { start, end } = toDate({ startDate, endDate });
 
-  const { start, end } = toDate(dates);
+  // Fetch rooms and groups for the specified hotel
+  const [rooms, groups] = await Promise.all([Room.find({ hotel }), Group.find({ hotel })]);
 
-  const rooms = await Room.find({ hotel });
   const roomIds = rooms.map((r) => r.id);
-  const groups = await Group.find({ hotel });
-  const groupsIds = groups.map((g) => g.id);
-  // Fetch links and activities
+  const groupIds = groups.map((g) => g.id);
+
+  // Fetch links and activities concurrently
   const [links, activities] = await Promise.all([
     Link.find({
-      $or: [{ room: { $in: roomIds } }, { group: { $in: groupsIds } }],
-    }).populate([{ path: 'room' }]),
-    Activity.find({ user: { $in: req.user.id }, createdAt: { $gte: start, $lte: end } }).sort({ createdAt: -1 }),
+      $or: [{ room: { $in: roomIds } }, { group: { $in: groupIds } }],
+    }).populate('room'),
+    Activity.find({
+      user: req.user.id,
+      createdAt: { $gte: start, $lte: end },
+    }).sort({ createdAt: -1 }),
   ]);
 
   // Initialize stats object
-  const stats: Record<string, Record<string, number>> = {
-    tap: {},
-    view: {},
+  const stats: Record<'taps' | 'views' | 'uniqueViews' | 'timeSpent', Record<string, any>> = {
+    taps: {},
+    views: {},
+    uniqueViews: {},
+    timeSpent: {},
   };
 
-  activities.forEach(({ action, createdAt }) => {
+  // Process activities to populate stats
+  activities.forEach(({ action, createdAt, details }) => {
     const date = new Date(createdAt).toISOString().split('T')[0];
-    if (date && stats[action]) {
-      stats[action]![date] = (stats[action]![date] || 0) + 1;
+    if (date) {
+      // Populate generic action-based stats
+      stats[`${action}s`][date] = (stats[`${action}s`][date] || 0) + 1;
+      // Handle timeSpent aggregation
+      if (action === 'view' && details.time) {
+        stats.timeSpent[date] = (stats.timeSpent[date] || 0) + Number(details.time);
+      }
+      // Unique views by IP
+      if (action === 'view' && details.ip) {
+        stats.uniqueViews[date] = stats.uniqueViews[date] || new Set();
+        (stats.uniqueViews[date] as Set<string>).add(details.ip);
+      }
     }
   });
 
+  stats.uniqueViews = Object.fromEntries(
+    Object.entries(stats.uniqueViews).map(([date, ips]) => [date, (ips as Set<string>).size])
+  );
+
+  // Enhance links with tap counts
   const updatedLinks = links.map((link) => ({
     ...link.toJSON(),
-    taps: activities.reduce((sum, a) => {
-      return a.action === 'tap' && a.details.link === String(link.id) ? sum + 1 : sum;
-    }, 0),
+    taps: activities.filter((activity) => activity.action === 'tap' && activity.details.link === String(link.id)).length,
   }));
 
+  // Enhance rooms with view counts and time spent
   const updatedRooms = rooms.map((room) => ({
     ...room.toJSON(),
-    views: activities.reduce((sum, a) => {
-      return a.action === 'view' && a.details.room === String(room.id) ? sum + 1 : sum;
-    }, 0),
-    timeSpent: activities.reduce((sum, a) => {
-      return a.action === 'view' && a.details.room === String(room.id) ? sum + Number(a.details.time || 0) : sum;
-    }, 0),
+    views: activities.filter((activity) => activity.action === 'view' && activity.details.room === String(room.id)).length,
+    timeSpent: activities
+      .filter((activity) => activity.action === 'view' && activity.details.room === String(room.id))
+      .reduce((sum, activity) => sum + Number(activity.details.time || 0), 0),
   }));
 
   res.send({

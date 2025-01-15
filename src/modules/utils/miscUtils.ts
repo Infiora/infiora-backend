@@ -54,12 +54,21 @@ export const toPopulateString = (populate1: any): string => {
 };
 
 export const toDate = ({ startDate, endDate }: { startDate?: string; endDate?: string }) => {
-  // Parse and validate the start date
-  const start = startDate && !Number.isNaN(Date.parse(startDate)) ? new Date(startDate) : new Date(2023, 0, 1);
+  // Calculate default start date as three months ago
+  const defaultStart = new Date();
+  defaultStart.setMonth(defaultStart.getMonth() - 3);
+  defaultStart.setHours(0, 0, 0, 0); // Start of the day
 
-  // Parse and validate the end date
-  const end = endDate && !Number.isNaN(Date.parse(endDate)) ? new Date(endDate) : new Date();
-  end.setHours(23, 59, 59, 999); // Ensure end date is at the end of the day
+  // Parse and validate the start date or use default
+  const start = startDate && !Number.isNaN(Date.parse(startDate)) ? new Date(startDate) : defaultStart;
+
+  // Calculate default end date as the next day
+  const defaultEnd = new Date();
+  defaultEnd.setDate(defaultEnd.getDate() + 1); // Next day
+  defaultEnd.setHours(23, 59, 59, 999); // End of the day
+
+  // Parse and validate the end date or use default
+  const end = endDate && !Number.isNaN(Date.parse(endDate)) ? new Date(endDate) : defaultEnd;
 
   return { start, end };
 };
