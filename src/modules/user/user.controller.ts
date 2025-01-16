@@ -12,6 +12,7 @@ import { Link } from '../link';
 import { Activity } from '../activity';
 import { toDate } from '../utils/miscUtils';
 import { Group } from '../group';
+import { Hotel } from '../hotel';
 
 export const getCurrentUser = catchAsync(async (req: Request, res: Response) => {
   res.send(req.user);
@@ -58,12 +59,12 @@ export const deleteUser = catchAsync(async (req: Request, res: Response) => {
 
 export const getInsights = catchAsync(async (req: Request, res: Response) => {
   // Extract query parameters
-  const { hotel } = pick(req.query, ['hotel']);
+  const { hotel: hotelId } = pick(req.query, ['hotel']);
   const { startDate, endDate } = pick(req.query, ['startDate', 'endDate']);
   const { start, end } = toDate({ startDate, endDate });
-
+  const hotel = await Hotel.findById(hotelId);
   // Fetch rooms and groups for the specified hotel
-  const [rooms, groups] = await Promise.all([Room.find({ hotel }), Group.find({ hotel })]);
+  const [rooms, groups] = await Promise.all([Room.find({ hotel: hotelId }), Group.find({ hotel: hotelId })]);
 
   const roomIds = rooms.map((r) => r.id);
   const groupIds = groups.map((g) => g.id);
@@ -112,16 +113,23 @@ export const getInsights = catchAsync(async (req: Request, res: Response) => {
   // Enhance links with tap counts
   const updatedLinks = links.map((link) => ({
     ...link.toJSON(),
-    taps: activities.filter((activity) => activity.action === 'tap' && activity.details.link === String(link.id)).length,
+    taps: activities.filter((a) => a.action === 'tap' && a.details.link === String(link.id)).length,
   }));
 
   // Enhance rooms with view counts and time spent
   const updatedRooms = rooms.map((room) => ({
     ...room.toJSON(),
-    views: activities.filter((activity) => activity.action === 'view' && activity.details.room === String(room.id)).length,
+    views: activities.filter((a) => a.action === 'view' && a.details.room === String(room.id)).length,
     timeSpent: activities
-      .filter((activity) => activity.action === 'view' && activity.details.room === String(room.id))
-      .reduce((sum, activity) => sum + Number(activity.details.time || 0), 0),
+      .filter((a) => a.action === 'view' && a.details.room === String(room.id))
+      .reduce((sum, a) => sum + Number(a.details.time || 0), 0)
+      .toFixed(0),
+  }));
+
+  // Enhance links with tap counts
+  const updatedSocialLinks = hotel?.socialLinks?.map((link) => ({
+    title: link.replace('mailto:', ''),
+    taps: activities.filter((a) => a.action === 'tap' && link.includes(a.details.socialLink)).length,
   }));
 
   res.send({
@@ -129,5 +137,6 @@ export const getInsights = catchAsync(async (req: Request, res: Response) => {
     stats,
     links: updatedLinks,
     rooms: updatedRooms,
+    socialLinks: updatedSocialLinks,
   });
 });
