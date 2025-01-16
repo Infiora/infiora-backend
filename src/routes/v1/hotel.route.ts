@@ -20,6 +20,7 @@ router
 router
   .route('/:hotelId')
   .get(auth(), isHotelOwner, validate(hotelValidation.getHotel), hotelController.getHotel)
+  .post(hotelController.socialLinkTap)
   .patch(
     auth(),
     isHotelOwner,

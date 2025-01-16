@@ -6,6 +6,7 @@ import * as hotelService from './hotel.service';
 import { pick, match } from '../utils';
 import { IOptions } from '../paginate/paginate';
 import { toObjectId } from '../utils/mongoUtils';
+import { Activity } from '../activity';
 
 export const getHotels = catchAsync(async (req: Request, res: Response) => {
   const filter = { ...pick(req.query, ['user']), ...match(req.query, ['name']) };
@@ -39,5 +40,25 @@ export const updateHotel = catchAsync(async (req: Request, res: Response) => {
 export const deleteHotel = catchAsync(async (req: Request, res: Response) => {
   const hotelId = toObjectId(req.params['hotelId']);
   await hotelService.deleteHotelById(hotelId);
+  res.status(httpStatus.NO_CONTENT).send();
+});
+
+export const socialLinkTap = catchAsync(async (req: Request, res: Response) => {
+  const hotelId = toObjectId(req.params['hotelId']);
+  const hotel = await hotelService.getHotelById(hotelId);
+  if (!hotel) {
+    throw new ApiError(httpStatus.NOT_FOUND, 'Hotel not found');
+  }
+  await Activity.create({
+    user: hotel.user,
+    action: 'tap',
+    details: {
+      image: hotel.image,
+      title: hotel.name,
+      headline: `${hotel.name} ${req.body.link} was tapped.`,
+      link: req.body.link,
+      hotel: hotelId,
+    },
+  });
   res.status(httpStatus.NO_CONTENT).send();
 });
