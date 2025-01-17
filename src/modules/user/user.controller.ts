@@ -149,13 +149,28 @@ export const getInsights = catchAsync(async (req: Request, res: Response) => {
   }));
 
   // Enhance rooms with view counts and time spent
-  const updatedRooms = rooms.map((room) => ({
-    ...room.toJSON(),
-    views: activities.filter((a) => a.action === 'view' && a.details.room === String(room.id)).length,
-    timeSpent: activities
-      .filter((a) => a.action === 'view' && a.details.room === String(room.id))
-      .reduce((sum, a) => sum + a.details.time || 0, 0),
-  }));
+  const updatedRooms = rooms.map((room) => {
+    const roomActivities = activities.filter((a) => a.action === 'view' && a.details.room === String(room.id));
+
+    const uniqueViewers = new Set(roomActivities.map((a) => a.details.user));
+    const totalViews = roomActivities.length;
+    const returningViews = roomActivities.length - uniqueViewers.size;
+
+    const timeSpent = roomActivities.reduce((sum, a) => sum + (a.details.time || 0), 0);
+
+    const bounces = roomActivities.filter((a) => !a.details.engaged).length;
+
+    const bounceRate = totalViews > 0 ? (bounces / totalViews) * 100 : 0;
+
+    return {
+      ...room.toJSON(),
+      views: totalViews,
+      uniqueViews: uniqueViewers.size,
+      returningViews,
+      timeSpent,
+      bounceRate,
+    };
+  });
 
   // Enhance links with tap counts
   const updatedSocialLinks = hotel?.socialLinks?.map((link) => ({
