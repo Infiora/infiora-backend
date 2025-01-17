@@ -7,6 +7,7 @@ import { pick, match } from '../utils';
 import { IOptions } from '../paginate/paginate';
 import { toObjectId } from '../utils/mongoUtils';
 import { Activity } from '../activity';
+import { logger } from '../logger';
 
 export const getRooms = catchAsync(async (req: Request, res: Response) => {
   const filter = { ...pick(req.query, ['hotel']), ...match(req.query, ['name', 'number']) };
@@ -17,7 +18,15 @@ export const getRooms = catchAsync(async (req: Request, res: Response) => {
 
 export const getRoom = catchAsync(async (req: Request, res: Response) => {
   const roomId = toObjectId(req.params['roomId']);
-  const { action, time, activityId } = pick(req.query, ['action', 'time', 'activityId']);
+  logger.info(req.ip);
+  const { action, activityId, ...details } = pick(req.query, [
+    'action',
+    'activityId',
+    'time',
+    'device',
+    'engaged',
+    'language',
+  ]);
   const room = await roomService.getRoom(roomId);
   if (!room) {
     throw new ApiError(httpStatus.NOT_FOUND, 'Room not found');
@@ -30,7 +39,6 @@ export const getRoom = catchAsync(async (req: Request, res: Response) => {
       action,
       details: {
         ip,
-        time,
         image: room.hotel.image,
         title: room.hotel.name,
         headline: `Room ${room.number} was viewed.`,
@@ -38,10 +46,13 @@ export const getRoom = catchAsync(async (req: Request, res: Response) => {
       },
     });
   }
-  if (activityId) {
+  if (activityId && details) {
     await Activity.findByIdAndUpdate(activityId, {
       $set: {
-        'details.time': time,
+        'details.engaged': details.engaged,
+        'details.device': details.device,
+        'details.language': details.language,
+        'details.time': Number(details.time).toFixed(0),
       },
     });
   }

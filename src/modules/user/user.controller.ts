@@ -81,33 +81,65 @@ export const getInsights = catchAsync(async (req: Request, res: Response) => {
   ]);
 
   // Initialize stats object
-  const stats: Record<'taps' | 'views' | 'uniqueViews' | 'timeSpent', Record<string, any>> = {
+  const stats: Record<
+    | 'taps'
+    | 'views'
+    | 'uniqueViews'
+    | 'timeSpent'
+    | 'returningViews'
+    | 'bounceRate'
+    | 'engagedViews'
+    | 'deviceViews'
+    | 'languageViews',
+    Record<string, any>
+  > = {
     taps: {},
     views: {},
     uniqueViews: {},
     timeSpent: {},
+    returningViews: {},
+    bounceRate: {},
+    engagedViews: {},
+    deviceViews: {},
+    languageViews: {},
   };
 
   // Process activities to populate stats
   activities.forEach(({ action, createdAt, details }) => {
     const date = new Date(createdAt).toISOString().split('T')[0];
-    if (date) {
-      // Populate generic action-based stats
-      stats[`${action}s`][date] = (stats[`${action}s`][date] || 0) + 1;
-      // Handle timeSpent aggregation
-      if (action === 'view' && details.time) {
-        stats.timeSpent[date] = (stats.timeSpent[date] || 0) + Number(details.time);
-      }
-      // Unique views by IP
-      if (action === 'view' && details.ip) {
-        stats.uniqueViews[date] = stats.uniqueViews[date] || new Set();
-        (stats.uniqueViews[date] as Set<string>).add(details.ip);
+    if (date && action === 'view') {
+      // Initialize date-related stats if not already present
+      stats.views[date] = (stats.views[date] || 0) + 1;
+      stats.engagedViews[date] = (stats.engagedViews[date] || 0) + (details.engaged ? 1 : 0);
+      stats.timeSpent[date] = (stats.timeSpent[date] || 0) + (details.time || 0);
+      stats.uniqueViews[date] = stats.uniqueViews[date] || new Set();
+      stats.returningViews[date] = stats.returningViews[date] || new Set();
+
+      // Track unique views
+      if (details.ip) {
+        const uniqueViewIPs = stats.uniqueViews[date] as Set<string>;
+        const returningViewIPs = stats.returningViews[date] as Set<string>;
+
+        if (uniqueViewIPs.has(details.ip)) {
+          returningViewIPs.add(details.ip); // If IP is already in unique views, it's a returning view
+        } else {
+          uniqueViewIPs.add(details.ip); // Otherwise, add it to unique views
+        }
       }
     }
   });
 
   stats.uniqueViews = Object.fromEntries(
-    Object.entries(stats.uniqueViews).map(([date, ips]) => [date, (ips as Set<string>).size])
+    Object.entries(stats.uniqueViews).map(([date, ipSet]) => [date, (ipSet as Set<string>).size])
+  );
+  stats.returningViews = Object.fromEntries(
+    Object.entries(stats.returningViews).map(([date, ipSet]) => [date, (ipSet as Set<string>).size])
+  );
+  stats.bounceRate = Object.fromEntries(
+    Object.entries(stats.views).map(([date, totalViews]) => [
+      date,
+      totalViews > 0 ? ((totalViews - (stats.engagedViews[date] || 0)) / totalViews) * 100 : 0,
+    ])
   );
 
   // Enhance links with tap counts
@@ -122,8 +154,7 @@ export const getInsights = catchAsync(async (req: Request, res: Response) => {
     views: activities.filter((a) => a.action === 'view' && a.details.room === String(room.id)).length,
     timeSpent: activities
       .filter((a) => a.action === 'view' && a.details.room === String(room.id))
-      .reduce((sum, a) => sum + Number(a.details.time || 0), 0)
-      .toFixed(0),
+      .reduce((sum, a) => sum + a.details.time || 0, 0),
   }));
 
   // Enhance links with tap counts
@@ -131,6 +162,26 @@ export const getInsights = catchAsync(async (req: Request, res: Response) => {
     title: link.replace('mailto:', ''),
     taps: activities.filter((a) => a.action === 'tap' && link.includes(a.details.socialLink)).length,
   }));
+
+  stats.deviceViews = activities
+    .filter((activity) => activity.action === 'view')
+    .reduce<Record<string, number>>((deviceViews, activity) => {
+      const device = activity.details.device || 'Android';
+      return {
+        ...deviceViews,
+        [device]: (deviceViews[device] || 0) + 1,
+      };
+    }, {});
+
+  stats.languageViews = activities
+    .filter((activity) => activity.action === 'view')
+    .reduce<Record<string, number>>((languageViews, activity) => {
+      const language = activity.details.language || 'English';
+      return {
+        ...languageViews,
+        [language]: (languageViews[language] || 0) + 1,
+      };
+    }, {});
 
   res.send({
     activities,

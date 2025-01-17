@@ -28,7 +28,8 @@ export const getRoom = {
   }),
   query: Joi.object().keys({
     action: Joi.string(),
-    time: Joi.string(),
+    time: Joi.number(),
+    engaged: Joi.boolean(),
     activityId: Joi.custom(objectId),
   }),
 };
