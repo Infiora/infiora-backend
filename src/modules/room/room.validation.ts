@@ -29,6 +29,8 @@ export const getRoom = {
   query: Joi.object().keys({
     action: Joi.string(),
     time: Joi.number(),
+    device: Joi.string(),
+    language: Joi.string(),
     engaged: Joi.boolean(),
     activityId: Joi.custom(objectId),
   }),

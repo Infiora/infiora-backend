@@ -57,6 +57,7 @@ export const socialLinkTap = catchAsync(async (req: Request, res: Response) => {
       title: hotel.name,
       headline: `${hotel.name} ${req.body.link} was tapped.`,
       socialLink: req.body.link,
+      room: req.body.room,
       hotel: hotelId,
     },
   });

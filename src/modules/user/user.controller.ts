@@ -134,26 +134,54 @@ const enrichLinksWithStats = (links: ILinkDoc[], activities: IActivity[]) => {
 };
 
 const enrichRoomsWithStats = (rooms: IRoomDoc[], activities: IActivity[]) => {
-  const viewActivities = activities.filter((a) => a.action === 'view');
-
   return rooms.map((room) => {
-    const roomActivities = viewActivities.filter((a) => a.details.room === room.id);
-    const uniqueViewers = new Set(roomActivities.map((a) => a.details.ip));
-    const totalViews = roomActivities.length;
+    const roomActivities = activities.filter((a) => a.details.room === room.id);
+    const viewActivities = roomActivities.filter((a) => a.action === 'view');
+    const tapActivities = roomActivities.filter((a) => a.action === 'tap');
+
+    const uniqueViewers = new Set(viewActivities.map((a) => a.details.ip));
+    const totalViews = viewActivities.length;
+    const totalTaps = tapActivities.length;
     const returningViews = totalViews - uniqueViewers.size;
-    const timeSpent = roomActivities.reduce((sum, a) => sum + (a.details.time || 0), 0);
-    const bounces = roomActivities.filter((a) => !a.details.engaged).length;
+    const timeSpent = viewActivities.reduce((sum, a) => sum + (a.details.time || 0), 0);
+    const bounces = viewActivities.filter((a) => !a.details.engaged).length;
     const bounceRate = totalViews > 0 ? (bounces / totalViews) * 100 : 0;
+
+    const links: Record<string, number> = {};
+    tapActivities.forEach((a) => {
+      const id: string | undefined = a.details.link;
+      if (id) {
+        links[id] = (links[id] || 0) + 1;
+      }
+    });
+    const topPerformingLink = Object.keys(links).reduce((maxId, id) => {
+      return links[maxId] && links[id]! > links[maxId]! ? id : maxId;
+    }, Object.keys(links)[0] || '');
+
+    const socialLinks: Record<string, number> = {};
+    tapActivities.forEach((a) => {
+      const id: string | undefined = a.details.socialLink;
+      if (id) {
+        socialLinks[id] = (socialLinks[id] || 0) + 1;
+      }
+    });
+
+    const topPerformingSocialLink = Object.keys(socialLinks).reduce((maxId, id) => {
+      return socialLinks[maxId] && socialLinks[id]! > socialLinks[maxId]! ? id : maxId;
+    }, Object.keys(socialLinks)[0] || '');
 
     return {
       ...room.toJSON(),
       views: totalViews,
+      taps: totalTaps,
+      topPerformingLink,
+      topPerformingSocialLink,
       uniqueViews: uniqueViewers.size,
       returningViews,
       timeSpent,
       bounceRate,
-      viewsByLanguages: getCounts(roomActivities, 'language'),
-      viewsByDevices: getCounts(roomActivities, 'device'),
+      viewsByLanguages: getCounts(viewActivities, 'language'),
+      viewsByDevices: getCounts(viewActivities, 'device'),
     };
   });
 };
@@ -203,8 +231,8 @@ const getStats = ({
     stats: {
       overTime,
       topPerforming: {
-        room: `Room ${topRoom?.number}`,
-        link: topLink.title,
+        room: topRoom.id,
+        link: topLink.id,
       },
       viewsByLanguages: getCounts(activities, 'language'),
       viewsByDevices: getCounts(activities, 'device'),
