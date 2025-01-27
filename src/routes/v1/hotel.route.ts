@@ -17,6 +17,8 @@ router
   )
   .get(auth(), isOwner, validate(hotelValidation.getHotels), hotelController.getHotels);
 
+router.route('/:hotelId/insights').get(auth(), isHotelOwner, hotelController.getInsights);
+
 router
   .route('/:hotelId')
   .get(auth(), isHotelOwner, validate(hotelValidation.getHotel), hotelController.getHotel)

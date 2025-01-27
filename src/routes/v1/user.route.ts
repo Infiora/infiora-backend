@@ -13,7 +13,7 @@ router
   .patch(auth(), isOwner, validate(userValidation.updateUser), userController.updateUser);
 
 router.route('/me').get(auth(), userController.getCurrentUser);
-router.route('/insights').get(auth(), userController.getInsights);
+router.route('/insights').get(auth('manageUsers'), userController.getInsights);
 
 router
   .route('/:userId')

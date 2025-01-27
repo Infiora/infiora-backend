@@ -7,6 +7,7 @@ import { pick, match } from '../utils';
 import { IOptions } from '../paginate/paginate';
 import { toObjectId } from '../utils/mongoUtils';
 import { Activity } from '../activity';
+import * as insightService from '../insight/insight.service';
 
 export const getHotels = catchAsync(async (req: Request, res: Response) => {
   const filter = { ...pick(req.query, ['user']), ...match(req.query, ['name']) };
@@ -62,4 +63,15 @@ export const socialLinkTap = catchAsync(async (req: Request, res: Response) => {
     },
   });
   res.status(httpStatus.NO_CONTENT).send();
+});
+
+export const getInsights = catchAsync(async (req: Request, res: Response) => {
+  const hotelId = toObjectId(req.params['hotelId']);
+  const { startDate, endDate } = pick(req.query, ['startDate', 'endDate']);
+  const hotel = await hotelService.getHotelById(hotelId);
+  if (!hotel) {
+    throw new ApiError(httpStatus.NOT_FOUND, 'Hotel not found');
+  }
+  const insights = await insightService.getHotelInsights({ hotel, startDate, endDate });
+  res.send(insights);
 });
