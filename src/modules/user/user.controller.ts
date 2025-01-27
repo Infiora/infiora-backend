@@ -96,7 +96,7 @@ const calculateStatsOverTime = (activities: IActivity[]) => {
     if (action === 'view') {
       stats.views[date] = (stats.views[date] || 0) + 1;
       stats.engagedViews[date] = (stats.engagedViews[date] || 0) + (details.engaged ? 1 : 0);
-      stats.timeSpent[date] = (stats.timeSpent[date] || 0) + (details.time || 0);
+      stats.timeSpent[date] = (stats.timeSpent[date] || 0) + Number(details.time || 0);
 
       const ip = details.ip || '';
 
@@ -143,9 +143,9 @@ const enrichRoomsWithStats = (rooms: IRoomDoc[], activities: IActivity[]) => {
     const totalViews = viewActivities.length;
     const totalTaps = tapActivities.length;
     const returningViews = totalViews - uniqueViewers.size;
-    const timeSpent = viewActivities.reduce((sum, a) => sum + (a.details.time || 0), 0);
+    const timeSpent = viewActivities.reduce((sum, a) => sum + Number(a.details.time || 0), 0);
     const bounces = viewActivities.filter((a) => !a.details.engaged).length;
-    const bounceRate = totalViews > 0 ? (bounces / totalViews) * 100 : 0;
+    const bounceRate = (totalViews > 0 ? (bounces / totalViews) * 100 : 0).toFixed(0);
 
     const links: Record<string, number> = {};
     tapActivities.forEach((a) => {
@@ -222,8 +222,8 @@ const getStats = ({
   const taps = tapActivities.length;
   const uniqueViews = new Set(viewActivities.map(({ details }) => details.ip || '')).size;
   const returningViews = views - uniqueViews;
-  const timeSpent = viewActivities.reduce((sum, { details }) => sum + (details.time || 0), 0);
-  const bounceRate = views > 0 ? ((views - engagedViews) / views) * 100 : 0;
+  const timeSpent = viewActivities.reduce((sum, { details }) => sum + Number(details.time || 0), 0);
+  const bounceRate = (views > 0 ? ((views - engagedViews) / views) * 100 : 0).toFixed(0);
   const topRoom: any = updatedRooms.reduce((max, current) => (current.views > (max.views || 0) ? current : max));
   const topLink: any = updatedLinks.reduce((max, current) => (current.taps > (max.taps || 0) ? current : max));
 
