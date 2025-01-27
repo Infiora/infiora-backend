@@ -61,14 +61,17 @@ export const deleteUser = catchAsync(async (req: Request, res: Response) => {
   res.status(httpStatus.NO_CONTENT).send();
 });
 
-const getCounts = (activities: IActivity[], field: string) => {
-  const counts = activities.reduce<Record<string, number>>((acc, activity) => {
-    const key = activity.details[field] || 'Others';
+const getCounts = (activities: IActivity[], field: string): Record<string, number> | null => {
+  const counts =
+    activities.length > 0
+      ? activities.reduce<Record<string, number>>((acc, activity) => {
+          const key = activity.details[field] || 'Others';
 
-    acc[key] = (acc[key] || 0) + 1;
+          acc[key] = (acc[key] || 0) + 1;
 
-    return acc;
-  }, {});
+          return acc;
+        }, {})
+      : {};
   return counts;
 };
 
@@ -143,7 +146,8 @@ const enrichRoomsWithStats = (rooms: IRoomDoc[], activities: IActivity[]) => {
     const totalViews = viewActivities.length;
     const totalTaps = tapActivities.length;
     const returningViews = totalViews - uniqueViewers.size;
-    const timeSpent = viewActivities.reduce((sum, a) => sum + Number(a.details.time || 0), 0);
+    const timeSpent =
+      viewActivities.length > 0 ? viewActivities.reduce((sum, a) => sum + Number(a.details.time || 0), 0) : null;
     const bounces = viewActivities.filter((a) => !a.details.engaged).length;
     const bounceRate = (totalViews > 0 ? (bounces / totalViews) * 100 : 0).toFixed(0);
 
@@ -154,9 +158,12 @@ const enrichRoomsWithStats = (rooms: IRoomDoc[], activities: IActivity[]) => {
         links[id] = (links[id] || 0) + 1;
       }
     });
-    const topPerformingLink = Object.keys(links).reduce((maxId, id) => {
-      return links[maxId] && links[id]! > links[maxId]! ? id : maxId;
-    }, Object.keys(links)[0] || '');
+    const topPerformingLink =
+      Object.keys(links).length > 0
+        ? Object.keys(links).reduce((maxId, id) => {
+            return links[maxId] && links[id]! > links[maxId]! ? id : maxId;
+          }, Object.keys(links)[0] || '')
+        : null;
 
     const socialLinks: Record<string, number> = {};
     tapActivities.forEach((a) => {
@@ -166,9 +173,12 @@ const enrichRoomsWithStats = (rooms: IRoomDoc[], activities: IActivity[]) => {
       }
     });
 
-    const topPerformingSocialLink = Object.keys(socialLinks).reduce((maxId, id) => {
-      return socialLinks[maxId] && socialLinks[id]! > socialLinks[maxId]! ? id : maxId;
-    }, Object.keys(socialLinks)[0] || '');
+    const topPerformingSocialLink =
+      Object.keys(socialLinks).length > 0
+        ? Object.keys(socialLinks).reduce((maxId, id) => {
+            return socialLinks[maxId] && socialLinks[id]! > socialLinks[maxId]! ? id : maxId;
+          }, Object.keys(socialLinks)[0] || '')
+        : null;
 
     return {
       ...room.toJSON(),
@@ -222,17 +232,22 @@ const getStats = ({
   const taps = tapActivities.length;
   const uniqueViews = new Set(viewActivities.map(({ details }) => details.ip || '')).size;
   const returningViews = views - uniqueViews;
-  const timeSpent = viewActivities.reduce((sum, { details }) => sum + Number(details.time || 0), 0);
+  const timeSpent =
+    updatedRooms.length > 0 ? viewActivities.reduce((sum, { details }) => sum + Number(details.time || 0), 0) : null;
   const bounceRate = (views > 0 ? ((views - engagedViews) / views) * 100 : 0).toFixed(0);
-  const topRoom: any = updatedRooms.reduce((max, current) => (current.views > (max.views || 0) ? current : max));
-  const topLink: any = updatedLinks.reduce((max, current) => (current.taps > (max.taps || 0) ? current : max));
+  const topRoom: any =
+    updatedRooms.length > 0
+      ? updatedRooms.reduce((max, current) => (current.views > (max.views || 0) ? current : max))
+      : null;
+  const topLink: any =
+    updatedLinks.length > 0 ? updatedLinks.reduce((max, current) => (current.taps > (max.taps || 0) ? current : max)) : null;
 
   return {
     stats: {
       overTime,
       topPerforming: {
-        room: topRoom.id,
-        link: topLink.id,
+        room: topRoom?.id,
+        link: topLink?.id,
       },
       viewsByLanguages: getCounts(activities, 'language'),
       viewsByDevices: getCounts(activities, 'device'),
