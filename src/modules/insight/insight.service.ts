@@ -48,13 +48,13 @@ const calculateStatsOverTime = (activities: IActivity[]) => {
       stats.engagedViews[date] = (stats.engagedViews[date] || 0) + (details.engaged ? 1 : 0);
       stats.timeSpent[date] = (stats.timeSpent[date] || 0) + Number(details.time || 0);
 
-      const ip = details.ip || '';
+      const visitorId = details.visitorId || '';
 
       if (!uniqueViewsTracker[date]) {
         uniqueViewsTracker[date] = new Set();
       }
 
-      uniqueViewsTracker[date]!.add(ip);
+      uniqueViewsTracker[date]!.add(visitorId);
     } else if (action === 'tap') {
       stats.taps[date] = (stats.taps[date] || 0) + 1;
     }
@@ -89,7 +89,7 @@ const enrichRoomsWithStats = (rooms: IRoomDoc[], activities: IActivity[]) => {
     const viewActivities = roomActivities.filter((a) => a.action === 'view');
     const tapActivities = roomActivities.filter((a) => a.action === 'tap');
 
-    const uniqueViewers = new Set(viewActivities.map((a) => a.details.ip));
+    const uniqueViewers = new Set(viewActivities.map((a) => a.details.visitorId));
     const totalViews = viewActivities.length;
     const totalTaps = tapActivities.length;
     const returningViews = totalViews - uniqueViewers.size;
@@ -177,7 +177,7 @@ const getStats = ({
   const views = viewActivities.length;
   const engagedViews = viewActivities.filter((a) => a.details.engaged).length;
   const taps = tapActivities.length;
-  const uniqueViews = new Set(viewActivities.map(({ details }) => details.ip || '')).size;
+  const uniqueViews = new Set(viewActivities.map(({ details }) => details.visitorId || '')).size;
   const returningViews = views - uniqueViews;
   const timeSpent =
     updatedRooms.length > 0 ? viewActivities.reduce((sum, { details }) => sum + Number(details.time || 0), 0) : null;

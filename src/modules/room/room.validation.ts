@@ -33,6 +33,7 @@ export const getRoom = {
     language: Joi.string(),
     engaged: Joi.boolean(),
     activityId: Joi.custom(objectId),
+    visitorId: Joi.string(),
   }),
 };
 
