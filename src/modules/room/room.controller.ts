@@ -40,17 +40,16 @@ export const getRoom = catchAsync(async (req: Request, res: Response) => {
         title: room.hotel.name,
         headline: `Room ${room.number} was viewed.`,
         room: room.id,
+        ...details,
       },
     });
   }
   if (activityId && details) {
     await Activity.findByIdAndUpdate(activityId, {
       $set: {
-        'details.visitorId': details.visitorId,
         'details.engaged': details.engaged,
-        'details.device': details.device,
         'details.language': details.language,
-        'details.time': Number(details.time).toFixed(0),
+        'details.time': details.time,
       },
     });
   }
