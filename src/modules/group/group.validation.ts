@@ -74,3 +74,9 @@ export const deleteGroup = {
     groupId: Joi.required().custom(objectId),
   }),
 };
+
+export const duplicateGroup = {
+  params: Joi.object().keys({
+    groupId: Joi.required().custom(objectId),
+  }),
+};

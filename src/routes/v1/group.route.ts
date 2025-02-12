@@ -10,11 +10,14 @@ router
   .route('/')
   .post(auth(), validate(groupValidation.createGroup), groupController.createGroup)
   .get(auth(), validate(groupValidation.getGroups), groupController.getGroups);
+router
+  .route('/duplicate/:groupId')
+  .post(auth(), validate(groupValidation.duplicateGroup), isGroupOwner, groupController.duplicateGroup);
 
 router
   .route('/:groupId')
-  .get(auth(), isGroupOwner, validate(groupValidation.getGroup), groupController.getGroup)
-  .patch(auth(), isGroupOwner, validate(groupValidation.updateGroup), groupController.updateGroup)
-  .delete(auth(), isGroupOwner, validate(groupValidation.deleteGroup), groupController.deleteGroup);
+  .get(auth(), validate(groupValidation.getGroup), isGroupOwner, groupController.getGroup)
+  .patch(auth(), validate(groupValidation.updateGroup), isGroupOwner, groupController.updateGroup)
+  .delete(auth(), validate(groupValidation.deleteGroup), isGroupOwner, groupController.deleteGroup);
 
 export default router;

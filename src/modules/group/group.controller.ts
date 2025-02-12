@@ -39,3 +39,9 @@ export const deleteGroup = catchAsync(async (req: Request, res: Response) => {
   await groupService.deleteGroupById(groupId);
   res.status(httpStatus.NO_CONTENT).send();
 });
+
+export const duplicateGroup = catchAsync(async (req: Request, res: Response) => {
+  const groupId = toObjectId(req.params['groupId']);
+  const group = await groupService.duplicateGroup(groupId);
+  res.status(httpStatus.CREATED).send(group);
+});
