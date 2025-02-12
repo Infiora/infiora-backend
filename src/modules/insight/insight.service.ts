@@ -9,17 +9,29 @@ import { IRoomDoc } from '../room/room.interfaces';
 import { toDate } from '../utils/miscUtils';
 
 const getCounts = (activities: IActivity[], field: string): Record<string, number> | null => {
-  const counts =
-    activities.length > 0
-      ? activities.reduce<Record<string, number>>((acc, activity) => {
-          const key = activity.details[field] || 'Others';
+  if (activities.length === 0) return null;
 
-          acc[key] = (acc[key] || 0) + 1;
+  // Count occurrences of each field value
+  const counts = activities.reduce<Record<string, number>>((acc, activity) => {
+    const key = activity.details[field] || 'Others';
+    acc[key] = (acc[key] || 0) + 1;
+    return acc;
+  }, {});
 
-          return acc;
-        }, {})
-      : {};
-  return counts;
+  // Convert counts object to an array of entries and sort by count (descending)
+  const sortedEntries = Object.entries(counts).sort((a, b) => b[1] - a[1]);
+
+  // Get top three and sum the rest into "Others"
+  const topThree = sortedEntries.slice(0, 3);
+  const othersCount = sortedEntries.slice(3).reduce((sum, [, count]) => sum + count, 0);
+
+  // Construct the final result
+  const finalCounts = Object.fromEntries(topThree);
+  if (othersCount > 0) {
+    finalCounts['Others'] = othersCount;
+  }
+
+  return finalCounts;
 };
 
 const calculateStatsOverTime = (activities: IActivity[]) => {
