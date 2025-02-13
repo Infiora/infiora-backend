@@ -33,6 +33,12 @@ const groupSchema = new mongoose.Schema<IGroupDoc, IGroupModel>(
       variant: { type: String },
       borderRadius: { type: String },
     },
+    popup: {
+      message: { type: String },
+      buttonText: { type: String },
+      link: { type: String },
+      color: { type: String },
+    },
     isActive: {
       type: Boolean,
       default: true,

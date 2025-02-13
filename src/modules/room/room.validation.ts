@@ -46,21 +46,35 @@ export const updateRoom = {
     description: Joi.string().allow(null, ''),
     group: Joi.custom(objectId).allow(null, ''),
     orderedLinks: Joi.array().items(Joi.custom(objectId)),
-    background: Joi.object().keys({
-      color: Joi.string().allow(null, ''),
-      direction: Joi.string().allow(null, ''),
-      type: Joi.string().allow(null, ''),
-    }),
-    font: Joi.object().keys({
-      color: Joi.string().allow(null, ''),
-      family: Joi.string().allow(null, ''),
-    }),
-    button: Joi.object().keys({
-      color: Joi.string().allow(null, ''),
-      backgroundColor: Joi.string().allow(null, ''),
-      variant: Joi.string().allow(null, ''),
-      borderRadius: Joi.string().allow(null, ''),
-    }),
+    background: Joi.object()
+      .keys({
+        color: Joi.string().allow(null, ''),
+        direction: Joi.string().allow(null, ''),
+        type: Joi.string().allow(null, ''),
+      })
+      .allow(null, ''),
+    font: Joi.object()
+      .keys({
+        color: Joi.string().allow(null, ''),
+        family: Joi.string().allow(null, ''),
+      })
+      .allow(null, ''),
+    button: Joi.object()
+      .keys({
+        color: Joi.string().allow(null, ''),
+        backgroundColor: Joi.string().allow(null, ''),
+        variant: Joi.string().allow(null, ''),
+        borderRadius: Joi.string().allow(null, ''),
+      })
+      .allow(null, ''),
+    popup: Joi.object()
+      .keys({
+        message: Joi.string().allow(null, ''),
+        buttonText: Joi.string().allow(null, ''),
+        link: Joi.string().allow(null, ''),
+        color: Joi.string().allow(null, ''),
+      })
+      .allow(null, ''),
   }),
 };
 

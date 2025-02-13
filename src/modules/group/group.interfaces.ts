@@ -21,6 +21,12 @@ export interface IGroup {
     variant?: string;
     borderRadius?: string;
   };
+  popup?: {
+    message?: string;
+    buttonText?: string;
+    link?: string;
+    color?: string;
+  };
   isActive?: boolean;
 }
 

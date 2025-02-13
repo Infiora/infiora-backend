@@ -41,6 +41,12 @@ const roomSchema = new mongoose.Schema<IRoomDoc, IRoomModel>(
       variant: { type: String },
       borderRadius: { type: String },
     },
+    popup: {
+      message: { type: String },
+      buttonText: { type: String },
+      link: { type: String },
+      color: { type: String },
+    },
   },
   {
     timestamps: true,

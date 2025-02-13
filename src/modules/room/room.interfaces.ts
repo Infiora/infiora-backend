@@ -24,6 +24,12 @@ export interface IRoom {
     variant?: string;
     borderRadius?: string;
   };
+  popup?: {
+    message?: string;
+    buttonText?: string;
+    link?: string;
+    color?: string;
+  };
 }
 
 export interface IRoomDoc extends IRoom, Document {}
