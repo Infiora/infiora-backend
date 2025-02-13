@@ -70,7 +70,7 @@ export const isRoomOwner = async (req: Request, _res: Response, next: NextFuncti
 export const isRoomOrGroupOwner = async (req: Request, _res: Response, next: NextFunction): Promise<void> => {
   try {
     const room: any = await Room.findById(req.params['id']).populate('hotel');
-    const group: any = await Room.findById(req.params['id']).populate('hotel');
+    const group: any = await Group.findById(req.params['id']).populate('hotel');
     await validateOwnership(req.user, room?.hotel?.user || group?.hotel?.user);
     return next();
   } catch (error) {
