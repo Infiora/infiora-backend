@@ -8,8 +8,8 @@ import { Room } from '../room';
 import { IRoomDoc } from '../room/room.interfaces';
 import { toDate } from '../utils/miscUtils';
 
-const getCounts = (activities: IActivity[], field: string): Record<string, number> | null => {
-  if (activities.length === 0) return null;
+const getCounts = (activities: IActivity[], field: string): Record<string, number> => {
+  if (activities.length === 0) return {};
 
   // Count occurrences of each field value
   const counts = activities.reduce<Record<string, number>>((acc, activity) => {
@@ -31,7 +31,13 @@ const getCounts = (activities: IActivity[], field: string): Record<string, numbe
     finalCounts['Others'] = othersCount;
   }
 
-  return finalCounts;
+  const total = Object.values(finalCounts).reduce((sum, count) => sum + count, 0);
+
+  if (total === 0) return {};
+
+  return Object.fromEntries(
+    Object.entries(finalCounts).map(([key, count]) => [key, Number(((count / total) * 100).toFixed(2))])
+  );
 };
 
 const calculateStatsOverTime = (activities: IActivity[]) => {
@@ -227,10 +233,14 @@ export const getHotelInsights = async ({
   hotel,
   startDate,
   endDate,
+  language,
+  device,
 }: {
   hotel: IHotelDoc;
   startDate: string;
   endDate: string;
+  language: string;
+  device: string;
 }) => {
   const { start, end } = toDate({ startDate, endDate });
 
@@ -253,6 +263,8 @@ export const getHotelInsights = async ({
     Activity.find({
       user: hotel.user,
       createdAt: { $gte: start, $lte: end },
+      ...(language && { 'details.language': language }),
+      ...(device && { 'details.device': device }),
     }).sort({ createdAt: -1 }),
   ]);
 

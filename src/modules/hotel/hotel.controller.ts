@@ -67,11 +67,11 @@ export const socialLinkTap = catchAsync(async (req: Request, res: Response) => {
 
 export const getInsights = catchAsync(async (req: Request, res: Response) => {
   const hotelId = toObjectId(req.params['hotelId']);
-  const { startDate, endDate } = pick(req.query, ['startDate', 'endDate']);
+  const { startDate, endDate, language, device } = pick(req.query, ['startDate', 'endDate', 'language', 'device']);
   const hotel = await hotelService.getHotelById(hotelId);
   if (!hotel) {
     throw new ApiError(httpStatus.NOT_FOUND, 'Hotel not found');
   }
-  const insights = await insightService.getHotelInsights({ hotel, startDate, endDate });
+  const insights = await insightService.getHotelInsights({ hotel, startDate, endDate, language, device });
   res.send(insights);
 });
