@@ -56,8 +56,9 @@ export const socialLinkTap = catchAsync(async (req: Request, res: Response) => {
     details: {
       image: hotel.image,
       title: hotel.name,
-      headline: `${hotel.name} ${req.body.link} was tapped.`,
+      headline: req.body.popup ? `popup was tapped.` : `${hotel.name} ${req.body.link} was tapped.`,
       socialLink: req.body.link,
+      popup: req.body.popup,
       room: req.body.room,
       hotel: hotelId,
     },
