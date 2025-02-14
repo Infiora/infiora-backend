@@ -106,10 +106,12 @@ const enrichRoomsWithStats = (rooms: IRoomDoc[], activities: IActivity[]) => {
     const roomActivities = activities.filter((a) => a.details.room === room.id);
     const viewActivities = roomActivities.filter((a) => a.action === 'view');
     const tapActivities = roomActivities.filter((a) => a.action === 'tap');
+    const popupTapActivities = tapActivities.filter((a) => a.details.popup);
 
     const uniqueViewers = new Set(viewActivities.map((a) => a.details.visitorId));
     const totalViews = viewActivities.length;
     const totalTaps = tapActivities.length;
+    const totalPopupTaps = popupTapActivities.length;
     const returningViews = totalViews - uniqueViewers.size;
     const timeSpent =
       viewActivities.length > 0 ? viewActivities.reduce((sum, a) => sum + Number(a.details.time || 0), 0) : null;
@@ -149,6 +151,7 @@ const enrichRoomsWithStats = (rooms: IRoomDoc[], activities: IActivity[]) => {
       ...room.toJSON(),
       views: totalViews,
       taps: totalTaps,
+      popupTaps: totalPopupTaps,
       topPerformingLink,
       topPerformingSocialLink,
       uniqueViews: uniqueViewers.size,
@@ -192,9 +195,11 @@ const getStats = ({
 
   const viewActivities = activities.filter((a) => a.action === 'view');
   const tapActivities = activities.filter((a) => a.action === 'tap');
+  const popupTapActivities = tapActivities.filter((a) => a.details.popup);
   const views = viewActivities.length;
   const engagedViews = viewActivities.filter((a) => a.details.engaged).length;
   const taps = tapActivities.length;
+  const popupTaps = popupTapActivities.length;
   const uniqueViews = new Set(viewActivities.map(({ details }) => details.visitorId || '')).size;
   const returningViews = views - uniqueViews;
   const timeSpent =
@@ -218,6 +223,7 @@ const getStats = ({
       viewsByDevices: getCounts(activities, 'device'),
       views,
       taps,
+      popupTaps,
       uniqueViews,
       returningViews,
       timeSpent,
