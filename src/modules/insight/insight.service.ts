@@ -219,8 +219,8 @@ const getStats = ({
         room: topRoom?.id,
         link: topLink?.id,
       },
-      viewsByLanguages: getCounts(activities, 'language'),
-      viewsByDevices: getCounts(activities, 'device'),
+      viewsByLanguages: getCounts(viewActivities, 'language'),
+      viewsByDevices: getCounts(viewActivities, 'device'),
       views,
       taps,
       popupTaps,
@@ -268,6 +268,7 @@ export const getHotelInsights = async ({
       .populate('group'),
     Activity.find({
       user: hotel.user,
+      hotel: hotel.id,
       createdAt: { $gte: start, $lte: end },
       ...(language && { 'details.language': language }),
       ...(device && { 'details.device': device }),

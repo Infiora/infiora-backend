@@ -4,6 +4,7 @@ import { IUser } from '../user/user.interfaces';
 
 export interface IActivity {
   user: ObjectId | IUser;
+  hotel: any;
   action: 'view' | 'tap';
   details?: any;
   createdAt: string;

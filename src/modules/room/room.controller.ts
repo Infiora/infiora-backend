@@ -34,11 +34,12 @@ export const getRoom = catchAsync(async (req: Request, res: Response) => {
   if (action) {
     activity = await Activity.create({
       user: room.hotel.user,
+      hotel: room.hotel.id,
       action,
       details: {
         image: room.hotel.image,
         title: room.hotel.name,
-        headline: `Room ${room.number} was viewed.`,
+        headline: `Room ${room.number || ''} was viewed.`,
         room: room.id,
         ...details,
       },

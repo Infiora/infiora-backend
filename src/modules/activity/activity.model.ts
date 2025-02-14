@@ -10,6 +10,11 @@ const activitySchema = new mongoose.Schema<IActivityDoc, IActivityModel>(
       required: true,
       ref: 'User',
     },
+    hotel: {
+      type: mongoose.Schema.Types.ObjectId,
+      required: true,
+      ref: 'Hotel',
+    },
     action: {
       type: String,
       required: true,

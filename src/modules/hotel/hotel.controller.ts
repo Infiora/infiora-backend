@@ -8,6 +8,7 @@ import { IOptions } from '../paginate/paginate';
 import { toObjectId } from '../utils/mongoUtils';
 import { Activity } from '../activity';
 import * as insightService from '../insight/insight.service';
+import { roomService } from '../room';
 
 export const getHotels = catchAsync(async (req: Request, res: Response) => {
   const filter = { ...pick(req.query, ['user']), ...match(req.query, ['name']) };
@@ -50,17 +51,23 @@ export const socialLinkTap = catchAsync(async (req: Request, res: Response) => {
   if (!hotel) {
     throw new ApiError(httpStatus.NOT_FOUND, 'Hotel not found');
   }
+  const room = await roomService.getRoomById(req.body.room);
+  if (!room) {
+    throw new ApiError(httpStatus.NOT_FOUND, 'Room not found');
+  }
   await Activity.create({
     user: hotel.user,
+    hotel: hotelId,
     action: 'tap',
     details: {
       image: hotel.image,
       title: hotel.name,
-      headline: req.body.popup ? `popup was tapped.` : `${hotel.name} ${req.body.link} was tapped.`,
+      headline: req.body.popup
+        ? `Room ${room.number || ''}'s popup was tapped.`
+        : `${hotel.name} ${req.body.link} was tapped.`,
       socialLink: req.body.link,
       popup: req.body.popup,
       room: req.body.room,
-      hotel: hotelId,
     },
   });
   res.status(httpStatus.NO_CONTENT).send();

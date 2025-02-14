@@ -33,11 +33,12 @@ export const getLink = catchAsync(async (req: Request, res: Response) => {
       const item = link.items?.find((i) => String(i.id) === String(itemId));
       await Activity.create({
         user: room.hotel.user,
+        hotel: room.hotel.id,
         action: 'tap',
         details: {
           image: room.hotel.image,
           title: room.hotel.name,
-          headline: `Room ${room.number}'s ${item?.title || link.title} was tapped`,
+          headline: `Room ${room.number || ''}'s ${item?.title || link.title} was tapped`,
           room: room.id,
           link: link.id,
           item: item?.id,
