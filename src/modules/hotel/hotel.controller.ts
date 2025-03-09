@@ -68,6 +68,8 @@ export const socialLinkTap = catchAsync(async (req: Request, res: Response) => {
       socialLink: req.body.link,
       popup: req.body.popup,
       room: req.body.room,
+      language: req.body.language,
+      device: req.body.device,
     },
   });
   res.status(httpStatus.NO_CONTENT).send();

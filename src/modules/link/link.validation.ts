@@ -37,6 +37,8 @@ export const getLink = {
   query: Joi.object().keys({
     room: Joi.custom(objectId),
     item: Joi.custom(objectId),
+    device: Joi.string(),
+    language: Joi.string(),
   }),
 };
 

@@ -26,7 +26,7 @@ export const getLink = catchAsync(async (req: Request, res: Response) => {
   if (!link) {
     throw new ApiError(httpStatus.NOT_FOUND, 'Link not found');
   }
-  const { room: roomId, item: itemId } = pick(req.query, ['room', 'item']);
+  const { room: roomId, item: itemId, language, device } = pick(req.query, ['room', 'item', 'language', 'device']);
   if (roomId) {
     const room = await Room.findById(roomId).populate('hotel');
     if (room) {
@@ -42,6 +42,8 @@ export const getLink = catchAsync(async (req: Request, res: Response) => {
           room: room.id,
           link: link.id,
           item: item?.id,
+          language,
+          device,
         },
       });
     }
