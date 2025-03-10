@@ -31,7 +31,7 @@ const tagSchema = new mongoose.Schema<ITagDoc, ITagModel>(
 );
 
 tagSchema.virtual('url').get(function () {
-  return `${config.clientUrl}/${this.id}`;
+  return `${config.urls.app}/${this.id}`;
 });
 
 // add plugin that converts mongoose to json

@@ -26,11 +26,10 @@ if (config.env !== 'test') {
 app.use(helmet());
 
 // enable cors
-const allowedOrigins = config.allowedOrigins?.split(',') || [];
 app.use(
   cors({
     origin: (origin, callback) => {
-      if (!origin || allowedOrigins.includes(origin)) {
+      if (!origin || config.allowedOrigins.includes(origin)) {
         callback(null, true);
       } else {
         callback(new Error('Not allowed by CORS'));

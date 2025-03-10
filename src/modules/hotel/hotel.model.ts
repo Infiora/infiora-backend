@@ -21,6 +21,9 @@ const hotelSchema = new mongoose.Schema<IHotelDoc, IHotelModel>(
     note: {
       type: String,
     },
+    activeUntil: {
+      type: Date,
+    },
     image: {
       type: String,
     },

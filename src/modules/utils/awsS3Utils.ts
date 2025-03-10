@@ -18,7 +18,7 @@ const s3 = new AWS.S3();
 export const uploadToS3 = async (file: Express.Multer.File, type: string): Promise<string> => {
   try {
     const fileStream = fs.createReadStream(file.path);
-    const Key = `uploads${config.env === 'production' ? '' : '/dev'}/${type}/${uuidv4()}${path.extname(file.originalname)}`;
+    const Key = `uploads${config.env === 'prod' ? '' : '/dev'}/${type}/${uuidv4()}${path.extname(file.originalname)}`;
 
     const uploadParams: AWS.S3.PutObjectRequest = {
       Bucket: config.aws.bucketName,

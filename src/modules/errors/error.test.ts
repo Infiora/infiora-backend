@@ -120,7 +120,7 @@ describe('Error middlewares', () => {
     });
 
     test('should put the error stack in the response if in development mode', () => {
-      config.env = 'development';
+      config.env = 'dev';
       const error = new ApiError(httpStatus.BAD_REQUEST, 'Any error');
       const res = httpMocks.createResponse();
       const next = jest.fn();
@@ -135,7 +135,7 @@ describe('Error middlewares', () => {
     });
 
     test('should send internal server error status and message if in production mode and error is not operational', () => {
-      config.env = 'production';
+      config.env = 'prod';
       const error = new ApiError(httpStatus.BAD_REQUEST, 'Any error', false);
       const res = httpMocks.createResponse();
       const next = jest.fn();
@@ -154,7 +154,7 @@ describe('Error middlewares', () => {
     });
 
     test('should preserve original error status and message if in production mode and error is operational', () => {
-      config.env = 'production';
+      config.env = 'prod';
       const error = new ApiError(httpStatus.BAD_REQUEST, 'Any error');
       const res = httpMocks.createResponse();
       const next = jest.fn();
