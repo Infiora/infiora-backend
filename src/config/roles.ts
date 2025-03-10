@@ -12,6 +12,18 @@ const allRoles = {
     'getHotels',
     'manageHotels',
   ],
+  manager: [
+    'getUsers',
+    'manageUsers',
+    'getTickets',
+    'manageTickets',
+    'getBatches',
+    'manageBatches',
+    'getTags',
+    'manageTags',
+    'getHotels',
+    'manageHotels',
+  ],
 };
 
 export const roles: string[] = Object.keys(allRoles);

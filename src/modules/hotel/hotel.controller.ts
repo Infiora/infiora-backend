@@ -11,7 +11,11 @@ import * as insightService from '../insight/insight.service';
 import { roomService } from '../room';
 
 export const getHotels = catchAsync(async (req: Request, res: Response) => {
-  const filter = { ...pick(req.query, ['user']), ...match(req.query, ['name']) };
+  const filter = {
+    ...(req.user.role === 'manager' ? { createdBy: req.user.id } : {}),
+    ...pick(req.query, ['user']),
+    ...match(req.query, ['name']),
+  };
   const options: IOptions = pick(req.query, ['sortBy', 'limit', 'page', 'projectBy']);
   const result = await hotelService.queryHotels(filter, options);
   res.send(result);
@@ -28,7 +32,10 @@ export const getHotel = catchAsync(async (req: Request, res: Response) => {
 
 export const createHotel = catchAsync(async (req: Request, res: Response) => {
   const file = req.file as Express.Multer.File;
-  const hotel = await hotelService.createHotel(req.body, file);
+  const hotel = await hotelService.createHotel(
+    { ...req.body, createdBy: req.user.id, isActive: req.user.role === 'admin' },
+    file
+  );
   res.status(httpStatus.CREATED).send(hotel);
 });
 

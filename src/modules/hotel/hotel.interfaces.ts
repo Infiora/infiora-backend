@@ -2,6 +2,7 @@ import { Model, Document, ObjectId } from 'mongoose';
 import { QueryResult } from '../paginate/paginate';
 
 export interface IHotel {
+  createdBy: ObjectId;
   user: ObjectId;
   name?: string;
   description?: string;
@@ -20,4 +21,4 @@ export interface IHotelModel extends Model<IHotelDoc> {
 
 export type UpdateHotelBody = Partial<IHotel>;
 
-export type NewCreatedHotel = Omit<IHotel, 'isActive'>;
+export type NewCreatedHotel = Omit<IHotel, 'isActive' | 'createdBy'>;

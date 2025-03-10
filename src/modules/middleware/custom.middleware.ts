@@ -11,6 +11,10 @@ const isAdmin = (reqUser: any): boolean => {
   return reqUser.role === 'admin';
 };
 
+const isManager = (reqUser: any): boolean => {
+  return reqUser.role === 'manager';
+};
+
 const isSelf = (reqUser: any, userId?: any): boolean => {
   return String(reqUser.id) === String(userId);
 };
@@ -29,7 +33,7 @@ const validateOwnership = async (reqUser: any, userId: string): Promise<void> =>
 export const isOwner = (req: Request, _res: Response, next: NextFunction): void => {
   const { user } = req;
 
-  if (isAdmin(user) || isSelf(user, req.params['userId']) || isSelf(user, req.query['user'] as string)) {
+  if (isAdmin(user) || isManager(user) || isSelf(user, req.params['userId']) || isSelf(user, req.query['user'] as string)) {
     return next();
   }
 
@@ -50,7 +54,14 @@ export const isHotelOwner = async (req: Request, _res: Response, next: NextFunct
   try {
     const hotel: any = await Hotel.findById(req.params['hotelId']);
 
-    await validateOwnership(req.user, hotel?.user);
+    if (req.user.role === 'manager') {
+      if (!isSelf(req.user, hotel?.createdBy) && !isSelf(req.user, hotel?.user)) {
+        throw new ApiError(httpStatus.FORBIDDEN, 'Forbidden');
+      }
+    } else {
+      await validateOwnership(req.user, hotel?.user);
+    }
+
     return next();
   } catch (error) {
     return next(error);

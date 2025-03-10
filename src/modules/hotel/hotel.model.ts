@@ -11,6 +11,11 @@ const hotelSchema = new mongoose.Schema<IHotelDoc, IHotelModel>(
       required: true,
       ref: 'User',
     },
+    createdBy: {
+      type: mongoose.Schema.Types.ObjectId,
+      required: true,
+      ref: 'User',
+    },
     name: {
       type: String,
       required: true,
