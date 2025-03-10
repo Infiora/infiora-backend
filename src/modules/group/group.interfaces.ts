@@ -26,6 +26,15 @@ export interface IGroup {
     buttonText?: string;
     link?: string;
     color?: string;
+    isActive?: boolean;
+  };
+  newsletter?: {
+    message?: string;
+    successMessage?: string;
+    buttonText?: string;
+    type?: string;
+    color?: string;
+    isActive?: boolean;
   };
   isActive?: boolean;
 }

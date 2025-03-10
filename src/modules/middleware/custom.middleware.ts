@@ -2,7 +2,6 @@ import { Request, Response, NextFunction } from 'express';
 import httpStatus from 'http-status';
 import { ApiError } from '../errors';
 import { Hotel } from '../hotel';
-import Tag from '../tag/tag.model';
 import { Room } from '../room';
 import { Link } from '../link';
 import { Group } from '../group';
@@ -29,7 +28,6 @@ const validateOwnership = async (reqUser: any, userId: string): Promise<void> =>
   }
 };
 
-// eslint-disable-next-line import/prefer-default-export
 export const isOwner = (req: Request, _res: Response, next: NextFunction): void => {
   const { user } = req;
 
@@ -38,16 +36,6 @@ export const isOwner = (req: Request, _res: Response, next: NextFunction): void 
   }
 
   return next(new ApiError(httpStatus.FORBIDDEN, 'Forbidden'));
-};
-
-export const isTagOwner = async (req: Request, _res: Response, next: NextFunction) => {
-  try {
-    const tag: any = await Tag.findById(req.params['tagId']);
-    if (!isAdmin(req.user)) await validateOwnership(req.user, tag?.user);
-    return next();
-  } catch (error) {
-    return next(error);
-  }
 };
 
 export const isHotelOwner = async (req: Request, _res: Response, next: NextFunction): Promise<void> => {
@@ -70,7 +58,8 @@ export const isHotelOwner = async (req: Request, _res: Response, next: NextFunct
 
 export const isRoomOwner = async (req: Request, _res: Response, next: NextFunction): Promise<void> => {
   try {
-    const room: any = await Room.findById(req.params['roomId']).populate('hotel');
+    const roomId = req.params['roomId'] || req.query['roomId'];
+    const room: any = await Room.findById(roomId).populate('hotel');
     await validateOwnership(req.user, room?.hotel?.user);
     return next();
   } catch (error) {

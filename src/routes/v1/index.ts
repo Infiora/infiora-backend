@@ -9,6 +9,7 @@ import hotelRoute from './hotel.route';
 import roomRoute from './room.route';
 import linkRoute from './link.route';
 import groupRoute from './group.route';
+import subscriberRoute from './subscriber.route';
 import config from '../../config/config';
 
 const router = express.Router();
@@ -54,6 +55,10 @@ const defaultIRoute: IRoute[] = [
   {
     path: '/groups',
     route: groupRoute,
+  },
+  {
+    path: '/subscribers',
+    route: subscriberRoute,
   },
 ];
 

@@ -29,6 +29,15 @@ export interface IRoom {
     buttonText?: string;
     link?: string;
     color?: string;
+    isActive?: string;
+  };
+  newsletter?: {
+    message?: string;
+    successMessage?: string;
+    buttonText?: string;
+    type?: string;
+    color?: string;
+    isActive?: string;
   };
 }
 

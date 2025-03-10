@@ -38,6 +38,21 @@ const groupSchema = new mongoose.Schema<IGroupDoc, IGroupModel>(
       buttonText: { type: String },
       link: { type: String },
       color: { type: String },
+      isActive: {
+        type: Boolean,
+        default: true,
+      },
+    },
+    newsletter: {
+      message: { type: String },
+      successMessage: { type: String },
+      buttonText: { type: String },
+      type: { type: String },
+      color: { type: String },
+      isActive: {
+        type: Boolean,
+        default: true,
+      },
     },
     isActive: {
       type: Boolean,

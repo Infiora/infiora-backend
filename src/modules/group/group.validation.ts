@@ -26,7 +26,18 @@ const createGroupBody: Record<keyof NewCreatedGroup, any> = {
     buttonText: Joi.string().allow(null, ''),
     link: Joi.string().allow(null, ''),
     color: Joi.string().allow(null, ''),
+    isActive: Joi.boolean(),
   }),
+  newsletter: Joi.object()
+    .keys({
+      message: Joi.string().allow(null, ''),
+      successMessage: Joi.string().allow(null, ''),
+      buttonText: Joi.string().allow(null, ''),
+      type: Joi.string().allow(null, ''),
+      color: Joi.string().allow(null, ''),
+      isActive: Joi.boolean(),
+    })
+    .allow(null, ''),
 };
 
 export const createGroup = {
@@ -84,6 +95,17 @@ export const updateGroup = {
         buttonText: Joi.string().allow(null, ''),
         link: Joi.string().allow(null, ''),
         color: Joi.string().allow(null, ''),
+        isActive: Joi.boolean(),
+      })
+      .allow(null, ''),
+    newsletter: Joi.object()
+      .keys({
+        message: Joi.string().allow(null, ''),
+        successMessage: Joi.string().allow(null, ''),
+        buttonText: Joi.string().allow(null, ''),
+        type: Joi.string().allow(null, ''),
+        color: Joi.string().allow(null, ''),
+        isActive: Joi.boolean(),
       })
       .allow(null, ''),
   }),
