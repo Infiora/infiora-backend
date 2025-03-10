@@ -8,6 +8,7 @@ export interface IActivity {
   action: 'view' | 'tap';
   details?: any;
   createdAt: string;
+  updatedAt: string;
 }
 
 export interface IActivityDoc extends IActivity, Document {}

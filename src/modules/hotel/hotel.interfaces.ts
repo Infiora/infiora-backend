@@ -5,6 +5,7 @@ export interface IHotel {
   user: ObjectId;
   name?: string;
   description?: string;
+  note?: string;
   image?: string;
   socialLinks?: string[];
   isActive?: boolean;

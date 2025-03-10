@@ -18,6 +18,9 @@ const hotelSchema = new mongoose.Schema<IHotelDoc, IHotelModel>(
     description: {
       type: String,
     },
+    note: {
+      type: String,
+    },
     image: {
       type: String,
     },

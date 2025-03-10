@@ -5,7 +5,8 @@ import { NewCreatedHotel } from './hotel.interfaces';
 const createHotelBody: Record<keyof NewCreatedHotel, any> = {
   user: Joi.custom(objectId),
   name: Joi.string(),
-  description: Joi.string(),
+  description: Joi.string().allow(null, ''),
+  note: Joi.string().allow(null, ''),
   image: Joi.any(),
   socialLinks: Joi.any(),
 };
@@ -37,7 +38,8 @@ export const updateHotel = {
   }),
   body: Joi.object().keys({
     name: Joi.string(),
-    description: Joi.string(),
+    description: Joi.string().allow(null, ''),
+    note: Joi.string().allow(null, ''),
     image: Joi.any(),
     socialLinks: Joi.any(),
     isActive: Joi.boolean(),
