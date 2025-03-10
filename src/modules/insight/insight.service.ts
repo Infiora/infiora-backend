@@ -107,7 +107,7 @@ const enrichRoomsWithStats = (rooms: IRoomDoc[], activities: IActivity[]) => {
   return rooms.map((room) => {
     const roomActivities = activities.filter((a) => a.details.room === room.id);
     const viewActivities = roomActivities.filter((a) => a.action === 'view');
-    const recentActivities = viewActivities.filter((a) => new Date(a.updatedAt).getTime() < oneMinuteAgo);
+    const recentActivities = viewActivities.filter((a) => new Date(a.updatedAt).getTime() > oneMinuteAgo);
     const tapActivities = roomActivities.filter((a) => a.action === 'tap');
     const popupTapActivities = tapActivities.filter((a) => a.details.popup);
 
@@ -194,14 +194,13 @@ const getStats = ({
   activities: IActivity[];
 }) => {
   const oneMinuteAgo = new Date().getTime() - 60 * 1000;
-
   const overTime = calculateStatsOverTime(activities);
   const updatedLinks = enrichLinksWithStats(links, activities);
   const updatedRooms = enrichRoomsWithStats(rooms, activities);
   const updatedSocialLinks = enrichSocialLinksWithStats(hotel, activities);
 
   const viewActivities = activities.filter((a) => a.action === 'view');
-  const recentActivities = viewActivities.filter((a) => new Date(a.updatedAt).getTime() < oneMinuteAgo);
+  const recentActivities = viewActivities.filter((a) => new Date(a.updatedAt).getTime() > oneMinuteAgo);
   const tapActivities = activities.filter((a) => a.action === 'tap');
   const popupTapActivities = tapActivities.filter((a) => a.details.popup);
   const views = viewActivities.length;
