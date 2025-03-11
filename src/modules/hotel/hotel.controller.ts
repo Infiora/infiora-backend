@@ -62,6 +62,13 @@ export const socialLinkTap = catchAsync(async (req: Request, res: Response) => {
   if (!room) {
     throw new ApiError(httpStatus.NOT_FOUND, 'Room not found');
   }
+  const { link, ...body } = req.body;
+
+  const headline =
+    body.popup || body.logo
+      ? `Room ${room.number || ''}'s ${body.popup ? 'popup' : 'logo'} was tapped.`
+      : `${hotel.name} ${link} was tapped.`;
+
   await Activity.create({
     user: hotel.user,
     hotel: hotelId,
@@ -69,14 +76,9 @@ export const socialLinkTap = catchAsync(async (req: Request, res: Response) => {
     details: {
       image: hotel.image,
       title: hotel.name,
-      headline: req.body.popup
-        ? `Room ${room.number || ''}'s popup was tapped.`
-        : `${hotel.name} ${req.body.link} was tapped.`,
+      headline,
       socialLink: req.body.link,
-      popup: req.body.popup,
-      room: req.body.room,
-      language: req.body.language,
-      device: req.body.device,
+      ...body,
     },
   });
   res.status(httpStatus.NO_CONTENT).send();

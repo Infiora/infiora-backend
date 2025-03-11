@@ -110,17 +110,19 @@ const enrichRoomsWithStats = (rooms: IRoomDoc[], activities: IActivity[]) => {
     const recentActivities = viewActivities.filter((a) => new Date(a.updatedAt).getTime() > oneMinuteAgo);
     const tapActivities = roomActivities.filter((a) => a.action === 'tap');
     const popupTapActivities = tapActivities.filter((a) => a.details.popup);
+    const logoTapActivities = tapActivities.filter((a) => a.details.logo);
 
     const uniqueViewers = new Set(viewActivities.map((a) => a.details.visitorId));
-    const totalViews = viewActivities.length;
-    const totalLiveViews = recentActivities.length;
-    const totalTaps = tapActivities.length;
-    const totalPopupTaps = popupTapActivities.length;
-    const returningViews = totalViews - uniqueViewers.size;
+    const views = viewActivities.length;
+    const liveViews = recentActivities.length;
+    const taps = tapActivities.length;
+    const popupTaps = popupTapActivities.length;
+    const logoTaps = logoTapActivities.length;
+    const returningViews = views - uniqueViewers.size;
     const timeSpent =
       viewActivities.length > 0 ? viewActivities.reduce((sum, a) => sum + Number(a.details.time || 0), 0) : null;
     const bounces = viewActivities.filter((a) => !a.details.engaged).length;
-    const bounceRate = (totalViews > 0 ? (bounces / totalViews) * 100 : 0).toFixed(0);
+    const bounceRate = (views > 0 ? (bounces / views) * 100 : 0).toFixed(0);
 
     const links: Record<string, number> = {};
     tapActivities.forEach((a) => {
@@ -153,10 +155,11 @@ const enrichRoomsWithStats = (rooms: IRoomDoc[], activities: IActivity[]) => {
 
     return {
       ...room.toJSON(),
-      views: totalViews,
-      liveViews: totalLiveViews,
-      taps: totalTaps,
-      popupTaps: totalPopupTaps,
+      views,
+      liveViews,
+      taps,
+      popupTaps,
+      logoTaps,
       topPerformingLink,
       topPerformingSocialLink,
       uniqueViews: uniqueViewers.size,
@@ -188,7 +191,7 @@ const getStats = ({
   links,
   activities,
 }: {
-  hotel: IHotelDoc;
+  hotel?: IHotelDoc;
   rooms: IRoomDoc[];
   links: ILinkDoc[];
   activities: IActivity[];
@@ -197,17 +200,19 @@ const getStats = ({
   const overTime = calculateStatsOverTime(activities);
   const updatedLinks = enrichLinksWithStats(links, activities);
   const updatedRooms = enrichRoomsWithStats(rooms, activities);
-  const updatedSocialLinks = enrichSocialLinksWithStats(hotel, activities);
+  const updatedSocialLinks = hotel ? enrichSocialLinksWithStats(hotel, activities) : {};
 
   const viewActivities = activities.filter((a) => a.action === 'view');
   const recentActivities = viewActivities.filter((a) => new Date(a.updatedAt).getTime() > oneMinuteAgo);
   const tapActivities = activities.filter((a) => a.action === 'tap');
   const popupTapActivities = tapActivities.filter((a) => a.details.popup);
+  const logoTapActivities = tapActivities.filter((a) => a.details.logo);
   const views = viewActivities.length;
   const liveViews = recentActivities.length;
   const engagedViews = viewActivities.filter((a) => a.details.engaged).length;
   const taps = tapActivities.length;
   const popupTaps = popupTapActivities.length;
+  const logoTaps = logoTapActivities.length;
   const uniqueViews = new Set(viewActivities.map(({ details }) => details.visitorId || '')).size;
   const returningViews = views - uniqueViews;
   const timeSpent =
@@ -233,6 +238,7 @@ const getStats = ({
       liveViews,
       taps,
       popupTaps,
+      logoTaps,
       uniqueViews,
       returningViews,
       timeSpent,
@@ -297,5 +303,29 @@ export const getHotelInsights = async ({
 export const getAdminInsights = async ({ startDate, endDate }: { startDate: string; endDate: string }) => {
   const { start, end } = toDate({ startDate, endDate });
 
-  return { start, end };
+  // Fetch rooms and groups for the specified hotel
+  const [rooms, groups] = await Promise.all([Room.find({}).populate('group'), Group.find({})]);
+
+  const roomIds = rooms.map((r) => r.id);
+  const groupIds = groups.map((g) => g.id);
+
+  // Fetch links and activities concurrently
+  const [links, activities] = await Promise.all([
+    Link.find({
+      $or: [{ room: { $in: roomIds } }, { group: { $in: groupIds } }],
+    })
+      .populate('room')
+      .populate('group'),
+    Activity.find({
+      createdAt: { $gte: start, $lte: end },
+    }).sort({ createdAt: -1 }),
+  ]);
+
+  const stats = getStats({
+    activities,
+    links,
+    rooms,
+  });
+
+  return { ...stats, activities };
 };
