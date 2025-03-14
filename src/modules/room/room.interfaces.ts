@@ -29,7 +29,7 @@ export interface IRoom {
     buttonText?: string;
     link?: string;
     color?: string;
-    isActive?: string;
+    isActive?: boolean;
   };
   newsletter?: {
     message?: string;
@@ -37,7 +37,7 @@ export interface IRoom {
     buttonText?: string;
     type?: string;
     color?: string;
-    isActive?: string;
+    isActive?: boolean;
   };
 }
 

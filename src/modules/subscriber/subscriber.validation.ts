@@ -5,7 +5,6 @@ import { NewCreatedSubscriber } from './subscriber.interfaces';
 const createSubscriberBody: Record<keyof NewCreatedSubscriber, any> = {
   user: Joi.custom(objectId),
   room: Joi.custom(objectId),
-  name: Joi.string(),
   email: Joi.string(),
 };
 
@@ -38,7 +37,6 @@ export const updateSubscriber = {
   body: Joi.object().keys({
     user: Joi.custom(objectId),
     room: Joi.custom(objectId),
-    name: Joi.string(),
     email: Joi.string(),
   }),
 };

@@ -4,7 +4,6 @@ import { QueryResult } from '../paginate/paginate';
 export interface ISubscriber {
   room: ObjectId;
   user: ObjectId;
-  name: string;
   email: string;
 }
 

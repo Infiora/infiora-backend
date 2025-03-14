@@ -11,7 +11,7 @@ import { toObjectId } from '../utils/mongoUtils';
 export const getSubscribers = catchAsync(async (req: Request, res: Response) => {
   const filter = {
     ...pick(req.query, ['user', 'room']),
-    ...match(req.query, ['name']),
+    ...match(req.query, ['email']),
   };
   const options: IOptions = pick(req.query, ['sortBy', 'limit', 'page', 'projectBy']);
   const result = await subscriberService.querySubscribers(filter, options);
@@ -47,11 +47,11 @@ export const deleteSubscriber = catchAsync(async (req: Request, res: Response) =
 export const exportSubscribers = catchAsync(async (req: Request, res: Response) => {
   const filter = {
     ...pick(req.query, ['user', 'room']),
-    ...match(req.query, ['name']),
+    ...match(req.query, ['email']),
   };
   const options: IOptions = pick(req.query, ['sortBy', 'limit', 'page', 'projectBy']);
   const result = await subscriberService.querySubscribers(filter, options);
-  const csv = json2csv(result.results);
+  const csv = json2csv(result.results.map((s: any) => ({ email: s.email })));
   res.set('Content-Type', `text/csv; name="subscribers.csv"`);
   res.set('Content-Disposition', `inline; filename="subscribers.csv"`);
   res.send(csv);

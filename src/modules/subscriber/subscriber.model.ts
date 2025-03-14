@@ -15,10 +15,6 @@ const subscriberSchema = new mongoose.Schema<ISubscriberDoc, ISubscriberModel>(
       required: true,
       ref: 'Room',
     },
-    name: {
-      type: String,
-      required: true,
-    },
     email: {
       type: String,
       required: true,
