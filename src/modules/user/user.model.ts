@@ -55,6 +55,12 @@ const userSchema = new mongoose.Schema<IUserDoc, IUserModel>(
       type: String,
       default: 'en',
     },
+    managers: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User',
+      },
+    ],
   },
   {
     timestamps: true,

@@ -7,6 +7,7 @@ const createUserBody: Record<keyof NewCreatedUser, any> = {
   password: Joi.string().required().custom(password),
   name: Joi.string().required(),
   role: Joi.string().valid('user', 'admin', 'manager'),
+  managers: Joi.array().items(Joi.string().custom(objectId)),
 };
 
 export const createUser = {
@@ -42,6 +43,7 @@ export const updateUserById = {
       role: Joi.string().valid('user', 'admin', 'manager'),
       language: Joi.string(),
       isActive: Joi.boolean(),
+      managers: Joi.array().items(Joi.string().custom(objectId)),
     })
     .min(1),
 };

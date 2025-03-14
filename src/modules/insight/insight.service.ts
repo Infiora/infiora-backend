@@ -1,6 +1,7 @@
 import { Activity } from '../activity';
 import { IActivity } from '../activity/activity.interfaces';
 import { Group } from '../group';
+import Hotel from '../hotel/hotel.model';
 import { IHotelDoc } from '../hotel/hotel.interfaces';
 import { Link } from '../link';
 import { ILinkDoc } from '../link/link.interfaces';
@@ -172,6 +173,23 @@ const enrichRoomsWithStats = (rooms: IRoomDoc[], activities: IActivity[]) => {
   });
 };
 
+const enrichHotelsWithStats = (hotels: IHotelDoc[], activities: IActivity[]) => {
+  return hotels.map((hotel) => {
+    const hotelActivities = activities.filter((a) => String(a.hotel) === String(hotel.id));
+    const viewActivities = hotelActivities.filter((a) => a.action === 'view');
+    const views = viewActivities.length;
+
+    const redirectActivities = hotelActivities.filter((a) => a.details.logo);
+    const redirects = redirectActivities.length;
+
+    return {
+      ...hotel.toJSON(),
+      views,
+      redirects,
+    };
+  });
+};
+
 const enrichSocialLinksWithStats = (hotel: IHotelDoc, activities: IActivity[]) => {
   const tapActivities = activities.filter((a) => a.action === 'tap');
 
@@ -304,7 +322,7 @@ export const getAdminInsights = async ({ startDate, endDate }: { startDate: stri
   const { start, end } = toDate({ startDate, endDate });
 
   // Fetch rooms and groups for the specified hotel
-  const [rooms, groups] = await Promise.all([Room.find({}).populate('group'), Group.find({})]);
+  const [rooms, groups, hotels] = await Promise.all([Room.find({}).populate('group'), Group.find({}), Hotel.find({})]);
 
   const roomIds = rooms.map((r) => r.id);
   const groupIds = groups.map((g) => g.id);
@@ -327,5 +345,7 @@ export const getAdminInsights = async ({ startDate, endDate }: { startDate: stri
     rooms,
   });
 
-  return { ...stats, activities };
+  const updatedHotels = enrichHotelsWithStats(hotels, activities);
+
+  return { ...stats, activities, hotels: updatedHotels };
 };

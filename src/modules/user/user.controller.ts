@@ -14,7 +14,8 @@ export const getCurrentUser = catchAsync(async (req: Request, res: Response) => 
 });
 
 export const getUsers = catchAsync(async (req: Request, res: Response) => {
-  const filter = { ...pick(req.query, ['role']), ...match(req.query, ['name', 'email']) };
+  const s = req.user.role === 'manager' ? { $or: [{ managers: { $in: [req.user.id] } }, { _id: req.user.id }] } : {};
+  const filter = { ...s, ...pick(req.query, ['role']), ...match(req.query, ['name', 'email']) };
   const options: IOptions = pick(req.query, ['sortBy', 'limit', 'page', 'projectBy']);
   const result = await userService.queryUsers(filter, options);
   res.send(result);

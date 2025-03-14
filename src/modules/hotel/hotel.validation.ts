@@ -39,7 +39,7 @@ export const updateHotel = {
   }),
   body: Joi.object().keys({
     name: Joi.string(),
-    createdBy: Joi.custom(objectId),
+    manager: Joi.custom(objectId),
     description: Joi.string().allow(null, ''),
     note: Joi.string().allow(null, ''),
     activeUntil: Joi.string().allow(null, ''),

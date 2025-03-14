@@ -12,7 +12,7 @@ import { roomService } from '../room';
 
 export const getHotels = catchAsync(async (req: Request, res: Response) => {
   const filter = {
-    ...(req.user.role === 'manager' ? { createdBy: req.user.id } : {}),
+    ...(req.user.role === 'manager' ? { manager: req.user.id } : {}),
     ...pick(req.query, ['user']),
     ...match(req.query, ['name']),
   };
@@ -32,10 +32,7 @@ export const getHotel = catchAsync(async (req: Request, res: Response) => {
 
 export const createHotel = catchAsync(async (req: Request, res: Response) => {
   const file = req.file as Express.Multer.File;
-  const hotel = await hotelService.createHotel(
-    { ...req.body, createdBy: req.user.id, isActive: req.user.role === 'admin' },
-    file
-  );
+  const hotel = await hotelService.createHotel({ ...req.body, isActive: req.user.role === 'admin' }, file);
   res.status(httpStatus.CREATED).send(hotel);
 });
 

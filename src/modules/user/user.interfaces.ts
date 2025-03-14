@@ -1,8 +1,9 @@
-import mongoose, { Model, Document } from 'mongoose';
+import mongoose, { Model, Document, ObjectId } from 'mongoose';
 import { QueryResult } from '../paginate/paginate';
 import { AccessAndRefreshTokens } from '../token/token.interfaces';
 
 export interface IUser {
+  managers?: ObjectId[];
   name: string;
   email: string;
   password: string;
@@ -23,7 +24,7 @@ export interface IUserModel extends Model<IUserDoc> {
 
 export type UpdateUserBody = Partial<IUser>;
 
-export type NewRegisteredUser = Omit<IUser, 'role' | 'isEmailVerified' | 'language' | 'isActive'>;
+export type NewRegisteredUser = Omit<IUser, 'role' | 'isEmailVerified' | 'language' | 'isActive' | 'managers'>;
 
 export type NewCreatedUser = Omit<IUser, 'isEmailVerified' | 'language' | 'isActive'>;
 

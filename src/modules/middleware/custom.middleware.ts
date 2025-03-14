@@ -43,7 +43,7 @@ export const isHotelOwner = async (req: Request, _res: Response, next: NextFunct
     const hotel: any = await Hotel.findById(req.params['hotelId']);
 
     if (req.user.role === 'manager') {
-      if (!isSelf(req.user, hotel?.createdBy) && !isSelf(req.user, hotel?.user)) {
+      if (!isSelf(req.user, hotel?.manager) && !isSelf(req.user, hotel?.user)) {
         throw new ApiError(httpStatus.FORBIDDEN, 'Forbidden');
       }
     } else {
@@ -60,7 +60,15 @@ export const isRoomOwner = async (req: Request, _res: Response, next: NextFuncti
   try {
     const roomId = req.params['roomId'] || req.query['roomId'];
     const room: any = await Room.findById(roomId).populate('hotel');
-    await validateOwnership(req.user, room?.hotel?.user);
+
+    if (req.user.role === 'manager') {
+      if (!isSelf(req.user, room?.hotel?.manager) && !isSelf(req.user, room?.hotel?.user)) {
+        throw new ApiError(httpStatus.FORBIDDEN, 'Forbidden');
+      }
+    } else {
+      await validateOwnership(req.user, room?.hotel?.user);
+    }
+
     return next();
   } catch (error) {
     return next(error);
