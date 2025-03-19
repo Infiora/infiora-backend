@@ -7,9 +7,13 @@ import * as subscriberService from './subscriber.service';
 import { pick, match } from '../utils';
 import { IOptions } from '../paginate/paginate';
 import { toObjectId } from '../utils/mongoUtils';
+import { toDate } from '../utils/miscUtils';
 
 export const getSubscribers = catchAsync(async (req: Request, res: Response) => {
+  const { startDate, endDate } = pick(req.query, ['startDate', 'endDate']);
+  const { start, end } = toDate({ startDate, endDate });
   const filter = {
+    createdAt: { $gte: start, $lte: end },
     ...pick(req.query, ['user', 'room']),
     ...match(req.query, ['email']),
   };

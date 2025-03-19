@@ -16,6 +16,8 @@ export const getSubscribers = {
   query: Joi.object().keys({
     user: Joi.custom(objectId),
     room: Joi.custom(objectId),
+    startDate: Joi.string(),
+    endDate: Joi.string(),
     search: Joi.string(),
     sortBy: Joi.string(),
     projectBy: Joi.string(),
