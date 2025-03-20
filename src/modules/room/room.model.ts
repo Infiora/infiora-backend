@@ -55,6 +55,7 @@ const roomSchema = new mongoose.Schema<IRoomDoc, IRoomModel>(
       message: { type: String },
       successMessage: { type: String },
       buttonText: { type: String },
+      mainButtonText: { type: String },
       type: { type: String },
       color: { type: String },
       isActive: {

@@ -81,6 +81,7 @@ export const updateRoom = {
         message: Joi.string().allow(null, ''),
         successMessage: Joi.string().allow(null, ''),
         buttonText: Joi.string().allow(null, ''),
+        mainButtonText: Joi.string().allow(null, ''),
         type: Joi.string().allow(null, ''),
         color: Joi.string().allow(null, ''),
         isActive: Joi.boolean(),

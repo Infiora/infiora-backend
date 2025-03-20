@@ -47,6 +47,7 @@ const groupSchema = new mongoose.Schema<IGroupDoc, IGroupModel>(
       message: { type: String },
       successMessage: { type: String },
       buttonText: { type: String },
+      mainButtonText: { type: String },
       type: { type: String },
       color: { type: String },
       isActive: {

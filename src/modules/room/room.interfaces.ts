@@ -35,6 +35,7 @@ export interface IRoom {
     message?: string;
     successMessage?: string;
     buttonText?: string;
+    mainButtonText?: string;
     type?: string;
     color?: string;
     isActive?: boolean;
