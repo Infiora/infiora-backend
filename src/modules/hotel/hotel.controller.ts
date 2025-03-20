@@ -11,10 +11,12 @@ import * as insightService from '../insight/insight.service';
 import { roomService } from '../room';
 
 export const getHotels = catchAsync(async (req: Request, res: Response) => {
-  const filter = {
-    ...(req.user.role === 'manager' ? { manager: req.user.id } : {}),
+  let filter = {
     ...pick(req.query, ['user']),
     ...match(req.query, ['name']),
+  };
+  filter = {
+    ...(req.user.role === 'manager' && !filter.user ? { manager: req.user.id } : {}),
   };
   const options: IOptions = pick(req.query, ['sortBy', 'limit', 'page', 'projectBy']);
   const result = await hotelService.queryHotels(filter, options);
