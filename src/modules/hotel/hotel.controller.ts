@@ -16,6 +16,7 @@ export const getHotels = catchAsync(async (req: Request, res: Response) => {
     ...match(req.query, ['name']),
   };
   filter = {
+    ...filter,
     ...(req.user.role === 'manager' && !filter.user ? { manager: req.user.id } : {}),
   };
   const options: IOptions = pick(req.query, ['sortBy', 'limit', 'page', 'projectBy']);
