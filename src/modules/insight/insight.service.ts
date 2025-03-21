@@ -121,9 +121,7 @@ const enrichRoomsWithStats = (rooms: IRoomDoc[], activities: IActivity[]) => {
     const logoTaps = logoTapActivities.length;
     const returningViews = views - uniqueViewers.size;
     const timeSpent =
-      viewActivities.length > 0
-        ? viewActivities.reduce((sum, a) => sum + Number(a.details.time || 0), 0) / viewActivities.length
-        : null;
+      viewActivities.length > 0 ? viewActivities.reduce((sum, a) => sum + Number(a.details.time || 0), 0) : null;
     const bounces = viewActivities.filter((a) => !a.details.engaged).length;
     const bounceRate = (views > 0 ? (bounces / views) * 100 : 0).toFixed(0);
 
