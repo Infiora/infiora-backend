@@ -4,6 +4,7 @@ import { NewCreatedHotel } from './hotel.interfaces';
 
 const createHotelBody: Record<keyof NewCreatedHotel, any> = {
   user: Joi.custom(objectId),
+  manager: Joi.custom(objectId),
   name: Joi.string(),
   description: Joi.string().allow(null, ''),
   note: Joi.string().allow(null, ''),

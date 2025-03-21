@@ -19,7 +19,7 @@ const roomSchema = new mongoose.Schema<IRoomDoc, IRoomModel>(
     },
     isActive: {
       type: Boolean,
-      default: true,
+      default: false,
     },
     group: {
       type: mongoose.Schema.Types.ObjectId,

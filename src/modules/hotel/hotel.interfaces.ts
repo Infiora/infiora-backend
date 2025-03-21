@@ -21,4 +21,4 @@ export interface IHotelModel extends Model<IHotelDoc> {
 
 export type UpdateHotelBody = Partial<IHotel>;
 
-export type NewCreatedHotel = Omit<IHotel, 'isActive' | 'manager'>;
+export type NewCreatedHotel = Omit<IHotel, 'isActive'>;
