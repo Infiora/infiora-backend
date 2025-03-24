@@ -9,7 +9,7 @@ import { toObjectId } from '../utils/mongoUtils';
 import { Activity } from '../activity';
 
 export const getRooms = catchAsync(async (req: Request, res: Response) => {
-  const filter = { ...pick(req.query, ['hotel']), ...match(req.query, ['name', 'number']) };
+  const filter = { ...pick(req.query, ['hotel']), ...match(req.query, ['name', 'number', '_id']) };
   const options: IOptions = pick(req.query, ['sortBy', 'limit', 'page', 'projectBy']);
   const result = await roomService.queryRooms(filter, options);
   res.send(result);

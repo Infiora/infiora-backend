@@ -2,6 +2,8 @@ import nodemailer from 'nodemailer';
 import config from '../../config/config';
 import logger from '../logger/logger';
 import { Message } from './email.interfaces';
+import { IHotelDoc } from '../hotel/hotel.interfaces';
+import { IUserDoc } from '../user/user.interfaces';
 
 export const transport = nodemailer.createTransport(config.email.smtp);
 /* istanbul ignore next */
@@ -140,6 +142,34 @@ export const sendTicketEmail = async (support: any): Promise<void> => {
       <p><strong>From:</strong> ${support.user.email}</p>
       <p><strong>Subject:</strong> ${support.subject}</p>
       <p><strong>Message:</strong> ${support.message}</p>
+    </div>
+  `;
+
+  await sendEmail(to, subject, text, html);
+};
+/**
+ * Sends a notification email for a new hotel request.
+ * @param {IUserDoc} user - The user who submitted the hotel.
+ * @param {IHotelDoc} hotel - The hotel document containing details.
+ * @returns {Promise<void>}
+ */
+export const sendHotelEmail = async (user: IUserDoc, hotel: IHotelDoc): Promise<void> => {
+  const to = 'support@infiora.hr';
+  const subject = 'New Hotel Request';
+
+  const text = `New Hotel Request\n\nHotel Details:\n\n- Name: ${hotel.name}\n\nSubmitted By:\n\n- Name: ${user.name}\n\n- Email: ${user.email}`;
+
+  const html = `
+    <div style="font-family: Arial, sans-serif; line-height: 1.6;">
+      <h2>New Hotel Request</h2>
+
+      <h3>Hotel Details</h3>
+      <p><strong>ID:</strong> ${hotel.id}</p>
+      <p><strong>Name:</strong> ${hotel.name}</p>
+
+      <h3>Submitted By</h3>
+      <p><strong>Name:</strong> ${user.name}</p>
+      <p><strong>Email:</strong> ${user.email}</p>
     </div>
   `;
 
