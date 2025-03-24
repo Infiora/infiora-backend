@@ -9,7 +9,7 @@ const router: Router = express.Router();
 router
   .route('/')
   .post(auth(), validate(roomValidation.createRoom), roomController.createRoom)
-  .get(auth(), validate(roomValidation.getRooms), roomController.getRooms);
+  .get(validate(roomValidation.getRooms), roomController.getRooms);
 
 router
   .route('/:roomId')
