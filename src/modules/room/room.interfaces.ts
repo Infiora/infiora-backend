@@ -42,6 +42,18 @@ export interface IRoom {
     imageType?: 'none' | 'image' | 'icon' | 'url';
     isActive?: boolean;
   };
+  feedback?: {
+    message?: string;
+    successMessage?: string;
+    buttonText?: string;
+    mainButtonText?: string;
+    link?: string;
+    type?: string;
+    color?: string;
+    image?: string;
+    imageType?: 'none' | 'image' | 'icon' | 'url';
+    isActive?: boolean;
+  };
 }
 
 export interface IRoomDoc extends IRoom, Document {}
