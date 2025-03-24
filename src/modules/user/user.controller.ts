@@ -55,6 +55,6 @@ export const deleteUser = catchAsync(async (req: Request, res: Response) => {
 
 export const getInsights = catchAsync(async (req: Request, res: Response) => {
   const { startDate, endDate } = pick(req.query, ['startDate', 'endDate']);
-  const insights = await insightService.getAdminInsights({ startDate, endDate });
+  const insights = await insightService.getAdminInsights({ startDate, endDate, reqUser: req.user });
   res.send(insights);
 });

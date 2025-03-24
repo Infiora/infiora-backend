@@ -320,11 +320,22 @@ export const getHotelInsights = async ({
   return { ...stats, activities };
 };
 
-export const getAdminInsights = async ({ startDate, endDate }: { startDate: string; endDate: string }) => {
+export const getAdminInsights = async ({
+  startDate,
+  endDate,
+  reqUser,
+}: {
+  startDate: string;
+  endDate: string;
+  reqUser: any;
+}) => {
   const { start, end } = toDate({ startDate, endDate });
+  const filter = reqUser.role === 'manager' ? { manager: reqUser.id } : {};
+  const hotels = await Hotel.find(filter);
+  const hotelIds = hotels.map((h) => h.id);
 
   // Fetch rooms and groups for the specified hotel
-  const [rooms, groups, hotels] = await Promise.all([Room.find({}).populate('group'), Group.find({}), Hotel.find({})]);
+  const [rooms, groups] = await Promise.all([Room.find({ hotel: { $in: hotelIds } }).populate('group'), Group.find({})]);
 
   const roomIds = rooms.map((r) => r.id);
   const groupIds = groups.map((g) => g.id);
@@ -337,6 +348,7 @@ export const getAdminInsights = async ({ startDate, endDate }: { startDate: stri
       .populate('room')
       .populate('group'),
     Activity.find({
+      hotel: { $in: hotelIds },
       createdAt: { $gte: start, $lte: end },
     }).sort({ createdAt: -1 }),
   ]);
