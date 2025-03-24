@@ -35,6 +35,8 @@ export interface IGroup {
     mainButtonText?: string;
     type?: string;
     color?: string;
+    image?: string;
+    imageType?: 'none' | 'image' | 'icon' | 'url';
     isActive?: boolean;
   };
   isActive?: boolean;

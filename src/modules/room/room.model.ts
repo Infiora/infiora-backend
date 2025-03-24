@@ -58,6 +58,12 @@ const roomSchema = new mongoose.Schema<IRoomDoc, IRoomModel>(
       mainButtonText: { type: String },
       type: { type: String },
       color: { type: String },
+      image: String,
+      imageType: {
+        type: String,
+        enum: ['none', 'icon', 'image', 'url'],
+        default: 'none',
+      },
       isActive: {
         type: Boolean,
         default: true,
