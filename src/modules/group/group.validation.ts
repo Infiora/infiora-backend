@@ -52,6 +52,7 @@ const createGroupBody: Record<keyof NewCreatedGroup, any> = {
       color: Joi.string().allow(null, ''),
       imageType: Joi.string().valid('none', 'icon', 'image', 'url'),
       image: Joi.any(),
+      questions: Joi.array().items(Joi.string()),
       isActive: Joi.boolean(),
     })
     .allow(null, ''),
@@ -139,6 +140,7 @@ export const updateGroup = {
         color: Joi.string().allow(null, ''),
         imageType: Joi.string().valid('none', 'icon', 'image', 'url'),
         image: Joi.any(),
+        questions: Joi.array().items(Joi.string()),
         isActive: Joi.boolean(),
       })
       .allow(null, ''),

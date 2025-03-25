@@ -83,6 +83,7 @@ const roomSchema = new mongoose.Schema<IRoomDoc, IRoomModel>(
         enum: ['none', 'icon', 'image', 'url'],
         default: 'none',
       },
+      questions: [String],
       isActive: {
         type: Boolean,
         default: true,

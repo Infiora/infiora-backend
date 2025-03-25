@@ -123,7 +123,7 @@ const enrichRoomsWithStats = (rooms: IRoomDoc[], activities: IActivity[]) => {
     const timeSpent =
       viewActivities.length > 0 ? viewActivities.reduce((sum, a) => sum + Number(a.details.time || 0), 0) : null;
     const bounces = viewActivities.filter((a) => !a.details.engaged).length;
-    const bounceRate = (views > 0 ? (bounces / views) * 100 : 0).toFixed(0);
+    const bounceRate = Number((views > 0 ? (bounces / views) * 100 : 0).toFixed(0));
 
     const links: Record<string, number> = {};
     tapActivities.forEach((a) => {
@@ -237,7 +237,7 @@ const getStats = ({
     viewActivities.length > 0
       ? viewActivities.reduce((sum, { details }) => sum + Number(details.time || 0), 0) / viewActivities.length
       : null;
-  const bounceRate = (views > 0 ? ((views - engagedViews) / views) * 100 : 0).toFixed(0);
+  const bounceRate = Number((views > 0 ? ((views - engagedViews) / views) * 100 : 0).toFixed(0));
   const topRoom: any =
     updatedRooms.length > 0
       ? updatedRooms.reduce((max, current) => (current.views > (max.views || 0) ? current : max))
@@ -285,6 +285,11 @@ export const getHotelInsights = async ({
 }) => {
   const { start, end } = toDate({ startDate, endDate });
 
+  const timeSpan = end.getTime() - start.getTime();
+
+  const prevStart = new Date(start.getTime() - timeSpan - 1);
+  const prevEnd = new Date(end.getTime() - timeSpan - 1);
+
   // Fetch rooms and groups for the specified hotel
   const [rooms, groups] = await Promise.all([
     Room.find({ hotel: hotel.id }).populate('group'),
@@ -310,6 +315,14 @@ export const getHotelInsights = async ({
     }).sort({ createdAt: -1 }),
   ]);
 
+  const prevActivities = await Activity.find({
+    user: hotel.user,
+    hotel: hotel.id,
+    createdAt: { $gte: prevStart, $lte: prevEnd },
+    ...(language && { 'details.language': language }),
+    ...(device && { 'details.device': device }),
+  }).sort({ createdAt: -1 });
+
   const stats = getStats({
     hotel,
     activities,
@@ -317,7 +330,14 @@ export const getHotelInsights = async ({
     rooms,
   });
 
-  return { ...stats, activities };
+  const prev = getStats({
+    hotel,
+    activities: prevActivities,
+    links,
+    rooms,
+  });
+
+  return { ...stats, activities, prev };
 };
 
 export const getAdminInsights = async ({

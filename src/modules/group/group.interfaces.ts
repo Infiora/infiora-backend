@@ -49,6 +49,7 @@ export interface IGroup {
     color?: string;
     image?: string;
     imageType?: 'none' | 'image' | 'icon' | 'url';
+    questions?: string[];
     isActive?: boolean;
   };
   isActive?: boolean;

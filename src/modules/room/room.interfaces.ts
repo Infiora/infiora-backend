@@ -52,6 +52,7 @@ export interface IRoom {
     color?: string;
     image?: string;
     imageType?: 'none' | 'image' | 'icon' | 'url';
+    questions?: string[];
     isActive?: boolean;
   };
 }
