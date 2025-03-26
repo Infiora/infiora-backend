@@ -58,7 +58,7 @@ export const getRoom = catchAsync(async (req: Request, res: Response) => {
 });
 
 export const createRoom = catchAsync(async (req: Request, res: Response) => {
-  const room = await roomService.createRoom(req.body);
+  const room = await roomService.createRoom({ ...req.body, isActive: req.user.role === 'admin' });
   res.status(httpStatus.CREATED).send(room);
 });
 

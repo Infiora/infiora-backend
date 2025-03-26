@@ -52,10 +52,16 @@ export const getRoom = async (id: mongoose.Types.ObjectId): Promise<any> => {
  * @returns {Promise<IRoomDoc>}
  */
 export const createRoom = async (roomBody: NewCreatedRoom): Promise<IRoomDoc> => {
-  const { quantity, hotel } = roomBody;
+  const { quantity, ...room } = roomBody;
+  const roomCount = await Room.countDocuments({ hotel: room.hotel });
+
   const createdRooms = await Promise.all(
-    Array.from({ length: quantity }, () => Room.create({ hotel }).then((room) => room.populate(roomPopulate)))
+    Array.from({ length: quantity }, async (_, index) => {
+      const newRoom = { ...room, number: roomCount + index };
+      return Room.create(newRoom).then((r) => r.populate(roomPopulate));
+    })
   );
+
   return createdRooms[0]!;
 };
 
