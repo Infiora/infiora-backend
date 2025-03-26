@@ -57,7 +57,7 @@ export const createRoom = async (roomBody: NewCreatedRoom): Promise<IRoomDoc> =>
 
   const createdRooms = await Promise.all(
     Array.from({ length: quantity }, async (_, index) => {
-      const newRoom = { ...room, number: roomCount + quantity - index };
+      const newRoom = { ...room, number: roomCount + index + 1 };
       return Room.create(newRoom).then((r) => r.populate(roomPopulate));
     })
   );
