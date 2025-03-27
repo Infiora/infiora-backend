@@ -290,6 +290,14 @@ export const getHotelInsights = async ({
   const prevStart = new Date(start.getTime() - timeSpan - 1);
   const prevEnd = new Date(end.getTime() - timeSpan - 1);
 
+  const startTimestamp = start.getTime();
+  const endTimestamp = end.getTime();
+  const diffInMs = endTimestamp - startTimestamp;
+  const diffInDays = diffInMs / (1000 * 60 * 60 * 24);
+
+  const pastStart = new Date(end);
+  pastStart.setDate(end.getDate() - 6);
+
   // Fetch rooms and groups for the specified hotel
   const [rooms, groups] = await Promise.all([
     Room.find({ hotel: hotel.id }).populate('group'),
@@ -315,6 +323,17 @@ export const getHotelInsights = async ({
     }).sort({ createdAt: -1 }),
   ]);
 
+  const pastActivities =
+    diffInDays < 2
+      ? await Activity.find({
+          user: hotel.user,
+          hotel: hotel.id,
+          createdAt: { $gte: pastStart, $lte: end },
+          ...(language && { 'details.language': language }),
+          ...(device && { 'details.device': device }),
+        }).sort({ createdAt: -1 })
+      : [];
+
   const prevActivities = await Activity.find({
     user: hotel.user,
     hotel: hotel.id,
@@ -330,6 +349,13 @@ export const getHotelInsights = async ({
     rooms,
   });
 
+  const past = getStats({
+    hotel,
+    activities: pastActivities,
+    links,
+    rooms,
+  });
+
   const prev = getStats({
     hotel,
     activities: prevActivities,
@@ -337,7 +363,7 @@ export const getHotelInsights = async ({
     rooms,
   });
 
-  return { ...stats, activities, prev };
+  return { ...stats, stats: { ...stats.stats, overTime: past.stats.overTime }, activities, prev };
 };
 
 export const getAdminInsights = async ({
