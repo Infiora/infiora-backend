@@ -55,9 +55,17 @@ export const createRoom = async (roomBody: NewCreatedRoom): Promise<IRoomDoc> =>
   const { quantity, ...room } = roomBody;
   const roomCount = await Room.countDocuments({ hotel: room.hotel });
 
+  const delay = (ms: number) =>
+    new Promise((resolve) => {
+      setTimeout(resolve, ms);
+    });
+
   const createdRooms = await Promise.all(
     Array.from({ length: quantity }, async (_, index) => {
       const newRoom = { ...room, number: roomCount + index + 1 };
+
+      await delay(100);
+
       return Room.create(newRoom).then((r) => r.populate(roomPopulate));
     })
   );
