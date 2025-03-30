@@ -5,6 +5,9 @@ import { NewCreatedRoom } from './room.interfaces';
 const createRoomBody: Record<keyof NewCreatedRoom, any> = {
   hotel: Joi.custom(objectId),
   quantity: Joi.number(),
+  suffix: Joi.string().allow(null, ''),
+  prefix: Joi.string().allow(null, ''),
+  start: Joi.number().allow(null, ''),
 };
 
 export const createRoom = {

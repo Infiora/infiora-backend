@@ -65,7 +65,7 @@ export interface IRoomModel extends Model<IRoomDoc> {
 
 export type UpdateRoomBody = Partial<IRoom>;
 
-export type NewCreatedRoom = { hotel: string; quantity: number };
+export type NewCreatedRoom = { hotel: string; quantity: number; start: number; suffix: string; prefix: string };
 
 export const roomPopulate = [
   {
