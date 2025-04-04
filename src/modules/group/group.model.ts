@@ -75,7 +75,17 @@ const groupSchema = new mongoose.Schema<IGroupDoc, IGroupModel>(
         enum: ['none', 'icon', 'image', 'url'],
         default: 'none',
       },
-      questions: [String],
+      questions: [
+        {
+          text: { type: String },
+          type: {
+            type: String,
+            enum: ['1', '2', '3'],
+            default: '1',
+          },
+          _id: false,
+        },
+      ],
       isActive: {
         type: Boolean,
         default: true,

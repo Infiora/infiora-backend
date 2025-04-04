@@ -103,7 +103,12 @@ export const updateRoom = {
         color: Joi.string().allow(null, ''),
         imageType: Joi.string().valid('none', 'icon', 'image', 'url'),
         image: Joi.any(),
-        questions: Joi.array().items(Joi.string()),
+        questions: Joi.array().items(
+          Joi.object().keys({
+            text: Joi.string(),
+            type: Joi.any(),
+          })
+        ),
         isActive: Joi.boolean(),
       })
       .allow(null, ''),

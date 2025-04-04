@@ -2,6 +2,31 @@ import { Model, Document } from 'mongoose';
 import { QueryResult } from '../paginate/paginate';
 import { IHotelDoc } from '../hotel/hotel.interfaces';
 
+interface INewsletter {
+  message?: string;
+  successMessage?: string;
+  buttonText?: string;
+  mainButtonText?: string;
+  type?: string;
+  color?: string;
+  image?: string;
+  imageType?: 'none' | 'image' | 'icon' | 'url';
+  isActive?: boolean;
+}
+interface IFeedback {
+  questions?: { text: string; type: any }[];
+  isActive?: boolean;
+  message?: string;
+  successMessage?: string;
+  buttonText?: string;
+  link?: string;
+  color?: string;
+  type?: 'button' | 'popup';
+  mainButtonText?: string;
+  imageType?: 'none' | 'icon' | 'url' | 'image';
+  image?: string;
+}
+
 export interface IRoom {
   hotel: IHotelDoc;
   number?: string;
@@ -31,30 +56,8 @@ export interface IRoom {
     color?: string;
     isActive?: boolean;
   };
-  newsletter?: {
-    message?: string;
-    successMessage?: string;
-    buttonText?: string;
-    mainButtonText?: string;
-    type?: string;
-    color?: string;
-    image?: string;
-    imageType?: 'none' | 'image' | 'icon' | 'url';
-    isActive?: boolean;
-  };
-  feedback?: {
-    message?: string;
-    successMessage?: string;
-    buttonText?: string;
-    mainButtonText?: string;
-    link?: string;
-    type?: string;
-    color?: string;
-    image?: string;
-    imageType?: 'none' | 'image' | 'icon' | 'url';
-    questions?: string[];
-    isActive?: boolean;
-  };
+  newsletter?: INewsletter;
+  feedback?: IFeedback;
 }
 
 export interface IRoomDoc extends IRoom, Document {}
