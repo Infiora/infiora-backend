@@ -3,7 +3,12 @@ import { QueryResult } from '../paginate/paginate';
 
 export interface IFeedback {
   room: ObjectId;
-  answers: Record<string, string | number | boolean | null>;
+  answers: [
+    {
+      question: string;
+      value: string | number | boolean | null;
+    }
+  ];
 }
 
 export interface IFeedbackDoc extends IFeedback, Document {}

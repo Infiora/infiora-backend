@@ -10,11 +10,12 @@ const feedbackSchema = new mongoose.Schema<IFeedbackDoc, IFeedbackModel>(
       required: true,
       ref: 'Room',
     },
-    answers: {
-      type: Map,
-      of: mongoose.Schema.Types.Mixed,
-      required: true,
-    },
+    answers: [
+      {
+        question: { type: String, required: true },
+        value: { type: mongoose.Schema.Types.Mixed },
+      },
+    ],
   },
   {
     timestamps: true,

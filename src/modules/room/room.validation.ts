@@ -126,8 +126,13 @@ export const createFeedback = {
     roomId: Joi.required().custom(objectId),
   }),
   body: Joi.object<NewCreatedFeedback>({
-    answers: Joi.object()
-      .pattern(Joi.string(), Joi.alternatives(Joi.string(), Joi.number(), Joi.boolean(), Joi.allow(null)))
+    answers: Joi.array()
+      .items(
+        Joi.object({
+          question: Joi.string().required(),
+          value: Joi.alternatives().try(Joi.string(), Joi.number(), Joi.boolean(), Joi.valid(null)).required(),
+        })
+      )
       .required(),
   }),
 };
