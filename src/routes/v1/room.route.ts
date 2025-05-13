@@ -12,6 +12,11 @@ router
   .get(validate(roomValidation.getRooms), roomController.getRooms);
 
 router
+  .route('/:roomId/feedback')
+  .post(validate(roomValidation.createFeedback), roomController.createFeedback)
+  .get(auth(), isRoomOwner, validate(roomValidation.getFeedbacks), roomController.getFeedbacks);
+
+router
   .route('/:roomId')
   .get(validate(roomValidation.getRoom), roomController.getRoom)
   .patch(auth(), isRoomOwner, validate(roomValidation.updateRoom), roomController.updateRoom)

@@ -1,17 +1,16 @@
 import Joi from 'joi';
 import { objectId } from '../validate/custom.validation';
-import { NewCreatedRoom } from './room.interfaces';
-
-const createRoomBody: Record<keyof NewCreatedRoom, any> = {
-  hotel: Joi.custom(objectId),
-  quantity: Joi.number(),
-  suffix: Joi.string().allow(null, ''),
-  prefix: Joi.string().allow(null, ''),
-  start: Joi.number().allow(null, ''),
-};
+import { NewCreatedRoom, UpdateRoomBody } from './room.interfaces';
+import { NewCreatedFeedback } from '../feedback/feedback.interfaces';
 
 export const createRoom = {
-  body: Joi.object().keys(createRoomBody),
+  body: Joi.object<NewCreatedRoom>({
+    hotel: Joi.custom(objectId),
+    quantity: Joi.number(),
+    suffix: Joi.string().allow(null, ''),
+    prefix: Joi.string().allow(null, ''),
+    start: Joi.number().allow(null, ''),
+  }),
 };
 
 export const getRooms = {
@@ -44,7 +43,7 @@ export const updateRoom = {
   params: Joi.object().keys({
     roomId: Joi.required().custom(objectId),
   }),
-  body: Joi.object().keys({
+  body: Joi.object<UpdateRoomBody>({
     number: Joi.string(),
     description: Joi.string().allow(null, ''),
     group: Joi.custom(objectId).allow(null, ''),
@@ -119,5 +118,31 @@ export const updateRoom = {
 export const deleteRoom = {
   params: Joi.object().keys({
     roomId: Joi.required().custom(objectId),
+  }),
+};
+
+export const createFeedback = {
+  params: Joi.object().keys({
+    roomId: Joi.required().custom(objectId),
+  }),
+  body: Joi.object<NewCreatedFeedback>({
+    answers: Joi.object()
+      .pattern(Joi.string(), Joi.alternatives(Joi.string(), Joi.number(), Joi.boolean(), Joi.allow(null)))
+      .required(),
+  }),
+};
+
+export const getFeedbacks = {
+  params: Joi.object().keys({
+    roomId: Joi.required().custom(objectId),
+  }),
+  query: Joi.object().keys({
+    startDate: Joi.string(),
+    endDate: Joi.string(),
+    search: Joi.string(),
+    sortBy: Joi.string(),
+    projectBy: Joi.string(),
+    limit: Joi.number().integer(),
+    page: Joi.number().integer(),
   }),
 };
