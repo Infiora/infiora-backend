@@ -14,7 +14,7 @@ jobs:
 
     steps:
       - name: Stop App
-        run: pm2 stop app
+        run: pm2 stop app || true
 
       - name: Disable Husky Hooks
         run: git config core.hooksPath /dev/null
@@ -26,13 +26,22 @@ jobs:
         uses: actions/setup-node@v2
         with:
           node-version: ${{ matrix.node-version }}
-          cache: 'yarn'
+
+      - name: Cache Yarn
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.cache/yarn
+            node_modules
+          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-yarn-
 
       - name: Install Dependencies
-        run: yarn install
+        run: yarn install --frozen-lockfile
 
       - name: Compile Code
         run: yarn compile
 
       - name: Restart App
-        run: pm2 restart app
+        run: pm2 restart app || true
