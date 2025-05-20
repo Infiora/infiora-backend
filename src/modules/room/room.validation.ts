@@ -122,10 +122,9 @@ export const deleteRoom = {
 };
 
 export const createFeedback = {
-  params: Joi.object().keys({
-    roomId: Joi.required().custom(objectId),
-  }),
   body: Joi.object<NewCreatedFeedback>({
+    room: Joi.required().custom(objectId),
+    hotel: Joi.required().custom(objectId),
     answers: Joi.array()
       .items(
         Joi.object({
@@ -138,10 +137,9 @@ export const createFeedback = {
 };
 
 export const getFeedbacks = {
-  params: Joi.object().keys({
-    roomId: Joi.required().custom(objectId),
-  }),
   query: Joi.object().keys({
+    room: Joi.custom(objectId),
+    hotel: Joi.required().custom(objectId),
     startDate: Joi.string(),
     endDate: Joi.string(),
     search: Joi.string(),

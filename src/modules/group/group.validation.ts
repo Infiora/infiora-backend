@@ -36,7 +36,7 @@ const createGroupBody: Record<keyof NewCreatedGroup, any> = {
       mainButtonText: Joi.string().allow(null, ''),
       type: Joi.string().allow(null, ''),
       color: Joi.string().allow(null, ''),
-      imageType: Joi.string().valid('none', 'icon', 'image', 'url'),
+      imageType: Joi.string().valid('none', 'icon', 'image', 'url').allow(null, ''),
       image: Joi.any(),
       isActive: Joi.boolean(),
     })
@@ -50,7 +50,7 @@ const createGroupBody: Record<keyof NewCreatedGroup, any> = {
       link: Joi.string().allow(null, ''),
       type: Joi.string().allow(null, ''),
       color: Joi.string().allow(null, ''),
-      imageType: Joi.string().valid('none', 'icon', 'image', 'url'),
+      imageType: Joi.string().valid('none', 'icon', 'image', 'url').allow(null, ''),
       image: Joi.any(),
       questions: Joi.array().items(
         Joi.object().keys({
@@ -129,7 +129,7 @@ export const updateGroup = {
         mainButtonText: Joi.string().allow(null, ''),
         type: Joi.string().allow(null, ''),
         color: Joi.string().allow(null, ''),
-        imageType: Joi.string().valid('none', 'icon', 'image', 'url'),
+        imageType: Joi.string().valid('none', 'icon', 'image', 'url').allow(null, ''),
         image: Joi.any(),
         isActive: Joi.boolean(),
       })
@@ -143,7 +143,7 @@ export const updateGroup = {
         link: Joi.string().allow(null, ''),
         type: Joi.string().allow(null, ''),
         color: Joi.string().allow(null, ''),
-        imageType: Joi.string().valid('none', 'icon', 'image', 'url'),
+        imageType: Joi.string().valid('none', 'icon', 'image', 'url').allow(null, ''),
         image: Joi.any(),
         questions: Joi.array().items(
           Joi.object().keys({

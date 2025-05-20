@@ -2,6 +2,7 @@ import { Model, Document, ObjectId } from 'mongoose';
 import { QueryResult } from '../paginate/paginate';
 
 export interface IFeedback {
+  hotel: ObjectId;
   room: ObjectId;
   answers: [
     {
@@ -17,4 +18,4 @@ export interface IFeedbackModel extends Model<IFeedbackDoc> {
   paginate(filter: Record<string, any>, options: Record<string, any>): Promise<QueryResult>;
 }
 
-export type NewCreatedFeedback = Omit<IFeedback, 'room'>;
+export type NewCreatedFeedback = IFeedback;

@@ -77,20 +77,19 @@ export const deleteRoom = catchAsync(async (req: Request, res: Response) => {
 });
 
 export const getFeedbacks = catchAsync(async (req: Request, res: Response) => {
-  const room = toObjectId(req.params['roomId']);
   const { startDate, endDate } = pick(req.query, ['startDate', 'endDate']);
   const { start, end } = toDate({ startDate, endDate });
   const filter = {
-    room,
+    ...pick(req.query, ['room', 'hotel']),
     createdAt: { $gte: start, $lte: end },
   };
+
   const options: IOptions = pick(req.query, ['sortBy', 'limit', 'page', 'projectBy']);
   const result = await feedbackService.queryFeedbacks(filter, options);
   res.send(result);
 });
 
 export const createFeedback = catchAsync(async (req: Request, res: Response) => {
-  const room = toObjectId(req.params['roomId']);
-  const feedback = await feedbackService.createFeedback({ room, ...req.body });
+  const feedback = await feedbackService.createFeedback(req.body);
   res.status(httpStatus.CREATED).send(feedback);
 });

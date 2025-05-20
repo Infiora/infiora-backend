@@ -5,6 +5,11 @@ import { IFeedbackDoc, IFeedbackModel } from './feedback.interfaces';
 
 const feedbackSchema = new mongoose.Schema<IFeedbackDoc, IFeedbackModel>(
   {
+    hotel: {
+      type: mongoose.Schema.Types.ObjectId,
+      required: true,
+      ref: 'Hotel',
+    },
     room: {
       type: mongoose.Schema.Types.ObjectId,
       required: true,

@@ -53,7 +53,6 @@ const groupSchema = new mongoose.Schema<IGroupDoc, IGroupModel>(
       image: String,
       imageType: {
         type: String,
-        enum: ['none', 'icon', 'image', 'url'],
         default: 'none',
       },
       isActive: {
@@ -72,7 +71,6 @@ const groupSchema = new mongoose.Schema<IGroupDoc, IGroupModel>(
       image: String,
       imageType: {
         type: String,
-        enum: ['none', 'icon', 'image', 'url'],
         default: 'none',
       },
       questions: [

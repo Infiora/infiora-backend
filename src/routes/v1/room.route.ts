@@ -12,9 +12,9 @@ router
   .get(validate(roomValidation.getRooms), roomController.getRooms);
 
 router
-  .route('/:roomId/feedback')
+  .route('/feedback')
   .post(validate(roomValidation.createFeedback), roomController.createFeedback)
-  .get(auth(), isRoomOwner, validate(roomValidation.getFeedbacks), roomController.getFeedbacks);
+  .get(auth(), validate(roomValidation.getFeedbacks), roomController.getFeedbacks);
 
 router
   .route('/:roomId')
