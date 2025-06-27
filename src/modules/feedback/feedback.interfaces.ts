@@ -10,6 +10,7 @@ export interface IFeedback {
       value: string | number | boolean | null;
     }
   ];
+  goodness: number;
 }
 
 export interface IFeedbackDoc extends IFeedback, Document {}

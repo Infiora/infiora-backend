@@ -85,11 +85,13 @@ const getKeyMetrics = (activities: IActivity[]) => {
   const viewActivities = activities.filter((a) => a.action === 'view');
   const recentActivities = viewActivities.filter((a) => new Date(a.updatedAt).getTime() > oneMinuteAgo);
   const tapActivities = activities.filter((a) => a.action === 'tap');
+  const feedbackActivities = activities.filter((a) => a.action === 'feedback');
 
   const views = viewActivities.length;
   const liveViews = recentActivities.length;
   const engagedViews = viewActivities.filter((a) => a.details.engaged).length;
   const taps = tapActivities.length;
+  const feedbacks = feedbackActivities.length;
 
   const uniqueViews = new Set(viewActivities.map(({ details }) => details.visitorId || '')).size;
   const returningViews = views - uniqueViews;
@@ -132,6 +134,7 @@ const getKeyMetrics = (activities: IActivity[]) => {
     views,
     liveViews,
     taps,
+    feedbacks,
     uniqueViews,
     returningViews,
     timeSpent,

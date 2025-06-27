@@ -125,6 +125,7 @@ export const createFeedback = {
   body: Joi.object<NewCreatedFeedback>({
     room: Joi.required().custom(objectId),
     hotel: Joi.required().custom(objectId),
+    goodness: Joi.number(),
     answers: Joi.array()
       .items(
         Joi.object({

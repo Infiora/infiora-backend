@@ -21,6 +21,7 @@ const feedbackSchema = new mongoose.Schema<IFeedbackDoc, IFeedbackModel>(
         value: { type: mongoose.Schema.Types.Mixed },
       },
     ],
+    goodness: { type: Number },
   },
   {
     timestamps: true,

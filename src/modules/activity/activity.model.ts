@@ -18,7 +18,7 @@ const activitySchema = new mongoose.Schema<IActivityDoc, IActivityModel>(
     action: {
       type: String,
       required: true,
-      enum: ['view', 'tap'],
+      enum: ['view', 'tap', 'feedback'],
     },
     details: mongoose.Schema.Types.Mixed,
   },

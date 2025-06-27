@@ -91,5 +91,20 @@ export const getFeedbacks = catchAsync(async (req: Request, res: Response) => {
 
 export const createFeedback = catchAsync(async (req: Request, res: Response) => {
   const feedback = await feedbackService.createFeedback(req.body);
+  const room = await roomService.getRoomById(req.body.room);
+  await Activity.create({
+    user: room?.hotel?.user,
+    hotel: room?.hotel?.id,
+    room: req.body.room,
+    action: 'feedback',
+    details: {
+      image: room?.hotel?.image,
+      title: room?.hotel?.name,
+      headline: `Feedback on room ${room?.number || ''}.`,
+      room: room?.id,
+      goodness: req.body.goodness,
+    },
+  });
+
   res.status(httpStatus.CREATED).send(feedback);
 });

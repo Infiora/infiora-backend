@@ -5,7 +5,7 @@ import { IUser } from '../user/user.interfaces';
 export interface IActivity {
   user: ObjectId | IUser;
   hotel: any;
-  action: 'view' | 'tap';
+  action: 'view' | 'tap' | 'feedback';
   details?: any;
   createdAt: string;
   updatedAt: string;
