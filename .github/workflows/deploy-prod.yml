@@ -1,4 +1,4 @@
-name: Deploy TS Express to Elastic Beanstalk
+name: Deploy Node to Elastic Beanstalk
 
 on:
   push:
