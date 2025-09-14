@@ -1,47 +1,35 @@
-name: Node.js CI - Prod
+name: Deploy TS Express to Elastic Beanstalk
 
 on:
   push:
-    branches: ['main']
+    branches: [main]
 
 jobs:
-  build:
-    runs-on: prod
-
-    strategy:
-      matrix:
-        node-version: [18.x]
+  deploy:
+    runs-on: ubuntu-latest
 
     steps:
-      - name: Stop App
-        run: pm2 stop app || true
+      - name: Checkout
+        uses: actions/checkout@v4
 
-      - name: Disable Husky Hooks
-        run: git config core.hooksPath /dev/null
-
-      - name: Checkout Code
-        uses: actions/checkout@v3
-
-      - name: Set Up Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@v2
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
         with:
-          node-version: ${{ matrix.node-version }}
+          node-version: 22
 
-      - name: Cache Yarn
-        uses: actions/cache@v3
+      - name: Install deps & build
+        run: |
+          npm ci
+          npm run build
+          zip -r deploy.zip . -x "*.git*"
+
+      - name: Deploy to Elastic Beanstalk
+        uses: einaregilsson/beanstalk-deploy@v22
         with:
-          path: |
-            ~/.cache/yarn
-            node_modules
-          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-yarn-
-
-      - name: Install Dependencies
-        run: yarn install --frozen-lockfile
-
-      - name: Compile Code
-        run: yarn compile
-
-      - name: Restart App
-        run: pm2 restart app || true
+          aws_access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws_secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          application_name: infiora-backend
+          environment_name: infiora-backend-env
+          version_label: ${{ github.sha }}
+          region: eu-north-1
+          deployment_package: deploy.zip
