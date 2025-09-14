@@ -19,8 +19,8 @@ jobs:
 
       - name: Install deps & build
         run: |
-          npm ci
-          npm run build
+          yarn install --frozen-lockfile
+          yarn build
           zip -r deploy.zip . -x "*.git*"
 
       - name: Deploy to Elastic Beanstalk
