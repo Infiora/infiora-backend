@@ -20,7 +20,7 @@ jobs:
       - name: Install deps & build
         run: |
           yarn install --frozen-lockfile
-          yarn build
+          yarn compile
           zip -r deploy.zip . -x "*.git*"
 
       - name: Deploy to Elastic Beanstalk
