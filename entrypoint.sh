@@ -34,8 +34,14 @@ python $MANAGE_PATH migrate
 
 # Collect static files in production
 if [ "$DEBUG" = "False" ]; then
-    echo "Collecting static files to S3..."
-    python $MANAGE_PATH collectstatic --noinput
+    if [ -n "$AWS_ACCESS_KEY_ID" ] && [ -n "$AWS_SECRET_ACCESS_KEY" ] && [ -n "$AWS_STORAGE_BUCKET_NAME" ]; then
+        echo "Collecting static files to S3..."
+        python $MANAGE_PATH collectstatic --noinput
+    else
+        echo "AWS S3 not configured. Creating local static directory..."
+        mkdir -p /app/staticfiles
+        python $MANAGE_PATH collectstatic --noinput
+    fi
 fi
 
 # Start server
