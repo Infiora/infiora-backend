@@ -39,24 +39,27 @@ jobs:
             cd /home/${{ secrets.EC2_USERNAME }}/infiora-backend
 
             # Create production environment file from GitHub secrets
-            cat > .env.prod << 'EOF'
+            cat > .env << 'EOF'
             SECRET_KEY=${{ secrets.SECRET_KEY }}
             DEBUG=False
             ALLOWED_HOSTS=${{ secrets.ALLOWED_HOSTS }}
             DB_ENGINE=django.db.backends.postgresql
             DB_NAME=infiora
             DB_USER=infiora
-            DB_PASSWORD=infiora
+            DB_PASSWORD=infiora123
             DB_HOST=db
             DB_PORT=5432
+            POSTGRES_DB=infiora
+            POSTGRES_USER=infiora
+            POSTGRES_PASSWORD=infiora123
             EOF
 
             # Make sure the file is readable
-            chmod 644 .env.prod
+            chmod 644 .env
 
             # Verify environment file was created
             echo "Environment file contents:"
-            cat .env.prod
+            cat .env
 
             # Use newgrp to apply docker group for this session
             newgrp docker << 'DOCKER_COMMANDS'
