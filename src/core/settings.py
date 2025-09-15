@@ -28,6 +28,16 @@ DEBUG = config('DEBUG', default='True', cast=lambda x: x.lower() == 'true')
 
 ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='localhost,127.0.0.1,0.0.0.0', cast=lambda v: [s.strip() for s in v.split(',')])
 
+# CSRF Configuration
+CSRF_TRUSTED_ORIGINS = config('CSRF_TRUSTED_ORIGINS', default='http://localhost:8000,http://127.0.0.1:8000', cast=lambda v: [s.strip() for s in v.split(',')])
+
+# Additional security settings for production
+if not DEBUG:
+    SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+    SECURE_SSL_REDIRECT = False  # Handle SSL at reverse proxy level
+    SESSION_COOKIE_SECURE = False  # Set to True when using HTTPS
+    CSRF_COOKIE_SECURE = False  # Set to True when using HTTPS
+
 
 # Application definition
 

@@ -86,6 +86,7 @@ EC2_USERNAME=ubuntu
 EC2_PRIVATE_KEY=your-private-key-content
 SECRET_KEY=your-django-secret-key-here
 ALLOWED_HOSTS=your-domain.com,your-ec2-ip
+CSRF_TRUSTED_ORIGINS=https://your-domain.com,https://your-ec2-ip:8000
 ```
 
 **Optional AWS S3 secrets (for static files):**
