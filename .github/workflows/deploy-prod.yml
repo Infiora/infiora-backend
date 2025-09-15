@@ -75,3 +75,33 @@ jobs:
             echo "Deployment completed successfully!"
             echo "Application is running on port 8000"
             DOCKER_COMMANDS
+
+            # Wait for application to start up
+            echo "Waiting for application to start..."
+            sleep 30
+
+            # Test health check endpoint
+            echo "Testing health check endpoint..."
+            HEALTH_RESPONSE=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:8000/health/)
+
+            if [ "$HEALTH_RESPONSE" = "200" ]; then
+                echo "✅ Health check passed! Application is healthy."
+
+                # Get detailed health check response
+                echo "Health check response:"
+                curl -s http://localhost:8000/health/ | python3 -m json.tool || echo "Could not parse JSON response"
+
+                exit 0
+            else
+                echo "❌ Health check failed! HTTP status: $HEALTH_RESPONSE"
+
+                # Show container logs for debugging
+                echo "Container logs:"
+                docker-compose -f docker-compose.prod.yml logs --tail=50
+
+                # Try to get health check response anyway
+                echo "Attempting to get health check response:"
+                curl -v http://localhost:8000/health/ || echo "Could not reach health endpoint"
+
+                exit 1
+            fi
