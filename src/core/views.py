@@ -26,16 +26,27 @@ def health_check(request):
     # Get current timestamp
     timestamp = int(time.time())
 
-    response_data = {
-        "status": "healthy" if db_status == "healthy" else "unhealthy",
-        "timestamp": timestamp,
-        "service": "infiora-backend",
-        "version": "1.0.0",
-        "database": db_status,
-        "debug": settings.DEBUG,
-    }
+    try:
+        response_data = {
+            "status": "healthy" if db_status == "healthy" else "unhealthy",
+            "timestamp": timestamp,
+            "service": "infiora-backend",
+            "version": "1.0.0",
+            "database": db_status,
+            "debug": settings.DEBUG,
+            "allowed_hosts": list(settings.ALLOWED_HOSTS),
+            "host_header": request.get_host(),
+        }
 
-    # Return 200 if healthy, 503 if unhealthy
-    status_code = 200 if response_data["status"] == "healthy" else 503
+        # Return 200 if healthy, 503 if unhealthy
+        status_code = 200 if response_data["status"] == "healthy" else 503
 
-    return JsonResponse(response_data, status=status_code)
+        return JsonResponse(response_data, status=status_code)
+
+    except Exception as e:
+        # Fallback response if there's any issue
+        return JsonResponse({
+            "status": "error",
+            "error": str(e),
+            "service": "infiora-backend"
+        }, status=500)
