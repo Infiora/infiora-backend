@@ -32,16 +32,24 @@ echo "Using manage.py at: $MANAGE_PATH"
 # Run migrations
 python $MANAGE_PATH migrate
 
-# Collect static files in production (temporarily disabled to get app running)
+# Collect static files in production
 if [ "$DEBUG" = "False" ]; then
-    echo "DEBUG: Checking AWS configuration..."
+    echo "DEBUG: Checking AWS S3 configuration..."
     echo "AWS_ACCESS_KEY_ID: '${AWS_ACCESS_KEY_ID:-UNSET}'"
     echo "AWS_SECRET_ACCESS_KEY: '${AWS_SECRET_ACCESS_KEY:-UNSET}'"
     echo "AWS_STORAGE_BUCKET_NAME: '${AWS_STORAGE_BUCKET_NAME:-UNSET}'"
 
-    echo "Skipping collectstatic temporarily to get app running..."
-    mkdir -p /app/staticfiles
-    # python $MANAGE_PATH collectstatic --noinput
+    # Check if all AWS variables are set and not empty
+    if [ -n "${AWS_ACCESS_KEY_ID:-}" ] && [ "${AWS_ACCESS_KEY_ID}" != "" ] && \
+       [ -n "${AWS_SECRET_ACCESS_KEY:-}" ] && [ "${AWS_SECRET_ACCESS_KEY}" != "" ] && \
+       [ -n "${AWS_STORAGE_BUCKET_NAME:-}" ] && [ "${AWS_STORAGE_BUCKET_NAME}" != "" ]; then
+        echo "✅ S3 configured - collecting static files to S3..."
+        python $MANAGE_PATH collectstatic --noinput
+    else
+        echo "⚠️  S3 not configured - using local static files..."
+        mkdir -p /app/staticfiles
+        python $MANAGE_PATH collectstatic --noinput
+    fi
 fi
 
 # Start server

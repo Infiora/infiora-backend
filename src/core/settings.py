@@ -24,9 +24,9 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = config('SECRET_KEY', default='django-insecure-)%l2_2b1zzx_t@*8)4@xj=w+nyo!^z5hukp6hv^5*e444a@ths')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = config('DEBUG', default=True, cast=bool)
+DEBUG = config('DEBUG', default='True', cast=lambda x: x.lower() == 'true')
 
-ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='localhost,127.0.0.1', cast=lambda v: [s.strip() for s in v.split(',')])
+ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='localhost,127.0.0.1,0.0.0.0', cast=lambda v: [s.strip() for s in v.split(',')])
 
 
 # Application definition
@@ -126,8 +126,12 @@ AWS_SECRET_ACCESS_KEY = config('AWS_SECRET_ACCESS_KEY', default='')
 AWS_STORAGE_BUCKET_NAME = config('AWS_STORAGE_BUCKET_NAME', default='')
 AWS_S3_REGION_NAME = config('AWS_S3_REGION_NAME', default='us-east-1')
 
-# Check if S3 is configured
-USE_S3 = bool(AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY and AWS_STORAGE_BUCKET_NAME)
+# Check if S3 is configured (only use S3 if all credentials are provided and not empty)
+USE_S3 = bool(
+    AWS_ACCESS_KEY_ID and AWS_ACCESS_KEY_ID.strip() and
+    AWS_SECRET_ACCESS_KEY and AWS_SECRET_ACCESS_KEY.strip() and
+    AWS_STORAGE_BUCKET_NAME and AWS_STORAGE_BUCKET_NAME.strip()
+)
 
 if USE_S3 and not DEBUG:
     # Production with S3: Use AWS S3
