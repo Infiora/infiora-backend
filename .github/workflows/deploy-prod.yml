@@ -32,11 +32,14 @@ jobs:
           key: ${{ secrets.EC2_PRIVATE_KEY }}
           port: 22
           script: |
+            # Add user to docker group if not already added
+            sudo usermod -aG docker ${{ secrets.EC2_USERNAME }}
+
             # Navigate to project directory
             cd /home/${{ secrets.EC2_USERNAME }}/infiora-backend
 
             # Create production environment file from GitHub secrets
-            cat > .env.prod << EOF
+            cat > .env.prod << 'EOF'
             SECRET_KEY=${{ secrets.SECRET_KEY }}
             DEBUG=False
             ALLOWED_HOSTS=${{ secrets.ALLOWED_HOSTS }}
@@ -48,6 +51,15 @@ jobs:
             DB_PORT=5432
             EOF
 
+            # Make sure the file is readable
+            chmod 644 .env.prod
+
+            # Verify environment file was created
+            echo "Environment file contents:"
+            cat .env.prod
+
+            # Use newgrp to apply docker group for this session
+            newgrp docker << 'DOCKER_COMMANDS'
             # Stop existing containers
             docker-compose -f docker-compose.prod.yml down
 
@@ -62,3 +74,4 @@ jobs:
 
             echo "Deployment completed successfully!"
             echo "Application is running on port 8000"
+            DOCKER_COMMANDS
