@@ -21,10 +21,16 @@ jobs:
           key: ${{ secrets.EC2_PRIVATE_KEY }}
           port: 22
           script: |
-            # Navigate to project directory
-            cd /home/${{ secrets.EC2_USERNAME }}/infiora-backend || exit 1
+            # Create project directory if it doesn't exist
+            if [ ! -d "/home/${{ secrets.EC2_USERNAME }}/infiora-backend" ]; then
+              echo "Directory doesn't exist, cloning repository..."
+              git clone https://github.com/${{ github.repository }}.git /home/${{ secrets.EC2_USERNAME }}/infiora-backend
+            fi
 
-            # Pull latest changes (works with SSH key setup)
+            # Navigate to project directory
+            cd /home/${{ secrets.EC2_USERNAME }}/infiora-backend
+
+            # Pull latest changes
             git pull origin main
 
             # Create production environment file from GitHub secrets
