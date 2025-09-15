@@ -38,11 +38,18 @@ jobs:
             # Navigate to project directory
             cd /home/${{ secrets.EC2_USERNAME }}/infiora-backend
 
+            # Generate a secure SECRET_KEY if not provided
+            if [ -z "${{ secrets.SECRET_KEY }}" ]; then
+              SECRET_KEY="django-$(openssl rand -hex 32)"
+            else
+              SECRET_KEY="${{ secrets.SECRET_KEY }}"
+            fi
+
             # Create production environment file from GitHub secrets
-            cat > .env << 'EOF'
-            SECRET_KEY=${{ secrets.SECRET_KEY }}
+            cat > .env << EOF
+            SECRET_KEY=${SECRET_KEY}
             DEBUG=False
-            ALLOWED_HOSTS=${{ secrets.ALLOWED_HOSTS }}
+            ALLOWED_HOSTS=${{ secrets.ALLOWED_HOSTS || 'localhost,127.0.0.1' }}
             DB_ENGINE=django.db.backends.postgresql
             DB_NAME=infiora
             DB_USER=infiora
