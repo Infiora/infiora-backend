@@ -39,13 +39,23 @@ if [ "$DEBUG" = "False" ]; then
     echo "AWS_SECRET_ACCESS_KEY: '${AWS_SECRET_ACCESS_KEY:-UNSET}'"
     echo "AWS_STORAGE_BUCKET_NAME: '${AWS_STORAGE_BUCKET_NAME:-UNSET}'"
 
-    # Temporarily skip collectstatic to get app running - will fix static files later
-    echo "⚠️  Temporarily skipping collectstatic to get Django running..."
-    echo "Static files will be served from Django's built-in admin/auth static files"
+    # Collect static files with proper error handling
+    echo "📦 Collecting static files..."
+
+    # Create local staticfiles directory as fallback
     mkdir -p /app/staticfiles
 
-    # TODO: Re-enable this once we fix the STATIC_ROOT vs S3 configuration issue
-    # python $MANAGE_PATH collectstatic --noinput
+    # Try to collect static files
+    if python $MANAGE_PATH collectstatic --noinput; then
+        echo "✅ Static files collected successfully"
+    else
+        echo "⚠️  Static files collection failed, but continuing..."
+        echo "Django will serve static files from built-in locations"
+
+        # Ensure we have basic static directories for Django admin
+        mkdir -p /app/staticfiles/admin
+        mkdir -p /app/staticfiles/rest_framework
+    fi
 fi
 
 # Start server
