@@ -84,6 +84,9 @@ jobs:
             echo "Environment file contents:"
             cat .env
 
+            # Add localhost to ALLOWED_HOSTS for health check
+            sed -i 's/ALLOWED_HOSTS=.*/ALLOWED_HOSTS=localhost,127.0.0.1,0.0.0.0/' .env
+
             # Use newgrp to apply docker group for this session
             newgrp docker << 'DOCKER_COMMANDS'
             # Stop existing containers
