@@ -13,6 +13,17 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
+      - name: Copy files to EC2
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USERNAME }}
+          key: ${{ secrets.EC2_PRIVATE_KEY }}
+          port: 22
+          source: "."
+          target: "/home/${{ secrets.EC2_USERNAME }}/infiora-backend"
+          rm: true
+
       - name: Deploy to EC2
         uses: appleboy/ssh-action@v1.0.0
         with:
@@ -21,17 +32,8 @@ jobs:
           key: ${{ secrets.EC2_PRIVATE_KEY }}
           port: 22
           script: |
-            # Create project directory if it doesn't exist
-            if [ ! -d "/home/${{ secrets.EC2_USERNAME }}/infiora-backend" ]; then
-              echo "Directory doesn't exist, cloning repository..."
-              git clone https://github.com/${{ github.repository }}.git /home/${{ secrets.EC2_USERNAME }}/infiora-backend
-            fi
-
             # Navigate to project directory
             cd /home/${{ secrets.EC2_USERNAME }}/infiora-backend
-
-            # Pull latest changes
-            git pull origin main
 
             # Create production environment file from GitHub secrets
             cat > .env.prod << EOF
