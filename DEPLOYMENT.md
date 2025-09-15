@@ -79,6 +79,7 @@ cd /home/ubuntu/infiora-backend
 
 Add the following secrets to your GitHub repository (Settings � Secrets and variables � Actions):
 
+**Required secrets:**
 ```
 EC2_HOST=your-ec2-public-ip-or-domain
 EC2_USERNAME=ubuntu
@@ -86,6 +87,16 @@ EC2_PRIVATE_KEY=your-private-key-content
 SECRET_KEY=your-django-secret-key-here
 ALLOWED_HOSTS=your-domain.com,your-ec2-ip
 ```
+
+**Optional AWS S3 secrets (for static files):**
+```
+AWS_ACCESS_KEY_ID=your-aws-access-key
+AWS_SECRET_ACCESS_KEY=your-aws-secret-key
+AWS_STORAGE_BUCKET_NAME=your-s3-bucket-name
+AWS_S3_REGION_NAME=us-east-1
+```
+
+**Note**: If AWS S3 secrets are not provided, the application will still work but static files will be served locally (not recommended for production).
 
 **How to get your private key content:**
 1. On your local machine, display the private key:
@@ -222,21 +233,15 @@ sudo apt install nginx -y
 2. **Configure Nginx** (`/etc/nginx/sites-available/infiora`):
 ```bash
 sudo tee /etc/nginx/sites-available/infiora << EOF
-server {
-    listen 80;
-    server_name your-domain.com;
+server_name prod.infiora.hr www.prod.infiora.hr;
 
-    location / {
-        proxy_pass http://localhost:8000;
-        proxy_set_header Host \$host;
-        proxy_set_header X-Real-IP \$remote_addr;
-        proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
-        proxy_set_header X-Forwarded-Proto \$scheme;
-    }
-
-    location /static/ {
-        alias /home/ubuntu/infiora-backend/staticfiles/;
-    }
+location / {
+    proxy_pass http://localhost:8000;
+    proxy_http_version 1.1;
+    proxy_set_header Upgrade $http_upgrade;
+    proxy_set_header Connection 'upgrade';
+    proxy_set_header Host $host;
+    proxy_cache_bypass $http_upgrade;
 }
 EOF
 ```

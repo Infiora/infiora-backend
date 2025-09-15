@@ -32,10 +32,11 @@ echo "Using manage.py at: $MANAGE_PATH"
 # Run migrations
 python $MANAGE_PATH migrate
 
-# Collect static files in production (disabled for now since no static files exist)
-# if [ "$DEBUG" = "False" ]; then
-#     python $MANAGE_PATH collectstatic --noinput
-# fi
+# Collect static files in production
+if [ "$DEBUG" = "False" ]; then
+    echo "Collecting static files to S3..."
+    python $MANAGE_PATH collectstatic --noinput
+fi
 
 # Start server
 if [ "$DEBUG" = "True" ]; then
