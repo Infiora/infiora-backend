@@ -1,36 +1,35 @@
-version: '3'
+version: "3.8"
 
 services:
-  mongo:
-    container_name: mongo
-    image: mongo:4.2.1-bionic
-    restart: always
-    ports:
-      - "27018:27017"
-    networks:
-      - backend
-  app:
-    container_name: app
-    build:
-      context: .
-      dockerfile: Dockerfile
-      target: base
-    restart: always
-    env_file: .env
-    expose:
-      - ${PORT}
-    ports:
-      - ${PORT}:${PORT}
+  db:
+    image: postgres:15
     environment:
-      - MONGODB_URL=mongodb://mongo:27017/node-boilerplate
-      - CLIENT_URL=${CLIENT_URL}
-    links:
-      - mongo
-    depends_on:
-      - mongo
-    networks:
-      - backend
+      POSTGRES_DB: ${DB_NAME}
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER} -d ${DB_NAME}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
-networks:
-  backend:
-    driver: bridge
+  web:
+    build: .
+    env_file:
+      - .env
+    volumes:
+      - .:/app
+      - /app/venv
+    ports:
+      - "8000:8000"
+    depends_on:
+      db:
+        condition: service_healthy
+    restart: unless-stopped
+
+volumes:
+  postgres_data:

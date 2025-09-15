@@ -1,26 +1,34 @@
-# development stage
-FROM node:14-alpine as base
+FROM python:3.13-slim
 
-WORKDIR /usr/src/app
+# Set environment variables
+ENV PYTHONDONTWRITEBYTECODE=1
+ENV PYTHONUNBUFFERED=1
+ENV DJANGO_SETTINGS_MODULE=core.settings
 
-COPY package.json yarn.lock tsconfig.json ecosystem.config.json ./
+# Set work directory
+WORKDIR /app
 
-COPY ./src ./src
+# Install system dependencies
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends \
+        postgresql-client \
+        build-essential \
+        libpq-dev \
+    && rm -rf /var/lib/apt/lists/*
 
-RUN ls -a
+# Install Python dependencies
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
 
-RUN yarn install --pure-lockfile && yarn compile
+# Copy project
+COPY . .
 
-# production stage
+# Copy entrypoint script
+COPY entrypoint.sh /app/entrypoint.sh
+RUN chmod +x /app/entrypoint.sh
 
-FROM base as production
+# Expose port
+EXPOSE 8000
 
-WORKDIR /usr/prod/app
-
-ENV NODE_ENV=prod
-
-COPY package.json yarn.lock ecosystem.config.json ./
-
-RUN yarn install --production --pure-lockfile
-
-COPY --from=base /usr/src/app/dist ./dist
+# Set entrypoint
+ENTRYPOINT ["/app/entrypoint.sh"]

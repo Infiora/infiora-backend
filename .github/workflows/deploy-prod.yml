@@ -1,35 +1,56 @@
-name: Deploy Node to Elastic Beanstalk
+name: Deploy to EC2
 
 on:
   push:
     branches: [main]
+  workflow_dispatch:
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout
+      - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
+      - name: Deploy to EC2
+        uses: appleboy/ssh-action@v1.0.0
         with:
-          node-version: 22
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USERNAME }}
+          key: ${{ secrets.EC2_PRIVATE_KEY }}
+          port: 22
+          script: |
+            # Navigate to project directory
+            cd /home/${{ secrets.EC2_USERNAME }}/infiora-backend || exit 1
 
-      - name: Install deps & build
-        run: |
-          yarn install --frozen-lockfile
-          yarn compile
-          zip -r deploy.zip . -x "*.git*"
+            # Pull latest changes (works with SSH key setup)
+            git pull origin main
 
-      - name: Deploy to Elastic Beanstalk
-        uses: einaregilsson/beanstalk-deploy@v22
-        with:
-          aws_access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws_secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          application_name: infiora-backend
-          environment_name: Infiora-backend-env
-          version_label: ${{ github.sha }}
-          region: eu-north-1
-          deployment_package: deploy.zip
+            # Create production environment file from GitHub secrets
+            cat > .env.prod << EOF
+            SECRET_KEY=${{ secrets.SECRET_KEY }}
+            DEBUG=False
+            ALLOWED_HOSTS=${{ secrets.ALLOWED_HOSTS }}
+            DB_ENGINE=django.db.backends.postgresql
+            DB_NAME=infiora
+            DB_USER=infiora
+            DB_PASSWORD=infiora
+            DB_HOST=db
+            DB_PORT=5432
+            EOF
+
+            # Stop existing containers
+            docker-compose -f docker-compose.prod.yml down
+
+            # Build and start containers
+            docker-compose -f docker-compose.prod.yml up --build -d
+
+            # Clean up unused Docker resources
+            docker system prune -f
+
+            # Check if containers are running
+            docker-compose -f docker-compose.prod.yml ps
+
+            echo "Deployment completed successfully!"
+            echo "Application is running on port 8000"
