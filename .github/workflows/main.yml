@@ -76,6 +76,9 @@ jobs:
 
             # Client URL
             INFIORA_CLIENT_URL=${{ secrets.CLIENT_URL || 'http://localhost:3000' }}
+
+            # Database settings (matches docker-compose.yml)
+            INFIORA_DATABASES={"default":{"ENGINE":"django.db.backends.postgresql","NAME":"infiora","USER":"postgres","PASSWORD":"infiora","HOST":"db","PORT":"5432"}}
             EOF
 
             # Make sure the file is readable
@@ -111,12 +114,12 @@ jobs:
             echo "Testing application health..."
 
             # Check if Django can connect to database and is configured correctly
-            if docker-compose exec -T app poetry run python -m core.manage check --database default; then
+            if docker-compose exec -T web poetry run python -m core.manage check --database default; then
                 echo "✅ Application health check passed!"
 
                 # Get application status
                 echo "Application status:"
-                docker-compose exec -T app poetry run python -m core.manage check
+                docker-compose exec -T web poetry run python -m core.manage check
 
                 exit 0
             else
