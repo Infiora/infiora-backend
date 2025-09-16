@@ -1,10 +1,3 @@
-"""
-Django settings module selector.
-
-This module automatically imports the appropriate settings based on the
-DJANGO_SETTINGS_MODULE environment variable or defaults to dev.
-"""
-
 import os
 
 # Determine which settings module to use
