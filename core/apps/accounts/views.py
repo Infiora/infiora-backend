@@ -4,8 +4,6 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import RefreshToken, TokenError
 
-from core.emails.utils import send_reset_password_email, send_verification_email
-
 from .serializers import (
     ForgotPasswordSerializer,
     LoginSerializer,
@@ -16,6 +14,9 @@ from .serializers import (
     SendVerificationEmailSerializer,
     VerifyEmailSerializer,
 )
+
+# from core.emails.utils import send_reset_password_email, send_verification_email
+
 
 User = get_user_model()
 
@@ -103,10 +104,10 @@ class ForgotPasswordView(APIView):
     def post(self, request):
         serializer = ForgotPasswordSerializer(data=request.data)
         if serializer.is_valid():
-            email = serializer.validated_data["email"]
-            user = User.objects.get(email=email)
-            token = str(RefreshToken.for_user(user))
-            send_reset_password_email(user, token)
+            email = serializer.validated_data["email"]  # noqa: F841
+            # user = User.objects.get(email=email)
+            # token = str(RefreshToken.for_user(user))
+            # send_reset_password_email(user, token)  # TODO: Implement email functionality
             return Response({"message": "Password reset email sent."}, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
@@ -139,8 +140,8 @@ class SendVerificationEmailView(APIView):
                     {"message": "Email already verified."},
                     status=status.HTTP_400_BAD_REQUEST,
                 )
-            token = str(RefreshToken.for_user(user))
-            send_verification_email(user, token)
+            # token = str(RefreshToken.for_user(user))
+            # send_verification_email(user, token)  # TODO: Implement email functionality
             return Response({"message": "Verification email sent."}, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
