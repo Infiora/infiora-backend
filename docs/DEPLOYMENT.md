@@ -146,7 +146,7 @@ docker-compose logs -f
 # Django Settings
 INFIORA_DEBUG=False
 INFIORA_SECRET_KEY=your-secret-key
-INFIORA_CSRF_TRUSTED_ORIGINS=["https://yourdomain.com"]
+INFIORA_CSRF_TRUSTED_ORIGINS=[https://yourdomain.com,https://www.yourdomain.com]
 ```
 
 ### Optional Variables

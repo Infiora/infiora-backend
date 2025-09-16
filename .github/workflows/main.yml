@@ -60,7 +60,7 @@ jobs:
             # Django settings
             INFIORA_DEBUG=False
             INFIORA_SECRET_KEY=${SECRET_KEY}
-            INFIORA_CSRF_TRUSTED_ORIGINS=${{ secrets.CSRF_TRUSTED_ORIGINS || '["http://localhost:8000","https://localhost:8000"]' }}
+            INFIORA_CSRF_TRUSTED_ORIGINS=${{ secrets.CSRF_TRUSTED_ORIGINS || '[http://localhost:8000,https://localhost:8000]' }}
 
             # Email settings (optional)
             INFIORA_EMAIL_HOST=${{ secrets.EMAIL_HOST || 'smtp.gmail.com' }}
