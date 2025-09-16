@@ -1,4 +1,4 @@
-name: CI - Continuous Integration
+name: Test - Application Testing
 
 on:
   push:

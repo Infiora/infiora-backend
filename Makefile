@@ -135,3 +135,26 @@ clean-cache: ## Clean Python cache files
 	find . -name "*.pyo" -delete 2>/dev/null || true
 	find . -name ".coverage" -delete 2>/dev/null || true
 	rm -rf htmlcov/ .pytest_cache/ .mypy_cache/ 2>/dev/null || true
+
+workflow-check: ## Simulate GitHub Actions workflow locally
+	@echo "🔄 Running workflow simulation..."
+	@echo "1️⃣ Code Quality Phase..."
+	make quality
+	@echo "2️⃣ Test Phase..."
+	make django-check
+	@echo "✅ Workflow simulation complete!"
+
+workflow-help: ## Show workflow information
+	@echo "🔄 GitHub Actions Workflows:"
+	@echo ""
+	@echo "📋 Workflow Sequence:"
+	@echo "  1. Code Quality (code-quality.yml) - Formatting, linting, security"
+	@echo "  2. Application Tests (test.yml) - Django tests and deployment checks"
+	@echo "  3. Production Deploy (deploy.yml) - EC2 deployment (main branch only)"
+	@echo ""
+	@echo "🚀 Local Commands:"
+	@echo "  make workflow-check  - Simulate full workflow locally"
+	@echo "  make quality        - Run code quality checks"
+	@echo "  make django-check   - Run Django system checks"
+	@echo ""
+	@echo "📖 Documentation: docs/WORKFLOWS.md"

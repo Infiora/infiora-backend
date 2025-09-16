@@ -1,4 +1,4 @@
-name: CD - Continuous Deployment
+name: Deploy - Production Deployment
 
 on:
   push:
@@ -6,12 +6,18 @@ on:
   workflow_dispatch:
 
 jobs:
-  # Call the CI workflow first
-  ci:
-    uses: ./.github/workflows/ci.yml
+  # Run code quality checks first
+  code-quality:
+    uses: ./.github/workflows/code-quality.yml
 
+  # Run application tests
+  test:
+    needs: code-quality
+    uses: ./.github/workflows/test.yml
+
+  # Deploy to production
   deploy:
-    needs: ci
+    needs: [code-quality, test]
     runs-on: ubuntu-latest
 
     steps:
