@@ -1,11 +1,6 @@
 import os
 
-from dotenv import load_dotenv
-
 from .misc import yaml_coerce
-
-# Load environment variables from .env file
-load_dotenv()
 
 
 def get_settings_from_environment(prefix):

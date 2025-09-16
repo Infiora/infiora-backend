@@ -26,6 +26,8 @@ INSTALLED_APPS = [
     "django_filters",
     "debug_toolbar",
     "storages",
+    # Apps
+    "core.apps.accounts.apps.AccountsConfig",
 ]
 
 MIDDLEWARE = [
