@@ -15,7 +15,7 @@ repos:
 
   # Flake8 - Linting
   - repo: https://github.com/pycqa/flake8
-    rev: 7.1.1
+    rev: 6.1.0
     hooks:
       - id: flake8
         additional_dependencies:
