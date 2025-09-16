@@ -6,3 +6,14 @@ python-decouple==3.8
 gunicorn==21.2.0
 boto3==1.35.28
 django-storages==1.14.4
+
+# Security and Rate Limiting
+django-ratelimit==4.1.0
+django-cors-headers==4.3.1
+
+# Monitoring and Performance
+psutil==6.1.0
+django-extensions==3.2.3
+
+# Enhanced Security
+django-environ==0.11.2

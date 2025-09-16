@@ -3,10 +3,13 @@ from django.db import connection
 from django.conf import settings
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_http_methods
+from django_ratelimit.decorators import ratelimit
 import time
+import psutil
 
 
 @csrf_exempt
+@ratelimit(key='ip', rate='10/m', method='GET')
 @require_http_methods(["GET", "HEAD"])
 def health_check(request):
     """
@@ -45,6 +48,66 @@ def health_check(request):
 
     except Exception as e:
         # Fallback response if there's any issue
+        return JsonResponse({
+            "status": "error",
+            "error": str(e),
+            "service": "infiora-backend"
+        }, status=500)
+
+
+@csrf_exempt
+@ratelimit(key='ip', rate='5/m', method='GET')
+@require_http_methods(["GET"])
+def metrics(request):
+    """
+    Application metrics endpoint for monitoring
+    """
+    try:
+        # System metrics
+        cpu_percent = psutil.cpu_percent(interval=1)
+        memory = psutil.virtual_memory()
+        disk = psutil.disk_usage('/')
+
+        # Database metrics
+        db_connections = 0
+        try:
+            with connection.cursor() as cursor:
+                cursor.execute("SELECT count(*) FROM pg_stat_activity WHERE state = 'active'")
+                db_connections = cursor.fetchone()[0]
+        except Exception:
+            db_connections = -1
+
+        metrics_data = {
+            "timestamp": int(time.time()),
+            "service": "infiora-backend",
+            "version": "1.0.0",
+            "system": {
+                "cpu_percent": cpu_percent,
+                "memory": {
+                    "total": memory.total,
+                    "available": memory.available,
+                    "percent": memory.percent,
+                    "used": memory.used
+                },
+                "disk": {
+                    "total": disk.total,
+                    "used": disk.used,
+                    "free": disk.free,
+                    "percent": (disk.used / disk.total) * 100
+                }
+            },
+            "database": {
+                "active_connections": db_connections
+            },
+            "django": {
+                "debug": settings.DEBUG,
+                "allowed_hosts": list(settings.ALLOWED_HOSTS)
+            }
+        }
+
+        return JsonResponse(metrics_data)
+
+    except Exception as e:
         return JsonResponse({
             "status": "error",
             "error": str(e),

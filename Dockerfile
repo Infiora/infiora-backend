@@ -8,12 +8,16 @@ ENV DJANGO_SETTINGS_MODULE=core.settings
 # Set work directory
 WORKDIR /app
 
+# Create necessary directories
+RUN mkdir -p /app/logs /app/staticfiles /app/media
+
 # Install system dependencies
 RUN apt-get update \
     && apt-get install -y --no-install-recommends \
         postgresql-client \
         build-essential \
         libpq-dev \
+        curl \
     && rm -rf /var/lib/apt/lists/*
 
 # Install Python dependencies

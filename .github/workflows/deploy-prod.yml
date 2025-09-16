@@ -6,7 +6,27 @@ on:
   workflow_dispatch:
 
 jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Build and test application
+        run: |
+          # Build the application
+          docker build -t infiora-backend-test .
+
+          # Basic configuration check
+          docker run --rm -e SECRET_KEY=test-key -e DEBUG=True \
+            infiora-backend-test python src/manage.py check
+
+          # Test static files collection (dry run)
+          docker run --rm -e SECRET_KEY=test-key -e DEBUG=False \
+            infiora-backend-test python src/manage.py collectstatic --noinput --dry-run
+
   deploy:
+    needs: test
     runs-on: ubuntu-latest
 
     steps:
@@ -54,12 +74,12 @@ jobs:
             DB_ENGINE=django.db.backends.postgresql
             DB_NAME=infiora
             DB_USER=infiora
-            DB_PASSWORD=infiora123
+            DB_PASSWORD=${{ secrets.DB_PASSWORD || 'infiora123' }}
             DB_HOST=db
             DB_PORT=5432
             POSTGRES_DB=infiora
             POSTGRES_USER=infiora
-            POSTGRES_PASSWORD=infiora123
+            POSTGRES_PASSWORD=${{ secrets.DB_PASSWORD || 'infiora123' }}
             EOF
 
             # Add AWS S3 variables only if they exist

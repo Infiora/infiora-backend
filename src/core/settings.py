@@ -21,7 +21,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = config('SECRET_KEY', default='django-insecure-)%l2_2b1zzx_t@*8)4@xj=w+nyo!^z5hukp6hv^5*e444a@ths')
+SECRET_KEY = config('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = config('DEBUG', default='True', cast=lambda x: x.lower() == 'true')
@@ -31,12 +31,38 @@ ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='localhost,127.0.0.1,0.0.0.0', c
 # CSRF Configuration
 CSRF_TRUSTED_ORIGINS = config('CSRF_TRUSTED_ORIGINS', default='http://localhost:8000,http://127.0.0.1:8000', cast=lambda v: [s.strip() for s in v.split(',')])
 
-# Additional security settings for production
+# Security settings for production
 if not DEBUG:
+    # Proxy and SSL settings
     SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
     SECURE_SSL_REDIRECT = False  # Handle SSL at reverse proxy level
-    SESSION_COOKIE_SECURE = False  # Set to True when using HTTPS
-    CSRF_COOKIE_SECURE = False  # Set to True when using HTTPS
+
+    # Security headers
+    SECURE_BROWSER_XSS_FILTER = True
+    SECURE_CONTENT_TYPE_NOSNIFF = True
+    X_FRAME_OPTIONS = 'DENY'
+    SECURE_REFERRER_POLICY = 'same-origin'
+
+    # HTTPS settings (enable when SSL is configured)
+    # SESSION_COOKIE_SECURE = True
+    # CSRF_COOKIE_SECURE = True
+    # SECURE_HSTS_SECONDS = 31536000  # 1 year
+    # SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+
+# CORS Configuration
+CORS_ALLOWED_ORIGINS = config(
+    'CORS_ALLOWED_ORIGINS',
+    default='http://localhost:3000,http://127.0.0.1:3000',
+    cast=lambda v: [s.strip() for s in v.split(',') if s.strip()]
+)
+
+CORS_ALLOW_CREDENTIALS = True
+CORS_ALLOW_ALL_ORIGINS = DEBUG  # Only allow all origins in development
+
+# Additional security settings
+if not DEBUG:
+    SECURE_CONTENT_TYPE_NOSNIFF = True
+    SECURE_BROWSER_XSS_FILTER = True
 
 
 # Application definition
@@ -48,10 +74,13 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'corsheaders',
+    'django_extensions',
     'storages',
 ]
 
 MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -92,6 +121,11 @@ DATABASES = {
         'PASSWORD': config('DB_PASSWORD', default=''),
         'HOST': config('DB_HOST', default='localhost'),
         'PORT': config('DB_PORT', default=5432, cast=int),
+        'CONN_MAX_AGE': config('DB_CONN_MAX_AGE', default=300, cast=int),
+        'OPTIONS': {
+            'connect_timeout': 10,
+            'options': '-c default_transaction_isolation=read_committed'
+        }
     }
 }
 
@@ -173,20 +207,54 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,
+    'formatters': {
+        'verbose': {
+            'format': '{levelname} {asctime} {module} {process:d} {thread:d} {message}',
+            'style': '{',
+        },
+        'simple': {
+            'format': '{levelname} {asctime} {message}',
+            'style': '{',
+        },
+    },
     'handlers': {
         'console': {
             'class': 'logging.StreamHandler',
+            'formatter': 'simple',
         },
+        'file': {
+            'class': 'logging.handlers.RotatingFileHandler',
+            'filename': '/app/logs/django.log',
+            'maxBytes': 1024*1024*10,  # 10MB
+            'backupCount': 5,
+            'formatter': 'verbose',
+        } if not DEBUG else None,
     },
     'root': {
-        'handlers': ['console'],
+        'handlers': ['console'] + (['file'] if not DEBUG else []),
         'level': 'INFO',
     },
     'loggers': {
         'django': {
-            'handlers': ['console'],
+            'handlers': ['console'] + (['file'] if not DEBUG else []),
             'level': 'INFO',
+            'propagate': False,
+        },
+        'django.security': {
+            'handlers': ['console'] + (['file'] if not DEBUG else []),
+            'level': 'WARNING',
+            'propagate': False,
+        },
+        'django.db.backends': {
+            'handlers': ['console'] + (['file'] if not DEBUG else []),
+            'level': 'WARNING',  # Set to DEBUG to see all SQL queries
             'propagate': False,
         },
     },
 }
+
+# Remove None handlers
+if not DEBUG and LOGGING['handlers']['file']:
+    pass
+else:
+    LOGGING['handlers'].pop('file', None)

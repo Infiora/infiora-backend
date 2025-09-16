@@ -87,6 +87,13 @@ EC2_PRIVATE_KEY=your-private-key-content
 SECRET_KEY=your-django-secret-key-here
 ALLOWED_HOSTS=your-domain.com,your-ec2-ip
 CSRF_TRUSTED_ORIGINS=https://your-domain.com,https://your-ec2-ip:8000
+DB_PASSWORD=your-secure-database-password
+```
+
+**Optional configuration secrets:**
+```
+CORS_ALLOWED_ORIGINS=https://your-frontend-domain.com,https://app.your-domain.com
+DB_CONN_MAX_AGE=300
 ```
 
 **Optional AWS S3 secrets (for static files):**
@@ -414,6 +421,30 @@ free -h
 # Check running processes
 top
 ```
+
+## Security Features
+
+### Production Security Enhancements
+
+This deployment includes several production-grade security features:
+
+1. **Rate Limiting**: Health check and metrics endpoints are rate-limited
+2. **Security Headers**: XSS protection, content type sniffing prevention, frame options
+3. **CORS Configuration**: Configurable allowed origins for frontend applications
+4. **Database Security**: Connection pooling and timeout settings
+5. **Secret Management**: No hardcoded secrets in code or logs
+6. **Container Security**: Health checks and proper dependency management
+
+### Monitoring Endpoints
+
+- **Health Check**: `GET /health/` - Application and database status
+- **Metrics**: `GET /metrics/` - System performance and resource usage
+- **Admin**: `GET /admin/` - Django administration panel
+
+### Rate Limits
+
+- Health endpoint: 10 requests per minute per IP
+- Metrics endpoint: 5 requests per minute per IP
 
 ## Security Considerations
 
