@@ -68,10 +68,10 @@ jobs:
             -e DB_PASSWORD=test \
             --entrypoint python \
             infiora-backend-test -c "
-import os
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'core.settings')
-import django
-django.setup()
-from core.views import health_check, metrics
-print('✅ Application modules imported successfully')
-"
+            import os
+            os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'core.settings')
+            import django
+            django.setup()
+            from core.views import health_check, metrics
+            print('✅ Application modules imported successfully')
+            "
