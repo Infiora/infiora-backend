@@ -6,7 +6,12 @@ on:
   workflow_dispatch:
 
 jobs:
+  # Call the CI workflow first
+  ci:
+    uses: ./.github/workflows/ci.yml
+
   deploy:
+    needs: ci
     runs-on: ubuntu-latest
 
     steps:
