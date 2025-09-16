@@ -149,3 +149,10 @@ static/
 
 # Local settings
 local_settings.py
+
+# Claude Code specific
+.claude/
+
+# Temporary files
+*.tmp
+*.temp
