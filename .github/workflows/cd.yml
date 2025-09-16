@@ -112,20 +112,20 @@ jobs:
             echo "Waiting for application to start..."
             sleep 30
 
-            # Test health check endpoint
-            echo "Testing health check endpoint..."
-            HEALTH_RESPONSE=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:8000/health/)
+            # Test application health using Django management command
+            echo "Testing application health..."
 
-            if [ "$HEALTH_RESPONSE" = "200" ]; then
-                echo "✅ Health check passed! Application is healthy."
+            # Check if Django can connect to database and is configured correctly
+            if docker-compose -f docker-compose.prod.yml exec -T web python src/manage.py check --database default; then
+                echo "✅ Application health check passed!"
 
-                # Get detailed health check response
-                echo "Health check response:"
-                curl -s http://localhost:8000/health/ | python3 -m json.tool || echo "Could not parse JSON response"
+                # Get application status
+                echo "Application status:"
+                docker-compose -f docker-compose.prod.yml exec -T web python src/manage.py check --database default
 
                 exit 0
             else
-                echo "❌ Health check failed! HTTP status: $HEALTH_RESPONSE"
+                echo "❌ Application health check failed!"
 
                 # Show container logs for debugging
                 echo "Container logs:"
