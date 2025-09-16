@@ -13,18 +13,6 @@ services:
     volumes:
       - postgresql-data:/var/lib/postgresql/data
 
-  app:
-    build: .
-    restart: unless-stopped
-    ports:
-      - "8000:8000"
-    depends_on:
-      - db
-    env_file:
-      - .env
-    environment:
-      INFIORA_DATABASES: '{"default":{"HOST":"db"}}'
-
 volumes:
   postgresql-data:
     driver: local

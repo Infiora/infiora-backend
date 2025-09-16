@@ -1,38 +1,35 @@
-FROM python:3.13-slim
+# Use an official Python runtime as the base image
+FROM python:3.10.4-buster
 
-# Set environment variables
-ENV PYTHONDONTWRITEBYTECODE=1
-ENV PYTHONUNBUFFERED=1
-ENV DJANGO_SETTINGS_MODULE=core.settings.prod
+# Set the working directory in the container
+WORKDIR /opt/project
 
-# Set work directory
-WORKDIR /app
+ENV PYTHONDONTWRITEBYTECODE 1
+ENV PYTHONUNBUFFERED 1
+ENV PYTHONPATH .
+ENV INFIORA_IN_DOCKER true
 
-# Create necessary directories
-RUN mkdir -p /app/logs /app/staticfiles /app/media
-
-# Install system dependencies
-RUN apt-get update \
-    && apt-get install -y --no-install-recommends \
-        postgresql-client \
-        build-essential \
-        libpq-dev \
-        curl \
+# Install dependencies
+RUN set -xe \
+    && apt-get update \
+    && apt-get install -y --no-install-recommends build-essential \
+    && pip install virtualenvwrapper poetry==1.4.2 \
+    && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
-# Install Python dependencies
-COPY requirements/ requirements/
-RUN pip install --no-cache-dir -r requirements/prod.txt
+# Copy and install Python dependencies
+COPY ["poetry.lock", "pyproject.toml", "./"]
+RUN poetry install --no-root
 
-# Copy project
-COPY . .
+# Copy project files
+COPY ["README.md", "Makefile", "./"]
+COPY core core
 
-# Copy entrypoint script
-COPY entrypoint.sh /app/entrypoint.sh
-RUN chmod +x /app/entrypoint.sh
-
-# Expose port
+# Expose the Django development server port (adjust if needed)
 EXPOSE 8000
 
-# Set entrypoint
-ENTRYPOINT ["/app/entrypoint.sh"]
+# Set up the entrypoint
+COPY scripts/entrypoint.sh /entrypoint.sh
+RUN chmod a+x /entrypoint.sh
+
+ENTRYPOINT ["/entrypoint.sh"]

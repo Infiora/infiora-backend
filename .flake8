@@ -1,41 +1,17 @@
 [flake8]
-max-line-length = 88
-max-complexity = 10
+ignore = C101,D403,F403,F405,I100,I201,W503,W504,Q000,A005
 exclude =
+    **/migrations/*,
     .git,
+    .mypy_cache,
     __pycache__,
-    .venv,
-    venv,
-    migrations,
-    .eggs,
-    *.egg,
-    build,
-    dist
-
-ignore =
-    # Black compatibility
-    E203, # whitespace before ':'
-    E501, # line too long (handled by black)
-    W503, # line break before binary operator
-    # Django specific
-    DJ01, # Avoid using null=True on string-based fields
-    # Docstring related (can be adjusted)
-    D100, # Missing docstring in public module
-    D101, # Missing docstring in public class
-    D102, # Missing docstring in public method
-    D103, # Missing docstring in public function
-    D104, # Missing docstring in public package
-    D105, # Missing docstring in magic method
-
+    venv
+filename = *.py
+accept-encodings = utf-8
+inline-quotes = single
+max-complexity = 12
+max-linenumber = 500
+max-line-length = 119
+multiline-quotes = double
 per-file-ignores =
-    # Settings files don't need docstrings
-    */settings/*.py:D100,D101,D102,D103
-    # Test files don't need docstrings
-    test_*.py:D100,D101,D102,D103
-    tests.py:D100,D101,D102,D103
-    # Migration files
-    */migrations/*.py:D100,D101,D102,D103,E501
-    # __init__.py files
-    __init__.py:D104
-
-docstring-convention = google
+    core/project/settings/templates/settings.dev.py:F821
