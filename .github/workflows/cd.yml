@@ -95,6 +95,16 @@ jobs:
             # Stop existing containers
             docker-compose -f docker-compose.prod.yml down
 
+            # Clean up any existing volumes to ensure fresh database with new credentials
+            echo "🔄 Cleaning up existing database volume to apply new credentials..."
+            docker volume prune -f
+
+            # Remove specific postgres volume if it exists
+            if docker volume ls -q | grep -q postgres_data_prod; then
+              echo "⚠️  Removing existing postgres volume..."
+              docker volume rm $(docker volume ls -q | grep postgres_data_prod) || true
+            fi
+
             # Build and start containers
             docker-compose -f docker-compose.prod.yml up --build -d
 
