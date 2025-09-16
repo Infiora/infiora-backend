@@ -1,16 +1,30 @@
 # Development requirements
 -r base.txt
 
-# Development server (Django's built-in server is used)
-# No additional packages needed for development currently
+# Code Quality and Formatting
+black==24.10.0
+isort==5.13.2
+flake8==7.1.1
+flake8-django==1.4
+flake8-docstrings==1.7.0
+flake8-import-order==0.18.2
 
-# Testing and debugging tools (add as needed)
-# pytest==7.4.3
-# pytest-django==4.8.0
-# django-debug-toolbar==4.2.0
-# ipython==8.18.1
+# Security scanning
+bandit==1.7.10
 
-# Code quality tools (add as needed)
-# black==23.11.0
-# flake8==6.1.0
-# isort==5.12.0
+# Pre-commit hooks
+pre-commit==4.0.1
+
+# Testing framework
+pytest==8.3.3
+pytest-django==4.9.0
+pytest-cov==6.0.0
+
+# Development tools
+django-debug-toolbar==4.4.6
+ipython==8.29.0
+django-extensions==3.2.3
+
+# Type checking
+mypy==1.13.0
+django-stubs==5.1.0

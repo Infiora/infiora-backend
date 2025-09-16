@@ -68,3 +68,70 @@ prod-down: ## Stop production containers
 
 prod-logs: ## View production logs
 	docker-compose -f docker-compose.prod.yml logs -f
+
+# Code Quality Targets
+quality: ## Run all code quality checks
+	@echo "🔍 Running code quality checks..."
+	make format-check
+	make lint
+	make type-check
+	make security-check
+	make test-coverage
+
+format: ## Format code with Black and isort
+	@echo "🖤 Formatting code with Black..."
+	black src/
+	@echo "🔢 Sorting imports with isort..."
+	isort src/
+
+format-check: ## Check code formatting
+	@echo "🖤 Checking code formatting..."
+	black --check --diff src/
+	@echo "🔢 Checking import sorting..."
+	isort --check-only --diff src/
+
+lint: ## Run linting with Flake8
+	@echo "🔍 Running linting..."
+	flake8 src/
+
+type-check: ## Run type checking with MyPy
+	@echo "🏷️ Running type checking..."
+	mypy src/
+
+security-check: ## Run security checks with Bandit
+	@echo "🔒 Running security checks..."
+	bandit -r src/
+
+test-coverage: ## Run tests with coverage
+	@echo "🧪 Running tests with coverage..."
+	cd src && pytest --cov=. --cov-report=html --cov-report=term-missing
+
+django-check: ## Run Django system checks
+	@echo "🔧 Running Django checks..."
+	cd src && python manage.py check
+
+pre-commit-install: ## Install pre-commit hooks
+	@echo "🔗 Installing pre-commit hooks..."
+	pre-commit install
+
+pre-commit-run: ## Run pre-commit hooks on all files
+	@echo "🔗 Running pre-commit hooks..."
+	pre-commit run --all-files
+
+pre-commit-update: ## Update pre-commit hooks
+	@echo "🔗 Updating pre-commit hooks..."
+	pre-commit autoupdate
+
+dev-setup: ## Set up development environment
+	@echo "🚀 Setting up development environment..."
+	pip install -r requirements/dev.txt
+	make pre-commit-install
+	@echo "✅ Development environment setup complete!"
+
+clean-cache: ## Clean Python cache files
+	@echo "🧹 Cleaning cache files..."
+	find . -type d -name "__pycache__" -exec rm -rf {} + 2>/dev/null || true
+	find . -name "*.pyc" -delete 2>/dev/null || true
+	find . -name "*.pyo" -delete 2>/dev/null || true
+	find . -name ".coverage" -delete 2>/dev/null || true
+	rm -rf htmlcov/ .pytest_cache/ .mypy_cache/ 2>/dev/null || true

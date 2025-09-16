@@ -20,9 +20,10 @@ Production-specific dependencies:
 ### `dev.txt`
 Development-specific dependencies:
 - Includes all base requirements (`-r base.txt`)
-- Development and debugging tools (commented out, uncomment as needed)
-- Testing frameworks (commented out, uncomment as needed)
-- Code quality tools (commented out, uncomment as needed)
+- Code quality tools (Black, isort, Flake8, Bandit, MyPy)
+- Testing framework (pytest with coverage)
+- Development tools (Django debug toolbar, IPython)
+- Pre-commit hooks for automated quality checks
 
 ## Usage
 
