@@ -124,7 +124,6 @@ DATABASES = {
         'CONN_MAX_AGE': config('DB_CONN_MAX_AGE', default=300, cast=int),
         'OPTIONS': {
             'connect_timeout': 10,
-            'options': '-c default_transaction_isolation="read committed"'
         }
     }
 }
