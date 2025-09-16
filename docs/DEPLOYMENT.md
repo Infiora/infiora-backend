@@ -174,10 +174,10 @@ INFIORA_CLIENT_URL=https://your-frontend-domain.com
 
 ```bash
 # Check Django application
-docker-compose exec web poetry run python -m core.manage check
+docker-compose exec app poetry run python -m core.manage check
 
 # Check database connectivity
-docker-compose exec web poetry run python -m core.manage check --database default
+docker-compose exec app poetry run python -m core.manage check --database default
 
 # Test HTTP endpoint
 curl http://localhost:8000/
@@ -190,7 +190,7 @@ curl http://localhost:8000/
 docker-compose ps
 
 # View container logs
-docker-compose logs web
+docker-compose logs app
 docker-compose logs db
 
 # Check resource usage
@@ -203,10 +203,10 @@ docker stats
 
 ```bash
 # Run database migrations
-docker-compose exec web poetry run python -m core.manage migrate
+docker-compose exec app poetry run python -m core.manage migrate
 
 # Create superuser
-docker-compose exec web poetry run python -m core.manage createsuperuser
+docker-compose exec app poetry run python -m core.manage createsuperuser
 ```
 
 ### Database Backup
@@ -286,18 +286,18 @@ docker-compose ps db
 #### 4. Application Won't Start
 ```bash
 # Check application logs
-docker-compose logs web
+docker-compose logs app
 
 # Verify environment variables
-docker-compose exec web env | grep INFIORA
+docker-compose exec app env | grep INFIORA
 
 # Run Django check
-docker-compose exec web poetry run python -m core.manage check
+docker-compose exec app poetry run python -m core.manage check
 ```
 
 ### Log Locations
 
-- **Application logs**: `docker-compose logs web`
+- **Application logs**: `docker-compose logs app`
 - **Database logs**: `docker-compose logs db`
 - **System logs**: `/var/log/syslog` or `journalctl -u docker`
 

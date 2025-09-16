@@ -93,14 +93,28 @@ jobs:
             # Stop existing containers
             docker-compose down
 
-            # Build and start containers
-            docker-compose up --build -d
-
-            # Clean up unused Docker resources
+            # Clean up unused Docker resources first
             docker system prune -f
 
+            # Build and start containers with verbose output
+            echo "Building and starting containers..."
+            if ! docker-compose up --build -d; then
+                echo "❌ Failed to start containers"
+                echo "Container logs:"
+                docker-compose logs
+                exit 1
+            fi
+
             # Check if containers are running
+            echo "Container status:"
             docker-compose ps
+
+            # Wait a moment for containers to fully start
+            sleep 10
+
+            # Check container logs
+            echo "Container logs:"
+            docker-compose logs --tail=50
 
             echo "Deployment completed successfully!"
             echo "Application is running on port 8000"
@@ -114,12 +128,12 @@ jobs:
             echo "Testing application health..."
 
             # Check if Django can connect to database and is configured correctly
-            if docker-compose exec -T web poetry run python -m core.manage check --database default; then
+            if docker-compose exec -T app poetry run python -m core.manage check --database default; then
                 echo "✅ Application health check passed!"
 
                 # Get application status
                 echo "Application status:"
-                docker-compose exec -T web poetry run python -m core.manage check
+                docker-compose exec -T app poetry run python -m core.manage check
 
                 exit 0
             else
