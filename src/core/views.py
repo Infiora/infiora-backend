@@ -25,36 +25,37 @@ def health_check(request):
         db_status = f"Unhealthy: {str(e)}"
         is_healthy = False
 
-    # Check if JSON response is requested
-    if request.GET.get('format') == 'json':
-        response_data = {
-            "status": "healthy" if is_healthy else "unhealthy",
-            "timestamp": int(time.time()),
-            "service": "infiora-backend",
-            "version": "1.0.0",
-            "database": db_status,
-            "debug": settings.DEBUG,
-            "allowed_hosts": list(settings.ALLOWED_HOSTS),
-            "host_header": request.get_host(),
+    try:
+        # Check if JSON response is requested
+        if request.GET.get('format') == 'json':
+            response_data = {
+                "status": "healthy" if is_healthy else "unhealthy",
+                "timestamp": int(time.time()),
+                "service": "infiora-backend",
+                "version": "1.0.0",
+                "database": db_status,
+                "debug": settings.DEBUG,
+                "allowed_hosts": list(settings.ALLOWED_HOSTS),
+                "host_header": request.get_host(),
+            }
+            status_code = 200 if is_healthy else 503
+            return JsonResponse(response_data, status=status_code)
+
+        # Prepare template context
+        context = {
+            'overall_status': 'Healthy' if is_healthy else 'Unhealthy',
+            'status_class': 'status-healthy' if is_healthy else 'status-unhealthy',
+            'status_icon': '✓' if is_healthy else '✗',
+            'current_time': datetime.now().strftime("%Y-%m-%d %H:%M:%S UTC"),
+            'service': 'infiora-backend',
+            'version': '1.0.0',
+            'db_status': db_status,
+            'debug_mode': 'Enabled' if settings.DEBUG else 'Disabled',
+            'host_header': request.get_host(),
         }
+
         status_code = 200 if is_healthy else 503
-        return JsonResponse(response_data, status=status_code)
-
-    # Prepare template context
-    context = {
-        'overall_status': 'Healthy' if is_healthy else 'Unhealthy',
-        'status_class': 'status-healthy' if is_healthy else 'status-unhealthy',
-        'status_icon': '✓' if is_healthy else '✗',
-        'current_time': datetime.now().strftime("%Y-%m-%d %H:%M:%S UTC"),
-        'service': 'infiora-backend',
-        'version': '1.0.0',
-        'db_status': db_status,
-        'debug_mode': 'Enabled' if settings.DEBUG else 'Disabled',
-        'host_header': request.get_host(),
-    }
-
-    status_code = 200 if is_healthy else 503
-    return render(request, 'health.html', context, status=status_code)
+        return render(request, 'health.html', context, status=status_code)
 
     except Exception as e:
         if request.GET.get('format') == 'json':
