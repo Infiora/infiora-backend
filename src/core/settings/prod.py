@@ -8,17 +8,7 @@ from decouple import config
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
 
-# Parse ALLOWED_HOSTS and always include localhost for internal health checks
-allowed_hosts_raw = config('ALLOWED_HOSTS', default='localhost,127.0.0.1,0.0.0.0')
-allowed_hosts_list = [s.strip() for s in allowed_hosts_raw.split(',') if s.strip()]
-
-# Ensure localhost and 127.0.0.1 are always included for health checks
-if 'localhost' not in allowed_hosts_list:
-    allowed_hosts_list.append('localhost')
-if '127.0.0.1' not in allowed_hosts_list:
-    allowed_hosts_list.append('127.0.0.1')
-
-ALLOWED_HOSTS = allowed_hosts_list
+ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='localhost,127.0.0.1,0.0.0.0', cast=lambda v: [s.strip() for s in v.split(',') if s.strip()])
 
 # CSRF Configuration
 CSRF_TRUSTED_ORIGINS = config('CSRF_TRUSTED_ORIGINS', default='http://localhost:8000,http://127.0.0.1:8000', cast=lambda v: [s.strip() for s in v.split(',')])
