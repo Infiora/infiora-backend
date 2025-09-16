@@ -1,13 +1,13 @@
+# Core Django and database
 asgiref==3.9.1
 Django==5.2.6
 sqlparse==0.5.3
 psycopg==3.2.3
-python-decouple==3.8
-gunicorn==21.2.0
-boto3==1.35.28
-django-storages==1.14.4
 
-# Security and Rate Limiting
+# Configuration
+python-decouple==3.8
+
+# Security and CORS
 django-ratelimit==4.1.0
 django-cors-headers==4.3.1
 

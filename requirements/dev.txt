@@ -1,0 +1,16 @@
+# Development requirements
+-r base.txt
+
+# Development server (Django's built-in server is used)
+# No additional packages needed for development currently
+
+# Testing and debugging tools (add as needed)
+# pytest==7.4.3
+# pytest-django==4.8.0
+# django-debug-toolbar==4.2.0
+# ipython==8.18.1
+
+# Code quality tools (add as needed)
+# black==23.11.0
+# flake8==6.1.0
+# isort==5.12.0
