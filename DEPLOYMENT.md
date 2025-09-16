@@ -1,49 +1,25 @@
-# EC2 Deployment Guide for Infiora Backend
-
-This guide covers deploying the Infiora Django backend to an AWS EC2 instance using Docker and GitHub Actions for CI/CD.
-
-## Table of Contents
-- [Prerequisites](#prerequisites)
-- [EC2 Setup](#ec2-setup)
-- [GitHub Actions Setup](#github-actions-setup)
-- [Manual Deployment](#manual-deployment)
-- [SSL/HTTPS Setup](#sslhttps-setup-optional)
-- [Monitoring and Maintenance](#monitoring-and-maintenance)
-- [Troubleshooting](#troubleshooting)
+# Django EC2 Deployment Guide
 
 ## Prerequisites
-
-- AWS account with EC2 access
+- AWS EC2 instance (Ubuntu 22.04)
 - GitHub repository with Actions enabled
-- Domain name (optional but recommended)
-- Basic knowledge of Linux commands
+- Domain name (optional)
 
-## EC2 Setup
+## 1. EC2 Setup
 
-### 1. Launch EC2 Instance
+### Launch Instance
+- **Type**: t3.medium or larger
+- **AMI**: Ubuntu 22.04 LTS
+- **Storage**: 20GB minimum
+- **Security Group**: Ports 22 (SSH), 80 (HTTP), 443 (HTTPS), 8000 (App)
 
-1. **Instance Type**: t3.medium or larger (recommended for production)
-2. **AMI**: Ubuntu 22.04 LTS
-3. **Storage**: At least 20GB
-4. **Security Group**: Configure the following ports:
-   - SSH (22) - Your IP only
-   - HTTP (80) - 0.0.0.0/0
-   - HTTPS (443) - 0.0.0.0/0
-   - Custom (8000) - 0.0.0.0/0 (for direct access during setup)
-
-### 2. Initial Server Setup
-
-Connect to your EC2 instance:
+### Install Dependencies
 ```bash
+# Connect to EC2
 ssh -i your-key.pem ubuntu@your-ec2-ip
-```
 
-Update the system and install dependencies:
-```bash
-# Update system
+# Update and install Docker
 sudo apt update && sudo apt upgrade -y
-
-# Install Docker
 curl -fsSL https://get.docker.com -o get-docker.sh
 sudo sh get-docker.sh
 sudo usermod -aG docker ubuntu
@@ -52,196 +28,71 @@ sudo usermod -aG docker ubuntu
 sudo curl -L "https://github.com/docker/compose/releases/download/v2.21.0/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
 sudo chmod +x /usr/local/bin/docker-compose
 
-# Install Git
-sudo apt install git -y
+# Create project directory
+sudo mkdir -p /home/ubuntu/infiora-backend
+sudo chown ubuntu:ubuntu /home/ubuntu/infiora-backend
 
-# Logout and login again for Docker group changes
+# Logout and login for Docker group
 exit
 ```
 
-### 3. Create Project Directory
+## 2. GitHub Secrets
 
-```bash
-# SSH back into the instance
-ssh -i your-key.pem ubuntu@your-ec2-ip
+Add these secrets in **GitHub Repository → Settings → Secrets and variables → Actions**:
 
-# Create directory for the application (GitHub Actions will clone here)
-sudo mkdir -p /home/ubuntu/infiora-backend
-sudo chown ubuntu:ubuntu /home/ubuntu/infiora-backend
-cd /home/ubuntu/infiora-backend
 ```
-
-**Note**: The repository will be automatically cloned and updated by GitHub Actions. No manual git setup is required on the server.
-
-## GitHub Actions Setup
-
-### 1. Repository Secrets
-
-Add the following secrets to your GitHub repository (Settings � Secrets and variables � Actions):
-
-**Required secrets:**
-```
-EC2_HOST=your-ec2-public-ip-or-domain
+EC2_HOST=your-ec2-ip-or-domain
 EC2_USERNAME=ubuntu
 EC2_PRIVATE_KEY=your-private-key-content
-SECRET_KEY=your-django-secret-key-here
+SECRET_KEY=your-django-secret-key
 ALLOWED_HOSTS=your-domain.com,your-ec2-ip
 CSRF_TRUSTED_ORIGINS=https://your-domain.com,https://your-ec2-ip:8000
 DB_PASSWORD=your-secure-database-password
 ```
 
-**Optional configuration secrets:**
+**Optional:**
 ```
-CORS_ALLOWED_ORIGINS=https://your-frontend-domain.com,https://app.your-domain.com
-DB_CONN_MAX_AGE=300
-```
-
-**Optional AWS S3 secrets (for static files):**
-```
-AWS_ACCESS_KEY_ID=your-aws-access-key
-AWS_SECRET_ACCESS_KEY=your-aws-secret-key
-AWS_STORAGE_BUCKET_NAME=your-s3-bucket-name
-AWS_S3_REGION_NAME=us-east-1
+AWS_ACCESS_KEY_ID=your-aws-key
+AWS_SECRET_ACCESS_KEY=your-aws-secret
+AWS_STORAGE_BUCKET_NAME=your-s3-bucket
+CORS_ALLOWED_ORIGINS=https://your-frontend-domain.com
 ```
 
-**Note**: If AWS S3 secrets are not provided, the application will still work but static files will be served locally (not recommended for production).
+## 3. Deployment
 
-**How to get your private key content:**
-1. On your local machine, display the private key:
-   ```bash
-   cat your-key.pem
-   ```
-2. Copy the entire content including `-----BEGIN RSA PRIVATE KEY-----` and `-----END RSA PRIVATE KEY-----`
-3. Paste it as the value for `EC2_PRIVATE_KEY` secret
+### Automatic Deployment
+Push to `main` branch - GitHub Actions will automatically deploy.
 
-**How to generate a Django SECRET_KEY:**
-```python
-# Run this in Python to generate a secure secret key
-import secrets
-print(secrets.token_urlsafe(50))
-```
+### Manual Deployment
+Go to **GitHub → Actions → CD - Continuous Deployment → Run workflow**
 
-### 2. GitHub Actions Workflow
-
-The workflow is already configured in `.github/workflows/deploy-prod.yml`. Here's what it does:
-
-**Automatic Deployment Process:**
-1. **Triggers**: Deploys on every push to `main` branch (or manual trigger)
-2. **Connects to EC2**: Uses SSH with your private key
-3. **Clones/Updates Code**: Pulls latest changes from GitHub
-4. **Environment Setup**: Creates production environment file from secrets
-5. **Docker Deployment**: Builds and deploys containers
-6. **Health Check**: Verifies deployment success
-
-**Deployment Steps:**
-- Stops existing containers
-- Pulls latest code from GitHub
-- Creates `.env.prod` with your secrets
-- Builds and starts new containers
-- Cleans up unused Docker resources
-- Reports deployment status
-
-## Environment Configuration
-
-### 1. Production Environment Variables
-
-The GitHub Actions workflow automatically creates `.env.prod` on your EC2 instance using the secrets. You can also create it manually:
+## 4. Verify Deployment
 
 ```bash
-# Create production environment file
-cat > .env.prod << EOF
-SECRET_KEY=your-super-secret-django-key
-DEBUG=False
-ALLOWED_HOSTS=your-domain.com,your-ec2-ip,localhost
-DB_ENGINE=django.db.backends.postgresql
-DB_NAME=infiora
-DB_USER=infiora
-DB_PASSWORD=infiora
-DB_HOST=db
-DB_PORT=5432
-EOF
-```
-
-### 2. Production Docker Compose
-
-Ensure you have `docker-compose.prod.yml` in your repository. If not, create it:
-
-```yaml
-version: "3.8"
-
-services:
-  db:
-    image: postgres:15
-    environment:
-      POSTGRES_DB: ${DB_NAME}
-      POSTGRES_USER: ${DB_USER}
-      POSTGRES_PASSWORD: ${DB_PASSWORD}
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
-    ports:
-      - "5432:5432"
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${DB_USER} -d ${DB_NAME}"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-    restart: unless-stopped
-
-  web:
-    build: .
-    env_file:
-      - .env.prod
-    ports:
-      - "8000:8000"
-    depends_on:
-      db:
-        condition: service_healthy
-    restart: unless-stopped
-
-volumes:
-  postgres_data:
-```
-
-## Manual Deployment (Optional)
-
-**Note**: Manual deployment is only needed for testing or troubleshooting. GitHub Actions handles all deployments automatically.
-
-For manual deployment if needed:
-
-```bash
-# Navigate to project directory
-cd /home/ubuntu/infiora-backend
-
-# Stop existing containers
-docker-compose -f docker-compose.prod.yml down
-
-# Build and start containers (code is already updated by GitHub Actions)
-docker-compose -f docker-compose.prod.yml up --build -d
-
-# Check container status
+# Check containers
 docker-compose -f docker-compose.prod.yml ps
 
-# View logs
-docker-compose -f docker-compose.prod.yml logs -f
+# Check logs
+docker-compose -f docker-compose.prod.yml logs
+
+# Test endpoints
+curl http://your-domain.com/health/
+curl http://your-domain.com/metrics/
 ```
 
-**Triggering Deployment:**
-- **Automatic**: Push code to `main` branch
-- **Manual**: Go to GitHub → Actions → Deploy to EC2 → Run workflow
+## 5. Install and Configure NGINX
 
-## SSL/HTTPS Setup (Optional)
+Install NGINX and edit its configuration:
 
-### Using Nginx and Let's Encrypt
-
-1. **Install Nginx**:
 ```bash
-sudo apt install nginx -y
+sudo apt install nginx
+sudo nano /etc/nginx/sites-available/default
 ```
 
-2. **Configure Nginx** (`/etc/nginx/sites-available/infiora`):
-```bash
-sudo tee /etc/nginx/sites-available/infiora << EOF
-server_name prod.infiora.hr www.prod.infiora.hr;
+Add this to the server block:
+
+```nginx
+server_name yourdomain.com www.yourdomain.com;
 
 location / {
     proxy_pass http://localhost:8000;
@@ -251,258 +102,75 @@ location / {
     proxy_set_header Host $host;
     proxy_cache_bypass $http_upgrade;
 }
-EOF
 ```
 
-3. **Enable site and get SSL**:
+Validate and restart NGINX:
+
 ```bash
-sudo ln -s /etc/nginx/sites-available/infiora /etc/nginx/sites-enabled/
-sudo rm /etc/nginx/sites-enabled/default
 sudo nginx -t
-sudo systemctl reload nginx
-
-# Install Certbot
-sudo apt install certbot python3-certbot-nginx -y
-
-# Get SSL certificate
-sudo certbot --nginx -d your-domain.com
+sudo service nginx restart
 ```
 
-## Monitoring and Maintenance
+Your app should now be accessible via your IP without specifying a port.
 
-### 1. Logs
+## 6. Domain Configuration
 
-View application logs:
+Configure your domain from your registrar.
+Create the necessary DNS records.
+
+## 7. Secure with SSL Using Let's Encrypt
+
+Install and configure Let's Encrypt:
+
 ```bash
-# Application logs
+sudo add-apt-repository ppa:certbot/certbot
+sudo apt-get install python3-certbot-nginx
+sudo certbot --nginx -d yourdomain.com -d www.yourdomain.com
+certbot renew --dry-run # Test the renewal process
+```
+
+Your Django application should now be accessible at https://yourdomain.com.
+
+## 8. Monitoring
+
+- **Health Check**: `GET /health/`
+- **Metrics**: `GET /metrics/`
+- **Admin Panel**: `GET /admin/`
+
+## 9. Troubleshooting
+
+### Common Issues
+```bash
+# Check container status
+docker-compose -f docker-compose.prod.yml ps
+
+# View logs
 docker-compose -f docker-compose.prod.yml logs web
-
-# Database logs
-docker-compose -f docker-compose.prod.yml logs db
-
-# Follow logs in real-time
-docker-compose -f docker-compose.prod.yml logs -f
-
-# Check specific container logs
-docker logs <container_name>
-```
-
-### 2. Database Operations
-
-```bash
-# Access database container
-docker-compose -f docker-compose.prod.yml exec db psql -U infiora -d infiora
-
-# Create backup
-docker-compose -f docker-compose.prod.yml exec db pg_dump -U infiora infiora > backup_$(date +%Y%m%d_%H%M%S).sql
-
-# Restore backup
-docker-compose -f docker-compose.prod.yml exec -T db psql -U infiora -d infiora < backup_file.sql
-
-# Run Django migrations
-docker-compose -f docker-compose.prod.yml exec web python src/manage.py migrate
-
-# Create superuser
-docker-compose -f docker-compose.prod.yml exec web python src/manage.py createsuperuser
-```
-
-### 3. System Maintenance
-
-```bash
-# Update system packages
-sudo apt update && sudo apt upgrade -y
-
-# Clean Docker resources
-docker system prune -f
-
-# Remove unused images
-docker image prune -f
 
 # Restart services
 docker-compose -f docker-compose.prod.yml restart
 
-# Check disk usage
-df -h
-du -sh ~/infiora-backend/
+# Test health endpoint
+curl -f http://localhost:8000/health/
 ```
 
-## Troubleshooting
+### Secrets Issues
+- Verify all GitHub secrets are set correctly
+- Check SSH key has proper permissions
+- Ensure SECRET_KEY is properly generated
 
-### Common Issues
-
-1. **Database Connection Error**:
-   ```bash
-   # Check if database container is running
-   docker-compose -f docker-compose.prod.yml ps
-
-   # Check database logs
-   docker-compose -f docker-compose.prod.yml logs db
-
-   # Test database connection
-   docker-compose -f docker-compose.prod.yml exec db psql -U infiora -d infiora -c "SELECT 1;"
-   ```
-
-2. **Permission Denied**:
-   ```bash
-   # Ensure user is in docker group
-   sudo usermod -aG docker ubuntu
-
-   # Logout and login again
-   exit
-   ssh -i your-key.pem ubuntu@your-ec2-ip
-   ```
-
-3. **Port Already in Use**:
-   ```bash
-   # Check what's using port 8000
-   sudo netstat -tulpn | grep :8000
-   sudo lsof -i :8000
-
-   # Kill process if needed
-   sudo kill -9 <process_id>
-   ```
-
-4. **GitHub Actions Deployment Fails**:
-   - Verify SSH connection: `ssh -i your-key.pem ubuntu@your-ec2-ip`
-   - Check repository secrets are correctly set
-   - Ensure SSH key has proper permissions
-   - Check GitHub Actions logs for specific errors
-
-5. **Container Build Failures**:
-   ```bash
-   # Check build logs
-   docker-compose -f docker-compose.prod.yml build --no-cache
-
-   # Check Dockerfile and requirements.txt
-   cat Dockerfile
-   cat requirements.txt
-   ```
-
-### Debugging Commands
-
+### Database Issues
 ```bash
-# Check container status
-docker ps -a
+# Connect to database
+docker-compose -f docker-compose.prod.yml exec db psql -U infiora -d infiora
 
-# Check container logs
-docker logs <container_id>
-
-# Access container shell
-docker exec -it <container_id> /bin/bash
-
-# Check Django migrations
-docker-compose -f docker-compose.prod.yml exec web python src/manage.py showmigrations
-
-# Run Django shell
-docker-compose -f docker-compose.prod.yml exec web python src/manage.py shell
-
-# Check static files
-docker-compose -f docker-compose.prod.yml exec web python src/manage.py collectstatic --dry-run
-
-# Test database connectivity
-docker-compose -f docker-compose.prod.yml exec web python src/manage.py dbshell
+# Run migrations
+docker-compose -f docker-compose.prod.yml exec web python src/manage.py migrate
 ```
 
-### Health Checks
+## 10. Features Included
 
-```bash
-# Check if application is responding
-curl http://localhost:8000/
-
-# Check database health
-docker-compose -f docker-compose.prod.yml exec db pg_isready -U infiora
-
-# Check disk space
-df -h
-
-# Check memory usage
-free -h
-
-# Check running processes
-top
-```
-
-## Security Features
-
-### Production Security Enhancements
-
-This deployment includes several production-grade security features:
-
-1. **Rate Limiting**: Health check and metrics endpoints are rate-limited
-2. **Security Headers**: XSS protection, content type sniffing prevention, frame options
-3. **CORS Configuration**: Configurable allowed origins for frontend applications
-4. **Database Security**: Connection pooling and timeout settings
-5. **Secret Management**: No hardcoded secrets in code or logs
-6. **Container Security**: Health checks and proper dependency management
-
-### Monitoring Endpoints
-
-- **Health Check**: `GET /health/` - Application and database status
-- **Metrics**: `GET /metrics/` - System performance and resource usage
-- **Admin**: `GET /admin/` - Django administration panel
-
-### Rate Limits
-
-- Health endpoint: 10 requests per minute per IP
-- Metrics endpoint: 5 requests per minute per IP
-
-## Security Considerations
-
-1. **Firewall Configuration**:
-   ```bash
-   # Enable UFW
-   sudo ufw enable
-
-   # Allow SSH (adjust port if needed)
-   sudo ufw allow 22/tcp
-
-   # Allow HTTP/HTTPS
-   sudo ufw allow 80/tcp
-   sudo ufw allow 443/tcp
-
-   # Allow app port (remove after setting up nginx)
-   sudo ufw allow 8000/tcp
-
-   # Check status
-   sudo ufw status
-   ```
-
-2. **SSH Security**:
-   ```bash
-   # Disable password authentication
-   sudo sed -i 's/#PasswordAuthentication yes/PasswordAuthentication no/' /etc/ssh/sshd_config
-   sudo systemctl restart ssh
-   ```
-
-3. **Environment Variables**: Never commit sensitive data to repository
-4. **Database**: Use strong passwords, restrict access
-5. **Updates**: Keep system and Docker images updated regularly
-6. **Monitoring**: Set up log monitoring and alerts
-
-## Performance Optimization
-
-1. **Database Performance**:
-   ```bash
-   # Tune PostgreSQL settings in docker-compose.prod.yml
-   # Add under db service environment:
-   # POSTGRES_INITDB_ARGS: "--encoding=UTF8 --lc-collate=C --lc-ctype=C"
-   ```
-
-2. **Application Performance**:
-   - Use Gunicorn with multiple workers
-   - Enable Django's cache framework
-   - Optimize database queries
-   - Use CDN for static files
-
-3. **Server Monitoring**:
-   ```bash
-   # Install htop for better process monitoring
-   sudo apt install htop -y
-
-   # Monitor containers
-   docker stats
-   ```
-
----
-
-For additional support or questions, please refer to the project documentation or create an issue in the repository.
+- **Security**: Rate limiting, CORS, security headers
+- **Monitoring**: Health checks, system metrics
+- **Reliability**: Container health checks, auto-restart
+- **Performance**: Database connection pooling, S3 storage

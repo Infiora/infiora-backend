@@ -1,0 +1,77 @@
+name: CI - Continuous Integration
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Build test image
+        run: |
+          docker build -t infiora-backend-test .
+
+      - name: Run security checks
+        run: |
+          docker run --rm \
+            -e SECRET_KEY=test-key-$(date +%s) \
+            -e DEBUG=True \
+            -e DB_HOST=test-db \
+            -e DB_NAME=test \
+            -e DB_USER=test \
+            -e DB_PASSWORD=test \
+            --entrypoint python \
+            infiora-backend-test src/manage.py check --tag=security
+
+      - name: Test static files collection
+        run: |
+          docker run --rm \
+            -e SECRET_KEY=test-key-$(date +%s) \
+            -e DEBUG=False \
+            -e DB_HOST=test-db \
+            -e DB_NAME=test \
+            -e DB_USER=test \
+            -e DB_PASSWORD=test \
+            --entrypoint python \
+            infiora-backend-test src/manage.py collectstatic --noinput --dry-run
+
+      - name: Test deployment configuration
+        run: |
+          docker run --rm \
+            -e SECRET_KEY=test-key-$(date +%s) \
+            -e DEBUG=False \
+            -e ALLOWED_HOSTS=localhost,127.0.0.1 \
+            -e DB_HOST=test-db \
+            -e DB_NAME=test \
+            -e DB_USER=test \
+            -e DB_PASSWORD=test \
+            --entrypoint python \
+            infiora-backend-test src/manage.py check --deploy --tag=security
+
+      - name: Test application startup (without database)
+        run: |
+          # Test that the application can import settings and basic modules
+          docker run --rm \
+            -e SECRET_KEY=test-key-$(date +%s) \
+            -e DEBUG=True \
+            -e DB_HOST=test-db \
+            -e DB_NAME=test \
+            -e DB_USER=test \
+            -e DB_PASSWORD=test \
+            --entrypoint python \
+            infiora-backend-test -c "
+            import os
+            os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'core.settings')
+            import django
+            django.setup()
+            from core.views import health_check, metrics
+            print('✅ Application modules imported successfully')
+            "
