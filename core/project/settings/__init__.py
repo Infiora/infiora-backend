@@ -25,6 +25,7 @@ include(
     "custom.py",
     optional(LOCAL_SETTINGS_PATH),
     "envvars.py",
+    "cors.py",  # Must come after envvars.py to use loaded environment variables
     "logging.py",
     "docker.py",
 )

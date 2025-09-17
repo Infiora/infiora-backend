@@ -3,9 +3,12 @@ from typing import List
 DEBUG = False
 SECRET_KEY = NotImplemented
 
-ALLOWED_HOSTS: List[str] = ["*"]
-CORS_ALLOW_ALL_ORIGINS = True
+ALLOWED_HOSTS: List[str] = ["localhost", "127.0.0.1"]  # Default for development
+CORS_ALLOWED_ORIGINS: List[str] = []  # Specific origins for production
 CSRF_TRUSTED_ORIGINS: List[str] = []
+
+# CORS Logic: Allow all origins only if no specific origins are configured
+# This will be set after environment variables are loaded in envvars.py
 
 INTERNAL_IPS = [
     "127.0.0.1",
