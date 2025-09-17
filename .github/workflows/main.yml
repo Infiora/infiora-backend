@@ -73,6 +73,7 @@ jobs:
             INFIORA_AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID || '' }}
             INFIORA_AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY || '' }}
             INFIORA_AWS_STORAGE_BUCKET_NAME=${{ secrets.AWS_STORAGE_BUCKET_NAME || '' }}
+            INFIORA_AWS_S3_REGION_NAME=${{ secrets.AWS_S3_REGION_NAME || '' }}
 
             # Client URL
             INFIORA_CLIENT_URL=${{ secrets.CLIENT_URL || 'http://localhost:3000' }}
