@@ -1,0 +1,45 @@
+{% extends "health/base.html" %}
+
+{% block title %}{{ check_type|title }} Check - {{ status|upper }}{% endblock %}
+
+{% block content %}
+<div class="header">
+    <div class="status {% if status == 'ready' or status == 'alive' %}healthy{% else %}unhealthy{% endif %}">
+        {{ status|upper }}
+    </div>
+    <div class="timestamp">Last checked: {{ timestamp|date:"Y-m-d H:i:s" }}</div>
+    <button class="refresh-btn" onclick="refreshPage()">Refresh Now</button>
+</div>
+
+<div class="checks">
+    <div class="check-item">
+        <div>
+            <div class="check-name">{{ check_type|title }} Check</div>
+            <div class="check-details">
+                {% if check_type == 'readiness' %}
+                    Indicates if the application is ready to receive traffic.
+                {% elif check_type == 'liveness' %}
+                    Indicates if the application is alive and should not be restarted.
+                {% endif %}
+            </div>
+            {% if reason %}
+            <div class="check-error">Reason: {{ reason }}</div>
+            {% endif %}
+        </div>
+        <div class="check-status {% if status == 'ready' or status == 'alive' %}status-healthy{% else %}status-unhealthy{% endif %}">
+            {{ status|upper }}
+        </div>
+    </div>
+</div>
+
+<div class="footer">
+    <p>🔄 Auto-refreshes every 30 seconds</p>
+    <p>For JSON format, add <code>?format=json</code> to the URL</p>
+    <p>Available endpoints:</p>
+    <ul style="list-style: none; padding: 0;">
+        <li><code>/health/</code> - Complete health check</li>
+        <li><code>/health/ready/</code> - Readiness check</li>
+        <li><code>/health/live/</code> - Liveness check</li>
+    </ul>
+</div>
+{% endblock %}

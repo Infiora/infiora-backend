@@ -127,28 +127,58 @@ jobs:
             echo "Waiting for application to start..."
             sleep 30
 
-            # Test application health
+            # Test application health using our dedicated health endpoints
             echo "Testing application health..."
 
-            # Check if Django can connect to database and is configured correctly
-            if docker-compose exec -T app poetry run python -m core.manage check --database default; then
-                echo "✅ Application health check passed!"
+            # Test health endpoint with retries
+            HEALTH_CHECK_RETRIES=5
+            HEALTH_CHECK_DELAY=10
 
-                # Get application status
-                echo "Application status:"
-                docker-compose exec -T app poetry run python -m core.manage check
+            for i in $(seq 1 $HEALTH_CHECK_RETRIES); do
+                echo "Health check attempt $i/$HEALTH_CHECK_RETRIES..."
 
-                exit 0
-            else
-                echo "❌ Application health check failed!"
+                if curl -f -s http://localhost:8000/health/?format=json > /tmp/health_response.json; then
+                    echo "✅ Health check endpoint responded successfully!"
+                    echo "Health status:"
+                    cat /tmp/health_response.json | python3 -m json.tool
 
-                # Show container logs for debugging
-                echo "Container logs:"
-                docker-compose logs --tail=50
+                    # Also test readiness endpoint
+                    if curl -f -s http://localhost:8000/health/ready/?format=json > /tmp/readiness_response.json; then
+                        echo "✅ Readiness check passed!"
+                        echo "Readiness status:"
+                        cat /tmp/readiness_response.json | python3 -m json.tool
 
-                # Try to get health check response anyway
-                echo "Attempting to get health check response:"
-                curl -v http://localhost:8000/ || echo "Could not reach application"
+                        # Verify Django management commands still work
+                        echo "Running Django system checks..."
+                        if docker-compose exec -T app poetry run python -m core.manage check --database default; then
+                            echo "✅ Django system checks passed!"
+                            exit 0
+                        else
+                            echo "⚠️ Health endpoints work but Django system checks failed"
+                            docker-compose logs --tail=50
+                            exit 1
+                        fi
+                    else
+                        echo "❌ Readiness check failed on attempt $i"
+                    fi
+                else
+                    echo "❌ Health check failed on attempt $i"
+                fi
 
-                exit 1
-            fi
+                if [ $i -lt $HEALTH_CHECK_RETRIES ]; then
+                    echo "Waiting ${HEALTH_CHECK_DELAY}s before retry..."
+                    sleep $HEALTH_CHECK_DELAY
+                fi
+            done
+
+            echo "❌ All health check attempts failed!"
+            echo "Container logs:"
+            docker-compose logs --tail=50
+
+            echo "Container status:"
+            docker-compose ps
+
+            echo "Attempting direct connection test:"
+            curl -v http://localhost:8000/ || echo "Could not reach application"
+
+            exit 1

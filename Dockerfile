@@ -31,6 +31,10 @@ COPY core core
 # Expose the Django development server port (adjust if needed)
 EXPOSE 8000
 
+# Health check configuration
+HEALTHCHECK --interval=30s --timeout=10s --start-period=60s --retries=3 \
+    CMD curl -f http://localhost:8000/health/?format=json || exit 1
+
 # Set up the entrypoint
 COPY scripts/entrypoint.sh /entrypoint.sh
 RUN chmod a+x /entrypoint.sh

@@ -8,6 +8,7 @@ API_PREFIX = "v1/"
 urlpatterns = [
     path("__debug__/", include("debug_toolbar.urls")),
     path("admin/", admin.site.urls),
+    path("", include("core.apps.health.urls")),  # Health checks at root level
     path(f"api/{API_PREFIX}", include("core.apps.accounts.urls")),
 ]
 

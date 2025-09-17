@@ -31,6 +31,7 @@ INSTALLED_APPS = [
     "storages",
     # Apps
     "core.apps.accounts.apps.AccountsConfig",
+    "core.apps.health",
 ]
 
 MIDDLEWARE = [
