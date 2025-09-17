@@ -29,6 +29,7 @@ INSTALLED_APPS = [
     "django_filters",
     "debug_toolbar",
     "storages",
+    "drf_spectacular",
     # Apps
     "core.apps.accounts.apps.AccountsConfig",
     "core.apps.health",

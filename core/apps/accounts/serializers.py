@@ -14,17 +14,20 @@ username_validator = RegexValidator(regex=r"^[a-zA-Z0-9_.-]*$", message="Invalid
 
 
 class AccountSerializer(serializers.ModelSerializer):
-
     class Meta:
         model = Account
         fields = (
+            "id",
             "username",
             "email",
             "first_name",
             "last_name",
             "image",
             "is_email_verified",
+            "date_joined",
+            "last_login",
         )
+        read_only_fields = ("id", "username", "email", "is_email_verified", "date_joined", "last_login")
 
 
 class RegisterSerializer(serializers.ModelSerializer):
