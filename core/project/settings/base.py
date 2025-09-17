@@ -3,7 +3,7 @@ from typing import List
 DEBUG = False
 SECRET_KEY = NotImplemented
 
-ALLOWED_HOSTS: List[str] = ["localhost", "127.0.0.1"]  # Default for development
+ALLOWED_HOSTS: List[str] = ["localhost", "127.0.0.1", "localhost:8000"]  # Default for development
 CORS_ALLOWED_ORIGINS: List[str] = []  # Specific origins for production
 CSRF_TRUSTED_ORIGINS: List[str] = []
 
