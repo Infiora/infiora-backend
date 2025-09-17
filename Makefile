@@ -32,7 +32,7 @@ superuser:
 
 .PHONY: test
 test:
-	poetry run pytest -v -rs -n auto --show-capture=no
+	poetry run python -m core.manage test core.apps.accounts.tests --verbosity=2
 
 .PHONY: up-dependencies-only
 up-dependencies-only:
