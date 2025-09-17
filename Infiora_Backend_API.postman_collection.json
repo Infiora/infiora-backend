@@ -1,0 +1,478 @@
+{
+	"info": {
+		"_postman_id": "infiora-backend-api",
+		"name": "Infiora Backend API",
+		"description": "Complete API collection for Infiora Backend authentication system with JWT tokens, user management, and comprehensive auth flows.",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Authentication",
+			"item": [
+				{
+					"name": "Register User",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"username\": \"testuser\",\n  \"email\": \"test@example.com\",\n  \"password\": \"testpass123\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/auth/register/",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "auth", "register", ""]
+						},
+						"description": "Register a new user account with username, email, and password. Returns user data upon successful registration."
+					},
+					"response": []
+				},
+				{
+					"name": "Login with Username",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"    const response = pm.response.json();",
+									"    pm.environment.set('access_token', response.access_token);",
+									"    pm.environment.set('refresh_token', response.refresh_token);",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"login\": \"testuser\",\n  \"password\": \"testpass123\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/auth/login/",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "auth", "login", ""]
+						},
+						"description": "Login with username and password. Returns access token, refresh token, and user data. Automatically saves tokens to environment variables."
+					},
+					"response": []
+				},
+				{
+					"name": "Login with Email",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"    const response = pm.response.json();",
+									"    pm.environment.set('access_token', response.access_token);",
+									"    pm.environment.set('refresh_token', response.refresh_token);",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"login\": \"test@example.com\",\n  \"password\": \"testpass123\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/auth/login/",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "auth", "login", ""]
+						},
+						"description": "Login with email and password. Returns access token, refresh token, and user data. Automatically saves tokens to environment variables."
+					},
+					"response": []
+				},
+				{
+					"name": "Refresh Token",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"    const response = pm.response.json();",
+									"    pm.environment.set('access_token', response.access_token);",
+									"    pm.environment.set('refresh_token', response.refresh_token);",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"refresh_token\": \"{{refresh_token}}\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/auth/refresh-token/",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "auth", "refresh-token", ""]
+						},
+						"description": "Get new access and refresh tokens using existing refresh token. Implements token rotation for security - old refresh token is blacklisted."
+					},
+					"response": []
+				},
+				{
+					"name": "Logout",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"refresh_token\": \"{{refresh_token}}\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/auth/logout/",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "auth", "logout", ""]
+						},
+						"description": "Logout user by blacklisting the refresh token. Prevents token reuse for security."
+					},
+					"response": []
+				}
+			],
+			"description": "Core authentication endpoints for user registration, login, token refresh, and logout with JWT token management."
+		},
+		{
+			"name": "Password Management",
+			"item": [
+				{
+					"name": "Forgot Password",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"email\": \"test@example.com\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/auth/forgot-password/",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "auth", "forgot-password", ""]
+						},
+						"description": "Request password reset email for a user account. Email must exist in the system."
+					},
+					"response": []
+				},
+				{
+					"name": "Reset Password",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"token\": \"reset_token_here\",\n  \"password\": \"newpassword123\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/auth/reset-password/",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "auth", "reset-password", ""]
+						},
+						"description": "Reset user password using the token received via email. Token is single-use and gets blacklisted after use."
+					},
+					"response": []
+				}
+			],
+			"description": "Password reset functionality including forgot password requests and password resets using tokens."
+		},
+		{
+			"name": "Email Verification",
+			"item": [
+				{
+					"name": "Send Verification Email",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"email\": \"test@example.com\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/auth/send-verification-email/",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "auth", "send-verification-email", ""]
+						},
+						"description": "Send email verification link to user. Only works for unverified accounts."
+					},
+					"response": []
+				},
+				{
+					"name": "Verify Email",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"token\": \"verification_token_here\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/auth/verify-email/",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "auth", "verify-email", ""]
+						},
+						"description": "Verify user email using the token received via email. Marks the account as email verified."
+					},
+					"response": []
+				}
+			],
+			"description": "Email verification system for confirming user email addresses."
+		},
+		{
+			"name": "User Profile",
+			"item": [
+				{
+					"name": "Get User Profile",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/v1/auth/user/",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "auth", "user", ""]
+						},
+						"description": "Get current authenticated user's profile information. Requires valid access token."
+					},
+					"response": []
+				},
+				{
+					"name": "Update User Profile (PUT)",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"first_name\": \"John\",\n  \"last_name\": \"Doe\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/auth/user/",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "auth", "user", ""]
+						},
+						"description": "Update user profile with complete replacement. Read-only fields (username, email, etc.) cannot be changed."
+					},
+					"response": []
+				},
+				{
+					"name": "Update User Profile (PATCH)",
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"first_name\": \"Jane\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/auth/user/",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "auth", "user", ""]
+						},
+						"description": "Partially update user profile. Only provided fields are updated. Read-only fields are ignored."
+					},
+					"response": []
+				}
+			],
+			"description": "User profile management endpoints for viewing and updating user information."
+		},
+		{
+			"name": "API Documentation",
+			"item": [
+				{
+					"name": "OpenAPI Schema",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/schema/",
+							"host": ["{{base_url}}"],
+							"path": ["api", "schema", ""]
+						},
+						"description": "Get the OpenAPI schema for the API in JSON format."
+					},
+					"response": []
+				},
+				{
+					"name": "Swagger UI",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/docs/",
+							"host": ["{{base_url}}"],
+							"path": ["api", "docs", ""]
+						},
+						"description": "Access the interactive Swagger UI documentation interface."
+					},
+					"response": []
+				},
+				{
+					"name": "ReDoc Documentation",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/redoc/",
+							"host": ["{{base_url}}"],
+							"path": ["api", "redoc", ""]
+						},
+						"description": "Access the ReDoc documentation interface for API documentation."
+					},
+					"response": []
+				}
+			],
+			"description": "API documentation endpoints including OpenAPI schema and interactive documentation."
+		},
+		{
+			"name": "Health Checks",
+			"item": [
+				{
+					"name": "Health Check",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/health/",
+							"host": ["{{base_url}}"],
+							"path": ["health", ""]
+						},
+						"description": "Basic health check endpoint to verify application is running."
+					},
+					"response": []
+				},
+				{
+					"name": "Readiness Check",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/health/ready/",
+							"host": ["{{base_url}}"],
+							"path": ["health", "ready", ""]
+						},
+						"description": "Readiness check to verify application is ready to serve requests."
+					},
+					"response": []
+				},
+				{
+					"name": "Liveness Check",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/health/live/",
+							"host": ["{{base_url}}"],
+							"path": ["health", "live", ""]
+						},
+						"description": "Liveness check to verify application is alive and responding."
+					},
+					"response": []
+				}
+			],
+			"description": "Health check endpoints for monitoring application status and readiness."
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					"// Auto-refresh token if needed",
+					"const accessToken = pm.environment.get('access_token');",
+					"if (!accessToken && pm.environment.get('refresh_token')) {",
+					"    console.log('No access token found, attempting to refresh...');",
+					"}"
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "base_url",
+			"value": "http://localhost:8000",
+			"description": "Base URL for the Infiora Backend API",
+			"type": "string"
+		}
+	]
+}
