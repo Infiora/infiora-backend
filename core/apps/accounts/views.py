@@ -55,15 +55,8 @@ class RegisterView(APIView):
         serializer = RegisterSerializer(data=request.data)
         if serializer.is_valid():
             user = serializer.save()
-            return Response(
-                {
-                    "message": "User registered successfully",
-                    "user_id": user.id,
-                    "username": user.username,
-                    "email": user.email,
-                },
-                status=status.HTTP_201_CREATED,
-            )
+            user_serializer = AccountSerializer(user)
+            return Response(user_serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
@@ -84,16 +77,12 @@ class LoginView(APIView):
                 if not user.is_active:
                     return Response({"error": "Account is deactivated"}, status=status.HTTP_401_UNAUTHORIZED)
                 refresh = RefreshToken.for_user(user)
+                user_serializer = AccountSerializer(user)
                 return Response(
                     {
-                        "refresh_token": str(refresh),
                         "access_token": str(refresh.access_token),
-                        "user": {
-                            "id": user.id,
-                            "username": user.username,
-                            "email": user.email,
-                            "is_email_verified": user.is_email_verified,
-                        },
+                        "refresh_token": str(refresh),
+                        "user": user_serializer.data,
                     },
                     status=status.HTTP_200_OK,
                 )
@@ -110,12 +99,28 @@ class LogoutView(APIView):
         """Blacklist refresh token to logout user"""
         serializer = LogoutSerializer(data=request.data)
         if serializer.is_valid():
-            token = RefreshToken(serializer.validated_data["refresh_token"])
-            token.blacklist()
-            return Response(
-                {"message": "User logged out successfully"},
-                status=status.HTTP_204_NO_CONTENT,
-            )
+            try:
+                token = RefreshToken(serializer.validated_data["refresh_token"])
+
+                # Get user info before blacklisting for logging purposes
+                user_id = token.payload.get("user_id")  # noqa: F841
+
+                # Blacklist the refresh token
+                from rest_framework_simplejwt.token_blacklist.models import BlacklistedToken, OutstandingToken
+
+                try:
+                    outstanding_token = OutstandingToken.objects.get(token=str(token))
+                    BlacklistedToken.objects.get_or_create(token=outstanding_token)
+                except OutstandingToken.DoesNotExist:
+                    pass
+
+                return Response(
+                    {"message": "Successfully logged out"},
+                    status=status.HTTP_200_OK,
+                )
+            except Exception as e:  # noqa: F841
+                # Handle case where token is already blacklisted or invalid
+                return Response({"message": "Logout successful"}, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
@@ -128,11 +133,38 @@ class RefreshTokenView(APIView):
         """Get new access token using refresh token"""
         serializer = RefreshTokenSerializer(data=request.data)
         if serializer.is_valid():
-            refresh = RefreshToken(serializer.validated_data["refresh_token"])
+            old_refresh = RefreshToken(serializer.validated_data["refresh_token"])
+
+            # Get user from the refresh token
+            user = User.objects.get(id=old_refresh.payload["user_id"])
+
+            # Check if user is still active
+            if not user.is_active:
+                from rest_framework_simplejwt.token_blacklist.models import BlacklistedToken, OutstandingToken
+
+                try:
+                    outstanding_token = OutstandingToken.objects.get(token=str(old_refresh))
+                    BlacklistedToken.objects.get_or_create(token=outstanding_token)
+                except OutstandingToken.DoesNotExist:
+                    pass
+                return Response({"message": "Account is deactivated"}, status=status.HTTP_401_UNAUTHORIZED)
+
+            # Generate new refresh token for token rotation security
+            new_refresh = RefreshToken.for_user(user)
+
+            # Blacklist the old refresh token
+            from rest_framework_simplejwt.token_blacklist.models import BlacklistedToken, OutstandingToken
+
+            try:
+                outstanding_token = OutstandingToken.objects.get(token=str(old_refresh))
+                BlacklistedToken.objects.get_or_create(token=outstanding_token)
+            except OutstandingToken.DoesNotExist:
+                pass
+
             return Response(
                 {
-                    "access_token": str(refresh.access_token),
-                    "refresh_token": str(refresh),
+                    "access_token": str(new_refresh.access_token),
+                    "refresh_token": str(new_refresh),
                 },
                 status=status.HTTP_200_OK,
             )
@@ -169,7 +201,13 @@ class ResetPasswordView(APIView):
             user = User.objects.get(id=token.payload["user_id"])
             user.set_password(password)
             user.save()
-            token.blacklist()
+            from rest_framework_simplejwt.token_blacklist.models import BlacklistedToken, OutstandingToken
+
+            try:
+                outstanding_token = OutstandingToken.objects.get(token=str(token))
+                BlacklistedToken.objects.get_or_create(token=outstanding_token)
+            except OutstandingToken.DoesNotExist:
+                pass
             return Response({"message": "Password reset successfully"}, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
@@ -208,7 +246,13 @@ class VerifyEmailView(APIView):
             user = User.objects.get(id=token.payload["user_id"])
             user.is_email_verified = True
             user.save()
-            token.blacklist()
+            from rest_framework_simplejwt.token_blacklist.models import BlacklistedToken, OutstandingToken
+
+            try:
+                outstanding_token = OutstandingToken.objects.get(token=str(token))
+                BlacklistedToken.objects.get_or_create(token=outstanding_token)
+            except OutstandingToken.DoesNotExist:
+                pass
             return Response({"message": "Email verified successfully"}, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 

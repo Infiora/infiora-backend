@@ -5,6 +5,18 @@ API Schema definitions for accounts app using drf-spectacular
 from drf_spectacular.utils import OpenApiExample, OpenApiResponse, extend_schema
 from rest_framework import status
 
+from .serializers import (
+    AccountSerializer,
+    ForgotPasswordSerializer,
+    LoginSerializer,
+    LogoutSerializer,
+    RefreshTokenSerializer,
+    RegisterSerializer,
+    ResetPasswordSerializer,
+    SendVerificationEmailSerializer,
+    VerifyEmailSerializer,
+)
+
 # Common responses
 VALIDATION_ERROR_RESPONSE = OpenApiResponse(
     response={
@@ -37,21 +49,10 @@ TOKEN_ERROR_RESPONSE = OpenApiResponse(
 register_schema = extend_schema(
     summary="Register new user",
     description="Create a new user account with username, email, and password",
-    request={
-        "type": "object",
-        "properties": {
-            "username": {"type": "string", "example": "johndoe"},
-            "email": {"type": "string", "format": "email", "example": "john@example.com"},
-            "password": {"type": "string", "example": "Password123", "minLength": 8},
-        },
-        "required": ["username", "email", "password"],
-    },
+    request=RegisterSerializer,
     responses={
         status.HTTP_201_CREATED: OpenApiResponse(
-            response={
-                "type": "object",
-                "properties": {"message": {"type": "string", "example": "User registered successfully"}},
-            },
+            response=AccountSerializer,
             description="User successfully registered",
         ),
         status.HTTP_400_BAD_REQUEST: VALIDATION_ERROR_RESPONSE,
@@ -71,24 +72,18 @@ register_schema = extend_schema(
 login_schema = extend_schema(
     summary="User login",
     description="Authenticate user and return JWT tokens",
-    request={
-        "type": "object",
-        "properties": {
-            "login": {"type": "string", "example": "john@example.com", "description": "Username or email"},
-            "password": {"type": "string", "example": "Password123"},
-        },
-        "required": ["login", "password"],
-    },
+    request=LoginSerializer,
     responses={
         status.HTTP_200_OK: OpenApiResponse(
             response={
                 "type": "object",
                 "properties": {
-                    "refresh_token": {"type": "string", "example": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9..."},
                     "access_token": {"type": "string", "example": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9..."},
+                    "refresh_token": {"type": "string", "example": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9..."},
+                    "user": {"$ref": "#/components/schemas/Account"},
                 },
             },
-            description="Login successful, tokens returned",
+            description="Login successful, tokens and user data returned",
         ),
         status.HTTP_401_UNAUTHORIZED: OpenApiResponse(
             response={"type": "object", "properties": {"error": {"type": "string", "example": "Invalid credentials"}}},
@@ -112,16 +107,12 @@ login_schema = extend_schema(
 logout_schema = extend_schema(
     summary="User logout",
     description="Blacklist refresh token to logout user",
-    request={
-        "type": "object",
-        "properties": {"refresh_token": {"type": "string", "example": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9..."}},
-        "required": ["refresh_token"],
-    },
+    request=LogoutSerializer,
     responses={
-        status.HTTP_204_NO_CONTENT: OpenApiResponse(
+        status.HTTP_200_OK: OpenApiResponse(
             response={
                 "type": "object",
-                "properties": {"message": {"type": "string", "example": "User logged out successfully"}},
+                "properties": {"message": {"type": "string", "example": "Successfully logged out"}},
             },
             description="Successfully logged out",
         ),
@@ -136,11 +127,7 @@ logout_schema = extend_schema(
 refresh_token_schema = extend_schema(
     summary="Refresh access token",
     description="Get new access token using refresh token",
-    request={
-        "type": "object",
-        "properties": {"refresh_token": {"type": "string", "example": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9..."}},
-        "required": ["refresh_token"],
-    },
+    request=RefreshTokenSerializer,
     responses={
         status.HTTP_200_OK: OpenApiResponse(
             response={
@@ -150,7 +137,7 @@ refresh_token_schema = extend_schema(
                     "refresh_token": {"type": "string", "example": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9..."},
                 },
             },
-            description="New tokens generated",
+            description="New access and refresh tokens generated",
         ),
         status.HTTP_400_BAD_REQUEST: VALIDATION_ERROR_RESPONSE,
         status.HTTP_401_UNAUTHORIZED: TOKEN_ERROR_RESPONSE,
@@ -163,11 +150,7 @@ refresh_token_schema = extend_schema(
 forgot_password_schema = extend_schema(
     summary="Request password reset",
     description="Send password reset email to user",
-    request={
-        "type": "object",
-        "properties": {"email": {"type": "string", "format": "email", "example": "john@example.com"}},
-        "required": ["email"],
-    },
+    request=ForgotPasswordSerializer,
     responses={
         status.HTTP_200_OK: OpenApiResponse(
             response={
@@ -186,14 +169,7 @@ forgot_password_schema = extend_schema(
 reset_password_schema = extend_schema(
     summary="Reset password",
     description="Reset user password using reset token",
-    request={
-        "type": "object",
-        "properties": {
-            "token": {"type": "string", "example": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9..."},
-            "password": {"type": "string", "example": "NewPassword123", "minLength": 8},
-        },
-        "required": ["token", "password"],
-    },
+    request=ResetPasswordSerializer,
     responses={
         status.HTTP_200_OK: OpenApiResponse(
             response={
@@ -213,11 +189,7 @@ reset_password_schema = extend_schema(
 send_verification_email_schema = extend_schema(
     summary="Send email verification",
     description="Send verification email to user",
-    request={
-        "type": "object",
-        "properties": {"email": {"type": "string", "format": "email", "example": "john@example.com"}},
-        "required": ["email"],
-    },
+    request=SendVerificationEmailSerializer,
     responses={
         status.HTTP_200_OK: OpenApiResponse(
             response={
@@ -236,11 +208,7 @@ send_verification_email_schema = extend_schema(
 verify_email_schema = extend_schema(
     summary="Verify email address",
     description="Verify user email using verification token",
-    request={
-        "type": "object",
-        "properties": {"token": {"type": "string", "example": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9..."}},
-        "required": ["token"],
-    },
+    request=VerifyEmailSerializer,
     responses={
         status.HTTP_200_OK: OpenApiResponse(
             response={
@@ -262,24 +230,7 @@ user_profile_schema = extend_schema(
     description="Get current authenticated user's profile information",
     responses={
         status.HTTP_200_OK: OpenApiResponse(
-            response={
-                "type": "object",
-                "properties": {
-                    "id": {"type": "integer", "example": 1},
-                    "username": {"type": "string", "example": "johndoe"},
-                    "email": {"type": "string", "format": "email", "example": "john@example.com"},
-                    "first_name": {"type": "string", "example": "John"},
-                    "last_name": {"type": "string", "example": "Doe"},
-                    "image": {
-                        "type": "string",
-                        "format": "uri",
-                        "nullable": True,
-                        "example": "https://example.com/image.jpg",
-                    },
-                    "is_email_verified": {"type": "boolean", "example": True},
-                    "date_joined": {"type": "string", "format": "date-time", "example": "2023-01-01T12:00:00Z"},
-                },
-            },
+            response=AccountSerializer,
             description="User profile information",
         ),
         status.HTTP_401_UNAUTHORIZED: UNAUTHORIZED_RESPONSE,
@@ -292,33 +243,10 @@ user_profile_schema = extend_schema(
 update_user_profile_schema = extend_schema(
     summary="Update user profile",
     description="Update current authenticated user's profile information",
-    request={
-        "type": "object",
-        "properties": {
-            "first_name": {"type": "string", "example": "John"},
-            "last_name": {"type": "string", "example": "Doe"},
-            "image": {"type": "string", "format": "binary", "description": "Profile image file"},
-        },
-    },
+    request=AccountSerializer,
     responses={
         status.HTTP_200_OK: OpenApiResponse(
-            response={
-                "type": "object",
-                "properties": {
-                    "id": {"type": "integer", "example": 1},
-                    "username": {"type": "string", "example": "johndoe"},
-                    "email": {"type": "string", "format": "email", "example": "john@example.com"},
-                    "first_name": {"type": "string", "example": "John"},
-                    "last_name": {"type": "string", "example": "Doe"},
-                    "image": {
-                        "type": "string",
-                        "format": "uri",
-                        "nullable": True,
-                        "example": "https://example.com/image.jpg",
-                    },
-                    "is_email_verified": {"type": "boolean", "example": True},
-                },
-            },
+            response=AccountSerializer,
             description="Updated user profile information",
         ),
         status.HTTP_400_BAD_REQUEST: VALIDATION_ERROR_RESPONSE,
