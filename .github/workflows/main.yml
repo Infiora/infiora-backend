@@ -132,6 +132,18 @@ jobs:
             if docker-compose exec -T app poetry run python -m core.manage check --database default; then
                 echo "✅ Application health check passed!"
 
+                # Create superuser if it doesn't exist
+                echo "Creating superuser admin if not exists..."
+                docker-compose exec -T app poetry run python -c "
+                from django.contrib.auth import get_user_model
+                User = get_user_model()
+                if not User.objects.filter(username='admin').exists():
+                    User.objects.create_superuser('admin', 'admin@infiora.hr', 'infiora')
+                    print('✅ Superuser admin created successfully')
+                else:
+                    print('ℹ️ Superuser admin already exists')
+                "
+
                 # Get application status
                 echo "Application status:"
                 docker-compose exec -T app poetry run python -m core.manage check
