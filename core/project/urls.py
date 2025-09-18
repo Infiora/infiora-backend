@@ -12,6 +12,7 @@ urlpatterns = [
     path("", include("core.apps.health.urls")),  # Health checks at root level
     # API endpoints
     path(f"api/{API_PREFIX}", include("core.apps.accounts.urls")),
+    path(f"api/{API_PREFIX}", include("core.apps.users.urls")),
     # API Documentation
     path("api/schema/", SpectacularAPIView.as_view(), name="schema"),
     path("api/docs/", SpectacularSwaggerView.as_view(url_name="schema"), name="swagger-ui"),

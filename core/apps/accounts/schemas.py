@@ -5,6 +5,8 @@ API Schema definitions for accounts app using drf-spectacular
 from drf_spectacular.utils import OpenApiExample, OpenApiResponse, extend_schema
 from rest_framework import status
 
+from core.general.schemas import TOKEN_ERROR_RESPONSE, UNAUTHORIZED_RESPONSE, VALIDATION_ERROR_RESPONSE
+
 from .serializers import (
     AccountSerializer,
     ForgotPasswordSerializer,
@@ -16,34 +18,6 @@ from .serializers import (
     SendVerificationEmailSerializer,
     VerifyEmailSerializer,
 )
-
-# Common responses
-VALIDATION_ERROR_RESPONSE = OpenApiResponse(
-    response={
-        "type": "object",
-        "properties": {
-            "field_name": {"type": "array", "items": {"type": "string"}, "example": ["This field is required."]}
-        },
-    },
-    description="Validation error with field-specific messages",
-)
-
-UNAUTHORIZED_RESPONSE = OpenApiResponse(
-    response={
-        "type": "object",
-        "properties": {"detail": {"type": "string", "example": "Authentication credentials were not provided."}},
-    },
-    description="Authentication required",
-)
-
-TOKEN_ERROR_RESPONSE = OpenApiResponse(
-    response={
-        "type": "object",
-        "properties": {"message": {"type": "string", "example": "Token is invalid or expired"}},
-    },
-    description="Token validation error",
-)
-
 
 # Register endpoint schema
 register_schema = extend_schema(
@@ -161,7 +135,7 @@ forgot_password_schema = extend_schema(
         ),
         status.HTTP_400_BAD_REQUEST: VALIDATION_ERROR_RESPONSE,
     },
-    tags=["Password Management"],
+    tags=["Authentication"],
 )
 
 
@@ -181,7 +155,7 @@ reset_password_schema = extend_schema(
         status.HTTP_400_BAD_REQUEST: VALIDATION_ERROR_RESPONSE,
         status.HTTP_401_UNAUTHORIZED: TOKEN_ERROR_RESPONSE,
     },
-    tags=["Password Management"],
+    tags=["Authentication"],
 )
 
 
@@ -200,7 +174,7 @@ send_verification_email_schema = extend_schema(
         ),
         status.HTTP_400_BAD_REQUEST: VALIDATION_ERROR_RESPONSE,
     },
-    tags=["Email Verification"],
+    tags=["Authentication"],
 )
 
 
@@ -220,7 +194,7 @@ verify_email_schema = extend_schema(
         status.HTTP_400_BAD_REQUEST: VALIDATION_ERROR_RESPONSE,
         status.HTTP_401_UNAUTHORIZED: TOKEN_ERROR_RESPONSE,
     },
-    tags=["Email Verification"],
+    tags=["Authentication"],
 )
 
 
@@ -235,7 +209,7 @@ user_profile_schema = extend_schema(
         ),
         status.HTTP_401_UNAUTHORIZED: UNAUTHORIZED_RESPONSE,
     },
-    tags=["User Profile"],
+    tags=["Authentication"],
 )
 
 
@@ -252,5 +226,5 @@ update_user_profile_schema = extend_schema(
         status.HTTP_400_BAD_REQUEST: VALIDATION_ERROR_RESPONSE,
         status.HTTP_401_UNAUTHORIZED: UNAUTHORIZED_RESPONSE,
     },
-    tags=["User Profile"],
+    tags=["Authentication"],
 )

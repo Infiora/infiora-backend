@@ -33,6 +33,7 @@ INSTALLED_APPS = [
     "drf_spectacular",
     # Apps
     "core.apps.accounts.apps.AccountsConfig",
+    "core.apps.users.apps.UsersConfig",
     "core.apps.health",
 ]
 

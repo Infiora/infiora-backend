@@ -1,16 +1,11 @@
 from django.contrib.auth import get_user_model
-from django.core.validators import RegexValidator
 from rest_framework import serializers
+
+from core.general.validators import password_validator, username_validator
 
 from .models import Account
 
 User = get_user_model()
-
-password_validator = RegexValidator(
-    regex=r"^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$",
-    message="Invalid password",
-)
-username_validator = RegexValidator(regex=r"^[a-zA-Z0-9_.-]*$", message="Invalid username")
 
 
 class AccountSerializer(serializers.ModelSerializer):
