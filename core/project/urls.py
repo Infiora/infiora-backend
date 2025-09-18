@@ -13,6 +13,7 @@ urlpatterns = [
     # API endpoints
     path(f"api/{API_PREFIX}", include("core.apps.accounts.urls")),
     path(f"api/{API_PREFIX}", include("core.apps.users.urls")),
+    path(f"api/{API_PREFIX}", include("core.apps.hotels.urls")),
     # API Documentation
     path("api/schema/", SpectacularAPIView.as_view(), name="schema"),
     path("api/docs/", SpectacularSwaggerView.as_view(url_name="schema"), name="swagger-ui"),

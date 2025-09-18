@@ -5,7 +5,7 @@ API Schema definitions for users app using drf-spectacular
 from drf_spectacular.utils import OpenApiResponse, extend_schema
 from rest_framework import status
 
-from core.general.schemas import (
+from core.shared.api.schemas import (
     ADMIN_FORBIDDEN_RESPONSE,
     NOT_FOUND_RESPONSE,
     SELF_ACTION_ERROR_RESPONSE,

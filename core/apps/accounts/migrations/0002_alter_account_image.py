@@ -2,7 +2,7 @@
 
 from django.db import migrations, models
 
-import core.apps.accounts.models
+from core.shared.storage.uploads import generate_upload_path
 
 
 class Migration(migrations.Migration):
@@ -15,6 +15,6 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name="account",
             name="image",
-            field=models.ImageField(blank=True, null=True, upload_to=core.apps.accounts.models.user_image_path),
+            field=models.ImageField(blank=True, null=True, upload_to=generate_upload_path("users", "image")),
         ),
     ]

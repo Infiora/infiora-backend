@@ -2,7 +2,7 @@ from django.contrib.auth import get_user_model
 from django.db import IntegrityError
 from django.test import TestCase
 
-from core.apps.accounts.models import user_image_path
+from core.shared.storage.uploads import generate_upload_path
 
 User = get_user_model()
 
@@ -65,34 +65,46 @@ class UserImagePathTests(TestCase):
     def test_user_image_path_generation(self):
         user = User.objects.create_user(username="testuser", email="test@example.com", password="testpass123")
         filename = "test_image.jpg"
-        path = user_image_path(user, filename)
+        upload_func = generate_upload_path("users", "image")
+        path = upload_func(user, filename)
 
         self.assertTrue(path.startswith(f"uploads/users/{user.id}/"))
         self.assertTrue(path.endswith(".jpg"))
-        self.assertNotEqual(path, f"uploads/users/{user.id}/{filename}")
+        # New behavior: uses field name instead of original filename
+        self.assertEqual(path, f"uploads/users/{user.id}/image.jpg")
 
     def test_user_image_path_preserves_extension(self):
         user = User.objects.create_user(username="testuser", email="test@example.com", password="testpass123")
         filename = "test_image.png"
-        path = user_image_path(user, filename)
+        upload_func = generate_upload_path("users", "image")
+        path = upload_func(user, filename)
 
         self.assertTrue(path.endswith(".png"))
 
-    def test_user_image_path_unique_for_same_filename(self):
+    def test_user_image_path_consistent_for_same_filename(self):
         user = User.objects.create_user(username="testuser", email="test@example.com", password="testpass123")
         filename = "test_image.jpg"
-        path1 = user_image_path(user, filename)
-        path2 = user_image_path(user, filename)
+        upload_func = generate_upload_path("users", "image")
+        path1 = upload_func(user, filename)
+        path2 = upload_func(user, filename)
 
-        self.assertNotEqual(path1, path2)
+        # Both paths should be the same (new behavior uses field name)
+        self.assertEqual(path1, path2)
+        # Both should end with .jpg
+        self.assertTrue(path1.endswith(".jpg"))
+        self.assertTrue(path2.endswith(".jpg"))
+        # Both should contain the user ID and field name
+        self.assertEqual(path1, f"uploads/users/{user.id}/image.jpg")
+        self.assertEqual(path2, f"uploads/users/{user.id}/image.jpg")
 
     def test_user_image_path_different_users(self):
         user1 = User.objects.create_user(username="testuser1", email="test1@example.com", password="testpass123")
         user2 = User.objects.create_user(username="testuser2", email="test2@example.com", password="testpass123")
         filename = "test_image.jpg"
-        path1 = user_image_path(user1, filename)
-        path2 = user_image_path(user2, filename)
+        upload_func = generate_upload_path("users", "image")
+        path1 = upload_func(user1, filename)
+        path2 = upload_func(user2, filename)
 
-        self.assertIn(f"uploads/users/{user1.id}/", path1)
-        self.assertIn(f"uploads/users/{user2.id}/", path2)
+        self.assertEqual(path1, f"uploads/users/{user1.id}/image.jpg")
+        self.assertEqual(path2, f"uploads/users/{user2.id}/image.jpg")
         self.assertNotEqual(path1, path2)

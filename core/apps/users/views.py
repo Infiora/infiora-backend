@@ -5,7 +5,7 @@ from rest_framework.filters import OrderingFilter, SearchFilter
 from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet
 
-from core.general.permissions import CanCreateUsers, CanManageUsers
+from core.shared.auth.permissions import CanCreateUsers, CanManageUsers
 
 from .schemas import user_create_schema, user_delete_schema, user_detail_schema, user_list_schema, user_update_schema
 from .serializers import UserCreateSerializer, UserDetailSerializer, UserListSerializer

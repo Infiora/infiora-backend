@@ -1,7 +1,7 @@
 from django.contrib.auth import get_user_model
 from rest_framework import serializers
 
-from core.general.validators import password_validator, username_validator
+from core.shared.validation.validators import password_validator, username_validator
 
 from .models import Account
 

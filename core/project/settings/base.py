@@ -34,6 +34,7 @@ INSTALLED_APPS = [
     # Apps
     "core.apps.accounts.apps.AccountsConfig",
     "core.apps.users.apps.UsersConfig",
+    "core.apps.hotels.apps.HotelsConfig",
     "core.apps.health",
 ]
 

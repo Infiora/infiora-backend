@@ -5,7 +5,7 @@ API Schema definitions for accounts app using drf-spectacular
 from drf_spectacular.utils import OpenApiExample, OpenApiResponse, extend_schema
 from rest_framework import status
 
-from core.general.schemas import TOKEN_ERROR_RESPONSE, UNAUTHORIZED_RESPONSE, VALIDATION_ERROR_RESPONSE
+from core.shared.api.schemas import TOKEN_ERROR_RESPONSE, UNAUTHORIZED_RESPONSE, VALIDATION_ERROR_RESPONSE
 
 from .serializers import (
     AccountSerializer,
