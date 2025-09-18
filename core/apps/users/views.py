@@ -68,7 +68,7 @@ class UserViewSet(ModelViewSet):
             return UserDetailSerializer
 
     @user_list_schema
-    def list(self, request, *args, **kwargs):
+    def list(self, request, *args, **kwargs):  # noqa: A003
         """List all users"""
         return super().list(request, *args, **kwargs)
 
