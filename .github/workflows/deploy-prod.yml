@@ -23,6 +23,19 @@ jobs:
         with:
           clean: true
 
+      - name: Cleanup Old Deployments
+        run: |
+          # Clean yarn cache
+          yarn cache clean --force || true
+          # Clean PM2 logs older than 7 days
+          pm2 flush || true
+          find ~/.pm2/logs -name "*.log" -mtime +7 -delete || true
+          # Remove old build artifacts
+          rm -rf dist/ || true
+          # Clean up old node_modules if they exist
+          rm -rf node_modules || true
+        continue-on-error: true
+
       - name: Disable Husky Hooks
         run: git config core.hooksPath /dev/null
 
@@ -55,4 +68,14 @@ jobs:
       - name: Health Check
         run: |
           timeout 30 bash -c 'until curl -f http://localhost:8000/v1/health 2>/dev/null; do sleep 2; done' || echo "Health check failed - check application logs"
+        continue-on-error: true
+
+      - name: Post-Deployment Cleanup
+        run: |
+          # Clean up any temporary files
+          find /tmp -name "yarn-*" -type d -mtime +1 -exec rm -rf {} + || true
+          find /tmp -name "npm-*" -type d -mtime +1 -exec rm -rf {} + || true
+          # Report disk usage
+          echo "=== Disk Usage After Deployment ==="
+          df -h
         continue-on-error: true

@@ -5,7 +5,7 @@ import 'dotenv/config';
 const envVarsSchema = Joi.object()
   .keys({
     // Environment Configuration
-    NODE_ENV: Joi.string().valid('prod', 'dev', 'test'),
+    NODE_ENV: Joi.string().valid('production', 'development', 'test'),
     APP_NAME: Joi.string().required().description('Application name'),
     PORT: Joi.number().default(3000).description('Application port number'),
     ALLOWED_ORIGINS: Joi.string().description('Comma-separated list of allowed CORS origins'),
@@ -56,12 +56,12 @@ if (error) {
 
 // Export configuration object
 const config = {
-  env: envVars.NODE_ENV || 'dev',
+  env: envVars.NODE_ENV || 'development',
   appName: envVars.APP_NAME,
   port: envVars.PORT,
   allowedOrigins: envVars.ALLOWED_ORIGINS ? envVars.ALLOWED_ORIGINS.split(',') : [],
   mongoose: {
-    url: `${envVars.MONGODB_URL}${envVars.NODE_ENV !== 'prod' ? `-${envVars.NODE_ENV}` : ''}`,
+    url: `${envVars.MONGODB_URL}${envVars.NODE_ENV !== 'production' ? `-${envVars.NODE_ENV}` : ''}`,
     options: {
       useNewUrlParser: true,
       useUnifiedTopology: true,
@@ -75,7 +75,7 @@ const config = {
     verifyEmailExpirationMinutes: envVars.JWT_VERIFY_EMAIL_EXPIRATION_MINUTES,
     cookieOptions: {
       httpOnly: true,
-      secure: envVars.NODE_ENV === 'prod',
+      secure: envVars.NODE_ENV === 'production',
       signed: true,
     },
   },

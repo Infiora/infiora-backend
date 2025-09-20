@@ -16,3 +16,12 @@ dist
 
 # docker volume
 data
+
+# Logs
+logs/*.log
+logs/*.log.*
+*.log
+*.log.*
+
+# PM2
+.pm2
