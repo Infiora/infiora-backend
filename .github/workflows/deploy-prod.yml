@@ -16,11 +16,11 @@ jobs:
       - name: Stop App
         run: pm2 stop app || true
 
-      - name: Disable Husky Hooks
-        run: git config core.hooksPath /dev/null
-
       - name: Checkout Code
         uses: actions/checkout@v3
+
+      - name: Disable Husky Hooks
+        run: git config core.hooksPath /dev/null
 
       - name: Set Up Node.js ${{ matrix.node-version }}
         uses: actions/setup-node@v2
