@@ -6,60 +6,45 @@ from .models import Hotel
 User = get_user_model()
 
 
+class HotelOwnerSerializer(serializers.ModelSerializer):
+    """Nested serializer for owner user information in hotel context"""
+
+    class Meta:
+        model = User
+        fields = (
+            "id",
+            "username",
+            "email",
+            "first_name",
+            "last_name",
+            "image",
+            "is_active",
+            "is_staff",
+            "is_superuser",
+        )
+
+
 class HotelListSerializer(serializers.ModelSerializer):
-    created_by_username = serializers.CharField(source="created_by.username", read_only=True)
+    users = HotelOwnerSerializer(many=True, read_only=True)
     user_count = serializers.SerializerMethodField()
 
     class Meta:
         model = Hotel
-        fields = [
-            "id",
-            "name",
-            "address",
-            "phone",
-            "email",
-            "image",
-            "cover",
-            "active_until",
-            "is_active",
-            "created_at",
-            "created_by",
-            "created_by_username",
-            "user_count",
-        ]
-        read_only_fields = ["id", "created_at", "created_by", "created_by_username", "user_count"]
+        fields = "__all__"
+        read_only_fields = ["id", "created_at", "users", "user_count"]
 
     def get_user_count(self, obj):
         return obj.users.count()
 
 
 class HotelDetailSerializer(serializers.ModelSerializer):
-    created_by_username = serializers.CharField(source="created_by.username", read_only=True)
+    users = HotelOwnerSerializer(many=True, read_only=True)
     user_count = serializers.SerializerMethodField()
 
     class Meta:
         model = Hotel
-        fields = [
-            "id",
-            "name",
-            "description",
-            "address",
-            "phone",
-            "email",
-            "website",
-            "image",
-            "cover",
-            "note",
-            "active_until",
-            "social_links",
-            "is_active",
-            "created_at",
-            "updated_at",
-            "created_by",
-            "created_by_username",
-            "user_count",
-        ]
-        read_only_fields = ["id", "created_at", "updated_at", "created_by", "created_by_username", "user_count"]
+        fields = "__all__"
+        read_only_fields = ["id", "created_at", "updated_at", "users", "user_count"]
 
     def get_user_count(self, obj):
         return obj.users.count()
@@ -68,20 +53,7 @@ class HotelDetailSerializer(serializers.ModelSerializer):
 class HotelCreateSerializer(serializers.ModelSerializer):
     class Meta:
         model = Hotel
-        fields = [
-            "name",
-            "description",
-            "address",
-            "phone",
-            "email",
-            "website",
-            "image",
-            "cover",
-            "note",
-            "active_until",
-            "social_links",
-            "is_active",
-        ]
+        fields = "__all__"
 
     def validate_name(self, value):
         if Hotel.objects.filter(name__iexact=value).exists():

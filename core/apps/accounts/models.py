@@ -16,15 +16,9 @@ class Account(AbstractUser, PermissionsMixin):
         related_name="created_users",
         help_text="User who created this account",
     )
-    hotel = models.ForeignKey(
+    hotels = models.ManyToManyField(
         "hotels.Hotel",
-        on_delete=models.SET_NULL,
-        null=True,
         blank=True,
         related_name="users",
-        help_text="Hotel this user belongs to",
-    )
-    is_hotel_admin = models.BooleanField(
-        default=False,
-        help_text="Whether this user is an admin for their hotel",
+        help_text="Hotels this user belongs to and can manage",
     )

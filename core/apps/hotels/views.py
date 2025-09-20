@@ -4,6 +4,8 @@ from rest_framework.filters import OrderingFilter, SearchFilter
 from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet
 
+from core.shared.pagination import StandardResultsSetPagination
+
 from .models import Hotel
 from .permissions import CanCreateHotels, CanManageHotels
 from .schemas import (
@@ -18,15 +20,16 @@ from .serializers import HotelCreateSerializer, HotelDetailSerializer, HotelList
 
 class HotelViewSet(ModelViewSet):
     """
-    ViewSet for hierarchical hotel management.
-    - Admin users can manage ALL hotels
-    - Staff users can only manage hotels they created
+    ViewSet for hotel management.
+    - Admin users can create and manage ALL hotels
+    - Regular users can only view/update hotels they belong to
     """
 
     queryset = Hotel.objects.all()
     permission_classes = [CanManageHotels]
+    pagination_class = StandardResultsSetPagination
     filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
-    filterset_fields = ["is_active", "created_by"]
+    filterset_fields = ["is_active", "users"]
     search_fields = ["name", "address", "phone", "email"]
     ordering_fields = ["name", "created_at"]
     ordering = ["-created_at"]
@@ -35,21 +38,31 @@ class HotelViewSet(ModelViewSet):
         """
         Filter queryset based on user permissions:
         - Admin users see all hotels
-        - Staff users only see hotels they created
+        - Regular users see only hotels they belong to
+
+        Query Parameters:
+        - user: Filter hotels by specific user ID (admin only)
         """
         queryset = super().get_queryset()
         user = self.request.user
 
+        # Check if user parameter is provided (for admin filtering)
+        user_param = self.request.query_params.get("user")
+
         # Admin users can see all hotels
         if user.is_superuser and user.is_staff:
+            # Apply user filter if parameter is provided
+            if user_param:
+                try:
+                    user_id = int(user_param)
+                    queryset = queryset.filter(users=user_id)
+                except (ValueError, TypeError):
+                    # Invalid user ID, return empty queryset
+                    return queryset.none()
             return queryset
 
-        # Staff users only see hotels they created
-        if user.is_staff:
-            return queryset.filter(created_by=user)
-
-        # Regular users see nothing (should not reach here due to permissions)
-        return queryset.none()
+        # Regular users see only hotels they belong to
+        return queryset.filter(users=user)
 
     def get_permissions(self):
         """
@@ -81,8 +94,8 @@ class HotelViewSet(ModelViewSet):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
 
-        # Set the created_by field to the current user
-        hotel = serializer.save(created_by=request.user)
+        # Admin creates hotel
+        hotel = serializer.save()
 
         # Return detailed hotel data
         response_serializer = HotelDetailSerializer(hotel)

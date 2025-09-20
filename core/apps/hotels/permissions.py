@@ -8,21 +8,22 @@ from rest_framework.permissions import BasePermission
 class CanManageHotels(BasePermission):
     """
     Permission for hotel management.
-    - Superadmin users can manage ALL hotels
-    - Staff users can only manage hotels they created
+    - Admin users can manage ALL hotels
+    - Regular users can only manage hotels they belong to
     """
 
     def has_permission(self, request, view):
-        return bool(request.user and request.user.is_authenticated and request.user.is_staff)
+        # Allow authenticated users - filtering is handled in get_queryset and has_object_permission
+        return bool(request.user and request.user.is_authenticated)
 
     def has_object_permission(self, request, view, obj):
-        # Superadmin users can access all hotels
+        # Admin users can access all hotels
         if request.user.is_superuser and request.user.is_staff:
             return True
 
-        # Staff users can only access hotels they created
-        if request.user.is_staff and hasattr(obj, "created_by"):
-            return obj.created_by == request.user
+        # Regular users can only manage hotels they belong to
+        if request.user in obj.users.all():
+            return True
 
         return False
 
@@ -30,18 +31,20 @@ class CanManageHotels(BasePermission):
 class CanCreateHotels(BasePermission):
     """
     Permission for hotel creation.
-    Only staff users can create hotels.
+    Only admin users (superuser and staff) can create hotels.
     """
 
     def has_permission(self, request, view):
-        return bool(request.user and request.user.is_authenticated and request.user.is_staff)
+        return bool(
+            request.user and request.user.is_authenticated and request.user.is_superuser and request.user.is_staff
+        )
 
 
-class IsHotelAdminOrSuperuser(BasePermission):
+class IsHotelUserOrSuperuser(BasePermission):
     """
     Permission for hotel-specific operations.
     - Superuser can access all
-    - Hotel admin can access their hotel's resources
+    - Users can access resources of hotels they belong to
     """
 
     def has_permission(self, request, view):
@@ -52,12 +55,13 @@ class IsHotelAdminOrSuperuser(BasePermission):
         if request.user.is_superuser and request.user.is_staff:
             return True
 
-        # Hotel admin can access their hotel's resources
-        if hasattr(request.user, "hotel") and request.user.hotel and request.user.is_hotel_admin:
-            if hasattr(obj, "hotel"):
-                return obj.hotel == request.user.hotel
-            elif hasattr(obj, "users"):  # For hotel objects
-                return obj == request.user.hotel
+        # Users can access resources of hotels they belong to
+        if hasattr(request.user, "hotels"):
+            user_hotels = request.user.hotels.all()
+            if hasattr(obj, "hotel") and obj.hotel in user_hotels:
+                return True
+            elif hasattr(obj, "users") and obj in user_hotels:  # For hotel objects
+                return True
 
         return False
 
@@ -66,7 +70,7 @@ class IsHotelUser(BasePermission):
     """
     Permission for hotel users to access hotel-related resources.
     - Superuser can access all
-    - Users can only access resources related to their hotel
+    - Users can only access resources related to their hotels
     """
 
     def has_permission(self, request, view):
@@ -77,11 +81,12 @@ class IsHotelUser(BasePermission):
         if request.user.is_superuser and request.user.is_staff:
             return True
 
-        # Users with hotel can access their hotel's resources
-        if hasattr(request.user, "hotel") and request.user.hotel:
-            if hasattr(obj, "hotel"):
-                return obj.hotel == request.user.hotel
-            elif hasattr(obj, "users"):  # For hotel objects
-                return obj == request.user.hotel
+        # Users with hotels can access their hotels' resources
+        if hasattr(request.user, "hotels"):
+            user_hotels = request.user.hotels.all()
+            if hasattr(obj, "hotel") and obj.hotel in user_hotels:
+                return True
+            elif hasattr(obj, "users") and obj in user_hotels:  # For hotel objects
+                return True
 
         return False

@@ -18,11 +18,25 @@ class AccountSerializer(serializers.ModelSerializer):
             "first_name",
             "last_name",
             "image",
+            "is_active",
+            "is_staff",
+            "is_superuser",
             "is_email_verified",
             "date_joined",
             "last_login",
+            "created_by",
+            "hotels",
         )
-        read_only_fields = ("id", "username", "email", "is_email_verified", "date_joined", "last_login")
+        read_only_fields = (
+            "id",
+            "username",
+            "email",
+            "is_email_verified",
+            "date_joined",
+            "last_login",
+            "created_by",
+            "hotels",
+        )
 
 
 class RegisterSerializer(serializers.ModelSerializer):

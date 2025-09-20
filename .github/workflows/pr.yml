@@ -1,5 +1,9 @@
 name: Quality Assurance
-on: [pull_request, workflow_call]
+on:
+  pull_request:
+    branches:
+      - dev
+  workflow_call:
 
 jobs:
   quality-assurance:

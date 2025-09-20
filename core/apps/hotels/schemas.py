@@ -19,6 +19,13 @@ hotel_list_schema = extend_schema(
     - **Admin users** (superuser + staff): Can see ALL hotels
     - **Staff users**: Can only see hotels they created
     - **Regular users**: No access
+
+    **Query Parameters:**
+    - **user**: Filter hotels by specific user ID (admin only). Returns hotels that the specified user belongs to.
+    - **is_active**: Filter by hotel active status
+    - **created_by**: Filter by creator user ID
+    - **search**: Search in name, address, phone, email fields
+    - **ordering**: Order by name, created_at (prefix with '-' for descending)
     """,
     responses={
         status.HTTP_200_OK: OpenApiResponse(

@@ -80,8 +80,7 @@ class LoginView(APIView):
                 user_serializer = AccountSerializer(user)
                 return Response(
                     {
-                        "access_token": str(refresh.access_token),
-                        "refresh_token": str(refresh),
+                        "tokens": {"access": str(refresh.access_token), "refresh": str(refresh)},
                         "user": user_serializer.data,
                     },
                     status=status.HTTP_200_OK,
@@ -163,8 +162,8 @@ class RefreshTokenView(APIView):
 
             return Response(
                 {
-                    "access_token": str(new_refresh.access_token),
-                    "refresh_token": str(new_refresh),
+                    "access": str(new_refresh.access_token),
+                    "refresh": str(new_refresh),
                 },
                 status=status.HTTP_200_OK,
             )
