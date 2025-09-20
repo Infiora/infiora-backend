@@ -1,39 +1,26 @@
-# Use an official Python runtime as the base image
-FROM python:3.10-slim
+# development stage
+FROM node:14-alpine as base
 
-# Set the working directory in the container
-WORKDIR /app
+WORKDIR /usr/src/app
 
-ENV PYTHONDONTWRITEBYTECODE 1
-ENV PYTHONUNBUFFERED 1
-ENV PYTHONPATH .
-ENV INFIORA_IN_DOCKER true
+COPY package.json yarn.lock tsconfig.json ecosystem.config.json ./
 
-# Install dependencies
-RUN set -xe \
-    && apt-get update \
-    && apt-get install -y --no-install-recommends \
-        build-essential \
-        libpq-dev \
-        curl \
-    && pip install --no-cache-dir poetry==1.4.2 \
-    && apt-get clean \
-    && rm -rf /var/lib/apt/lists/*
+COPY ./src ./src
 
-# Copy and install Python dependencies
-COPY ["poetry.lock", "pyproject.toml", "./"]
-RUN poetry install --no-root
+RUN ls -a
 
-# Copy project files
-COPY ["README.md", "Makefile", "./"]
-COPY core core
+RUN yarn install --pure-lockfile && yarn compile
 
-# Expose the Django development server port (adjust if needed)
-EXPOSE 8000
+# production stage
 
+FROM base as production
 
-# Set up the entrypoint
-COPY scripts/entrypoint.sh /entrypoint.sh
-RUN chmod a+x /entrypoint.sh
+WORKDIR /usr/prod/app
 
-ENTRYPOINT ["/entrypoint.sh"]
+ENV NODE_ENV=prod
+
+COPY package.json yarn.lock ecosystem.config.json ./
+
+RUN yarn install --production --pure-lockfile
+
+COPY --from=base /usr/src/app/dist ./dist

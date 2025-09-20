@@ -1,1 +1,0 @@
-# Hotels app tests

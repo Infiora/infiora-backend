@@ -1,77 +1,18 @@
-# Backup files
-*.bak
+# Dependencies
+node_modules
 
-# Distribution / packaging
-*.egg
-*.egg-info/
-*.manifest
-*.spec
-.Python build/
-.eggs/
-.installed.cfg
-develop-eggs/
-dist/
-downloads/
-eggs/
-lib/
-lib64/
-parts/
-sdist/
-var/
-wheels/
+# yarn error logs
+yarn-error.log
 
-# Django
-*.log
-*.pot
-*.pyc
-/staticfiles
-__pycache__
-db.sqlite3
-media
+# Environment varibales
+.env*
+!.env*.example
 
-# Environments
-.venv
-/.env
-/.env.prod
-/.env.dev
-/local
-ENV/
-env.bak/
-env/
-venv
-venv.bak/
-venv/
+# Code coverage
+coverage
 
-# IDEs
-.DS_Store
-.idea
-.vscode
+# build folder
+dist
 
-# Installer logs
-pip-delete-this-directory.txt
-pip-log.txt
-
-# mypy
-.mypy_cache
-
-# pyenv
-.python-version
-
-# pytest
-.pytest_cache
-
-# Python
-*$py.class
-*.py[cod]
-
-# Unit test / coverage reports
-*.cover
-.cache
-.coverage
-.coverage.*
-.hypothesis/
-.pytest_cache/
-.tox/
-coverage.xml
-htmlcov/
-nosetests.xml
+# docker volume
+data

@@ -1,36 +1,36 @@
-version: "3.9"
+version: '3'
 
 services:
-  db:
-    image: postgres:14.2-alpine
-    restart: unless-stopped
+  mongo:
+    container_name: mongo
+    image: mongo:4.2.1-bionic
+    restart: always
     ports:
-      - "5432:5432"
-    environment:
-      POSTGRES_DB: infiora
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: infiora
-    volumes:
-      - postgresql-data:/var/lib/postgresql/data
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres -d infiora"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-      start_period: 60s
-
+      - "27018:27017"
+    networks:
+      - backend
   app:
-    build: .
-    restart: unless-stopped
+    container_name: app
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: base
+    restart: always
+    env_file: .env
+    expose:
+      - ${PORT}
     ports:
-      - "8000:8000"
-    depends_on:
-      - db
-    env_file:
-      - .env
+      - ${PORT}:${PORT}
     environment:
-      INFIORA_DATABASES: '{"default":{"HOST":"db"}}'
+      - MONGODB_URL=mongodb://mongo:27017/node-boilerplate
+      - CLIENT_URL=${CLIENT_URL}
+    links:
+      - mongo
+    depends_on:
+      - mongo
+    networks:
+      - backend
 
-volumes:
-  postgresql-data:
-    driver: local
+networks:
+  backend:
+    driver: bridge
