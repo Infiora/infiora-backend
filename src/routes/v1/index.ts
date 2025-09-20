@@ -10,6 +10,7 @@ import roomRoute from './room.route';
 import linkRoute from './link.route';
 import groupRoute from './group.route';
 import subscriberRoute from './subscriber.route';
+import healthRoute from './health.route';
 import config from '../../config/config';
 
 const router = express.Router();
@@ -20,6 +21,10 @@ interface IRoute {
 }
 
 const defaultIRoute: IRoute[] = [
+  {
+    path: '/health',
+    route: healthRoute,
+  },
   {
     path: '/auth',
     route: authRoute,
