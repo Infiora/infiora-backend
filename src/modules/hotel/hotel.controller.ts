@@ -35,16 +35,14 @@ export const getHotel = catchAsync(async (req: Request, res: Response) => {
 });
 
 export const createHotel = catchAsync(async (req: Request, res: Response) => {
-  const file = req.file as Express.Multer.File;
-  const hotel = await hotelService.createHotel({ ...req.body, isActive: req.user.role === 'admin' }, file);
+  const hotel = await hotelService.createHotel({ ...req.body, isActive: req.user.role === 'admin' }, req.files);
   await emailService.sendHotelEmail(req.user, hotel);
   res.status(httpStatus.CREATED).send(hotel);
 });
 
 export const updateHotel = catchAsync(async (req: Request, res: Response) => {
   const hotelId = toObjectId(req.params['hotelId']);
-  const file = req.file as Express.Multer.File;
-  const hotel = await hotelService.updateHotelById(hotelId, req.body, file);
+  const hotel = await hotelService.updateHotelById(hotelId, req.body, req.files);
   res.send(hotel);
 });
 

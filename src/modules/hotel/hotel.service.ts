@@ -30,9 +30,15 @@ export const getHotelById = async (id: mongoose.Types.ObjectId): Promise<IHotelD
  * @param {Express.Multer.File | undefined} file
  * @returns {Promise<IHotelDoc>}
  */
-export const createHotel = async (hotelBody: NewCreatedHotel, file?: Express.Multer.File): Promise<IHotelDoc> => {
-  const body = { ...hotelBody };
-  if (file) body.image = await uploadToS3(file, 'hotel');
+export const createHotel = async (hotelBody: NewCreatedHotel, files?: any): Promise<IHotelDoc> => {
+  const body: any = { ...hotelBody };
+  if (files) {
+    await Promise.all(
+      Object.keys(files).map(async (field) => {
+        if (files[field]) body[field] = await uploadToS3(files[field][0], 'hotel');
+      })
+    );
+  }
   return Hotel.create(body);
 };
 
@@ -46,14 +52,20 @@ export const createHotel = async (hotelBody: NewCreatedHotel, file?: Express.Mul
 export const updateHotelById = async (
   hotelId: mongoose.Types.ObjectId,
   hotelBody: UpdateHotelBody,
-  file?: Express.Multer.File
+  files?: any
 ): Promise<IHotelDoc | null> => {
-  const body = { ...hotelBody };
+  const body: any = { ...hotelBody };
   const hotel = await getHotelById(hotelId);
   if (!hotel) {
     throw new ApiError(httpStatus.NOT_FOUND, 'Hotel not found');
   }
-  if (file) body.image = await uploadToS3(file, 'hotel');
+  if (files) {
+    await Promise.all(
+      Object.keys(files).map(async (field) => {
+        if (files[field]) body[field] = await uploadToS3(files[field][0], 'hotel');
+      })
+    );
+  }
   Object.assign(hotel, body);
   await hotel.save();
   return hotel;

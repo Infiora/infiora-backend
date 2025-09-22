@@ -10,6 +10,7 @@ const createHotelBody: Record<keyof NewCreatedHotel, any> = {
   note: Joi.string().allow(null, ''),
   activeUntil: Joi.string().allow(null, ''),
   image: Joi.any(),
+  cover: Joi.any(),
   socialLinks: Joi.any(),
 };
 
@@ -45,6 +46,7 @@ export const updateHotel = {
     note: Joi.string().allow(null, ''),
     activeUntil: Joi.string().allow(null, ''),
     image: Joi.any(),
+    cover: Joi.any(),
     socialLinks: Joi.any(),
     isActive: Joi.boolean(),
   }),

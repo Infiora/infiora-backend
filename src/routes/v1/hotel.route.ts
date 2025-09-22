@@ -12,7 +12,10 @@ router
   .post(
     auth('manageHotels'),
     validate(hotelValidation.createHotel),
-    multerUpload.single('image'),
+    multerUpload.fields([
+      { name: 'image', maxCount: 1 },
+      { name: 'cover', maxCount: 1 },
+    ]),
     hotelController.createHotel
   )
   .get(auth(), isOwner, validate(hotelValidation.getHotels), hotelController.getHotels);
@@ -27,7 +30,10 @@ router
     auth(),
     isHotelOwner,
     validate(hotelValidation.updateHotel),
-    multerUpload.single('image'),
+    multerUpload.fields([
+      { name: 'image', maxCount: 1 },
+      { name: 'cover', maxCount: 1 },
+    ]),
     hotelController.updateHotel
   )
   .delete(auth('manageHotels'), validate(hotelValidation.deleteHotel), hotelController.deleteHotel);

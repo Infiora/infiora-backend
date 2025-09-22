@@ -31,6 +31,9 @@ const hotelSchema = new mongoose.Schema<IHotelDoc, IHotelModel>(
     image: {
       type: String,
     },
+    cover: {
+      type: String,
+    },
     socialLinks: {
       type: [String],
       default: [],

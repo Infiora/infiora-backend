@@ -9,6 +9,7 @@ export interface IHotel {
   note?: string;
   activeUntil?: string;
   image?: string;
+  cover?: string;
   socialLinks?: string[];
   isActive?: boolean;
 }
