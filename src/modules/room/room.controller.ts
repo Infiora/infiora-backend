@@ -93,3 +93,11 @@ export const createFeedback = catchAsync(async (req: Request, res: Response) => 
   const feedback = await feedbackService.createFeedback(req.body);
   res.status(httpStatus.CREATED).send(feedback);
 });
+
+export const exportRooms = catchAsync(async (req: Request, res: Response) => {
+  const filter = pick(req.query, ['hotel']);
+  const rooms = await roomService.exportRooms(filter);
+  res.set('Content-Type', `text/csv; name="rooms.csv"`);
+  res.set('Content-Disposition', `inline; filename="rooms.csv"`);
+  res.send(rooms);
+});

@@ -3,6 +3,7 @@ import toJSON from '../toJSON/toJSON';
 import paginate from '../paginate/paginate';
 import { IRoomDoc, IRoomModel } from './room.interfaces';
 import Link from '../link/link.model';
+import config from '../../config/config';
 
 const roomSchema = new mongoose.Schema<IRoomDoc, IRoomModel>(
   {
@@ -101,9 +102,14 @@ const roomSchema = new mongoose.Schema<IRoomDoc, IRoomModel>(
     },
   },
   {
+    toJSON: { virtuals: true },
     timestamps: true,
   }
 );
+
+roomSchema.virtual('url').get(function () {
+  return `${config.urls.app}/${this.id}`;
+});
 
 // Add plugins to the schema
 roomSchema.plugin(toJSON);

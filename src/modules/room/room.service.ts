@@ -1,5 +1,6 @@
 import httpStatus from 'http-status';
 import mongoose from 'mongoose';
+import { json2csv } from 'json-2-csv';
 import Room from './room.model';
 import ApiError from '../errors/ApiError';
 import { NewCreatedRoom, UpdateRoomBody, IRoomDoc, roomPopulate } from './room.interfaces';
@@ -105,4 +106,17 @@ export const deleteRoomById = async (roomId: mongoose.Types.ObjectId): Promise<I
   }
   await room.deleteOne();
   return room;
+};
+
+/**
+ * Export rooms in csv
+ * @param {Object} filter - Mongo filter
+ * @returns {Promise<string | null>}
+ */
+export const exportRooms = async (filter: Record<string, any>): Promise<any> => {
+  const rooms = await Room.find(filter, { url: 1, number: 1 });
+  const roomsWithUrls = rooms.map((room) => ({ number: room.number, url: room.toObject({ virtuals: true }).url }));
+  const csvData = json2csv(roomsWithUrls);
+
+  return csvData;
 };

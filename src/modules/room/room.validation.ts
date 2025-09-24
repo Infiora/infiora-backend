@@ -149,3 +149,9 @@ export const getFeedbacks = {
     page: Joi.number().integer(),
   }),
 };
+
+export const exportRooms = {
+  query: Joi.object().keys({
+    hotel: Joi.custom(objectId),
+  }),
+};

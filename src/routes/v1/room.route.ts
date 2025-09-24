@@ -11,6 +11,8 @@ router
   .post(auth(), validate(roomValidation.createRoom), roomController.createRoom)
   .get(validate(roomValidation.getRooms), roomController.getRooms);
 
+router.route('/export').get(auth(), validate(roomValidation.exportRooms), roomController.exportRooms);
+
 router
   .route('/feedback')
   .post(validate(roomValidation.createFeedback), roomController.createFeedback)

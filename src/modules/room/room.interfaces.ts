@@ -29,6 +29,7 @@ interface IFeedback {
 
 export interface IRoom {
   hotel: IHotelDoc;
+  url?: string;
   number?: string;
   description?: string;
   isActive?: boolean;
