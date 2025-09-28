@@ -19,12 +19,13 @@ jobs:
         run: pm2 stop app || true
         continue-on-error: true
 
+      - name: Disable Husky Hooks
+        run: git config core.hooksPath /dev/null
+
       - name: Checkout Code
         uses: actions/checkout@v4
         with:
           clean: true
-        env:
-          HUSKY: 0
 
       - name: Cleanup Old Deployments
         run: |
