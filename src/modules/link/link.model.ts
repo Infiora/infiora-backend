@@ -11,6 +11,17 @@ const itemSchema = new mongoose.Schema({
 });
 itemSchema.plugin(toJSON);
 
+const sectionSchema = new mongoose.Schema({
+  title: { type: String, required: true },
+  description: String,
+  url: String,
+  phone: String,
+  address: String,
+  images: [String],
+  video: String,
+});
+sectionSchema.plugin(toJSON);
+
 const linkSchema = new mongoose.Schema<ILinkDoc, ILinkModel>(
   {
     position: { type: Number, default: 0 },
@@ -32,6 +43,7 @@ const linkSchema = new mongoose.Schema<ILinkDoc, ILinkModel>(
       default: 'none',
     },
     items: [itemSchema],
+    sections: [sectionSchema],
     data: Object,
     isActive: { type: Boolean, default: true },
   },

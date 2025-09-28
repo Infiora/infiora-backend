@@ -8,11 +8,23 @@ export interface IItem {
   type: string;
   data?: any;
 }
+export interface ISection {
+  id: string;
+  title: string;
+  description?: string;
+  url?: string;
+  phone?: string;
+  address?: string;
+  images?: string[];
+  video?: string;
+}
+
 interface IBaseLink {
   title?: string;
   value: string;
   type: string;
   items?: IItem[];
+  sections?: ISection[];
   image?: string;
   imageType?: 'image' | 'icon' | 'url';
   isActive: boolean;
