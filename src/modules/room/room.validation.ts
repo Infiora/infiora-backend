@@ -91,26 +91,7 @@ export const updateRoom = {
         isActive: Joi.boolean(),
       })
       .allow(null, ''),
-    feedback: Joi.object()
-      .keys({
-        message: Joi.string().allow(null, ''),
-        successMessage: Joi.string().allow(null, ''),
-        buttonText: Joi.string().allow(null, ''),
-        mainButtonText: Joi.string().allow(null, ''),
-        link: Joi.string().allow(null, ''),
-        type: Joi.string().allow(null, ''),
-        color: Joi.string().allow(null, ''),
-        imageType: Joi.string().valid('none', 'icon', 'image', 'url'),
-        image: Joi.any(),
-        questions: Joi.array().items(
-          Joi.object().keys({
-            text: Joi.string(),
-            type: Joi.any(),
-          })
-        ),
-        isActive: Joi.boolean(),
-      })
-      .allow(null, ''),
+    feedback: Joi.any(),
     isActive: Joi.boolean(),
   }),
 };
