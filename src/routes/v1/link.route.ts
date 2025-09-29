@@ -9,7 +9,7 @@ const router: Router = express.Router();
 
 router
   .route('/')
-  .post(auth(), validate(linkValidation.createLink), multerUpload.single('image'), linkController.createLink)
+  .post(auth(), validate(linkValidation.createLink), multerUpload.any(), linkController.createLink)
   .get(auth(), validate(linkValidation.getLinks), linkController.getLinks);
 
 router
@@ -19,7 +19,7 @@ router
 router
   .route('/:linkId')
   .get(validate(linkValidation.getLink), linkController.getLink)
-  .patch(auth(), validate(linkValidation.updateLink), isLinkOwner, multerUpload.single('image'), linkController.updateLink)
+  .patch(auth(), validate(linkValidation.updateLink), isLinkOwner, multerUpload.any(), linkController.updateLink)
   .delete(auth(), validate(linkValidation.deleteLink), isLinkOwner, linkController.deleteLink);
 
 export default router;

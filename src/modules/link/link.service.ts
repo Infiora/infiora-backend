@@ -8,6 +8,59 @@ import { toObjectId } from '../utils/mongoUtils';
 import { uploadToS3 } from '../utils/awsS3Utils';
 
 /**
+ * Handle file uploads for link body
+ * @param {any} body - Link body object
+ * @param {Express.Multer.File[] | undefined} files - Uploaded files
+ * @returns {Promise<void>}
+ */
+const handleFileUploads = async (body: any, files?: Express.Multer.File[]): Promise<void> => {
+  if (!files || files.length === 0) return;
+
+  const linkBody = body;
+
+  // Handle main image
+  const mainImageFile = files.find((file) => file.fieldname === 'image');
+  if (mainImageFile) {
+    linkBody.image = await uploadToS3(mainImageFile, 'link');
+  }
+
+  // Handle section images
+  const sectionImageFiles = files.filter(
+    (file) => file.fieldname.startsWith('sections[') && file.fieldname.includes('[images][')
+  );
+
+  if (sectionImageFiles.length > 0 && linkBody.sections) {
+    // Parse sections if they come as strings
+    if (typeof linkBody.sections === 'string') {
+      linkBody.sections = JSON.parse(linkBody.sections);
+    }
+
+    // Process each section image file
+    await Promise.all(
+      sectionImageFiles.map(async (file) => {
+        const match = file.fieldname.match(/sections\[(\d+)\]\[images\]\[(\d+)\]/);
+        if (match && match[1] && match[2]) {
+          const sectionIndex = parseInt(match[1], 10);
+          const imageIndex = parseInt(match[2], 10);
+
+          if (linkBody.sections && linkBody.sections[sectionIndex]) {
+            const section = linkBody.sections[sectionIndex];
+            if (section && !section.images) {
+              section.images = [];
+            }
+
+            const uploadedImageUrl = await uploadToS3(file, 'link/sections');
+            if (section && section.images) {
+              section.images[imageIndex] = uploadedImageUrl;
+            }
+          }
+        }
+      })
+    );
+  }
+};
+
+/**
  * Query for links
  * @param {Object} filter - Mongo filter
  * @param {Object} options - Query options
@@ -28,12 +81,14 @@ export const getLinkById = async (id: mongoose.Types.ObjectId): Promise<ILinkDoc
 /**
  * Create a link
  * @param {NewCreatedLink} linkBody
- * @param {Express.Multer.File | undefined} file
+ * @param {Express.Multer.File[] | undefined} files
  * @returns {Promise<ILinkDoc>}
  */
-export const createLink = async (linkBody: NewCreatedLink, file?: Express.Multer.File): Promise<ILinkDoc> => {
+export const createLink = async (linkBody: NewCreatedLink, files?: Express.Multer.File[]): Promise<ILinkDoc> => {
   const body = { ...linkBody };
-  if (file) body.image = await uploadToS3(file, 'link');
+
+  await handleFileUploads(body, files);
+
   return Link.create(body);
 };
 
@@ -41,20 +96,22 @@ export const createLink = async (linkBody: NewCreatedLink, file?: Express.Multer
  * Update link by id
  * @param {mongoose.Types.ObjectId} linkId
  * @param {UpdateLinkBody} linkBody
- * @param {Express.Multer.File | undefined} file
+ * @param {Express.Multer.File[] | undefined} files
  * @returns {Promise<ILinkDoc | null>}
  */
 export const updateLinkById = async (
   linkId: mongoose.Types.ObjectId,
   linkBody: UpdateLinkBody,
-  file?: Express.Multer.File
+  files?: Express.Multer.File[]
 ): Promise<ILinkDoc | null> => {
   const body = { ...linkBody };
   const link = await getLinkById(linkId);
   if (!link) {
     throw new ApiError(httpStatus.NOT_FOUND, 'Link not found');
   }
-  if (file) body.image = await uploadToS3(file, 'link');
+
+  await handleFileUploads(body, files);
+
   Object.assign(link, body);
   await link.save();
   return link;
