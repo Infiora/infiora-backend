@@ -15,12 +15,9 @@ const feedbackSchema = new mongoose.Schema<IFeedbackDoc, IFeedbackModel>(
       required: true,
       ref: 'Room',
     },
-    answers: [
-      {
-        question: { type: String, required: true },
-        value: { type: mongoose.Schema.Types.Mixed },
-      },
-    ],
+    rating: Number,
+    email: String,
+    message: String,
   },
   {
     timestamps: true,

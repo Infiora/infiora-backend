@@ -4,12 +4,9 @@ import { QueryResult } from '../paginate/paginate';
 export interface IFeedback {
   hotel: ObjectId;
   room: ObjectId;
-  answers: [
-    {
-      question: string;
-      value: string | number | boolean | null;
-    }
-  ];
+  rating: number;
+  email: string;
+  message: string;
 }
 
 export interface IFeedbackDoc extends IFeedback, Document {}

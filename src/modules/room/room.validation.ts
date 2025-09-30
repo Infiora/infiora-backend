@@ -106,14 +106,9 @@ export const createFeedback = {
   body: Joi.object<NewCreatedFeedback>({
     room: Joi.required().custom(objectId),
     hotel: Joi.required().custom(objectId),
-    answers: Joi.array()
-      .items(
-        Joi.object({
-          question: Joi.string().required(),
-          value: Joi.alternatives().try(Joi.string(), Joi.number(), Joi.boolean(), Joi.valid(null)).required(),
-        })
-      )
-      .required(),
+    rating: Joi.number(),
+    email: Joi.string().allow(null, ''),
+    message: Joi.string().allow(null, ''),
   }),
 };
 
