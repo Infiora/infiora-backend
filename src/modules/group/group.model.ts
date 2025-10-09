@@ -60,35 +60,7 @@ const groupSchema = new mongoose.Schema<IGroupDoc, IGroupModel>(
         default: true,
       },
     },
-    feedback: {
-      message: { type: String },
-      successMessage: { type: String },
-      buttonText: { type: String },
-      mainButtonText: { type: String },
-      link: { type: String },
-      type: { type: String },
-      color: { type: String },
-      image: String,
-      imageType: {
-        type: String,
-        default: 'none',
-      },
-      questions: [
-        {
-          text: { type: String },
-          type: {
-            type: String,
-            enum: ['1', '2', '3'],
-            default: '1',
-          },
-          _id: false,
-        },
-      ],
-      isActive: {
-        type: Boolean,
-        default: true,
-      },
-    },
+    feedback: Object,
     isActive: {
       type: Boolean,
       default: true,
