@@ -2,6 +2,16 @@ import { Model, Document } from 'mongoose';
 import { QueryResult } from '../paginate/paginate';
 import { IHotelDoc } from '../hotel/hotel.interfaces';
 
+export interface IPopup {
+  message?: string;
+  buttonText?: string;
+  link?: string;
+  color?: string;
+  image?: string;
+  imageType?: 'none' | 'image' | 'icon' | 'url';
+  isActive?: boolean;
+}
+
 interface INewsletter {
   message?: string;
   successMessage?: string;
@@ -13,6 +23,7 @@ interface INewsletter {
   imageType?: 'none' | 'image' | 'icon' | 'url';
   isActive?: boolean;
 }
+
 export interface IFeedback {
   isActive?: boolean;
   emailRequirement?: 'none' | 'optional' | 'mandatory';
@@ -44,13 +55,7 @@ export interface IRoom {
     variant?: string;
     borderRadius?: string;
   };
-  popup?: {
-    message?: string;
-    buttonText?: string;
-    link?: string;
-    color?: string;
-    isActive?: boolean;
-  };
+  popup?: IPopup;
   newsletter?: INewsletter;
   feedback?: IFeedback;
 }

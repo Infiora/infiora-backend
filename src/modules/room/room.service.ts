@@ -8,6 +8,7 @@ import { IOptions, QueryResult } from '../paginate/paginate';
 import { removeNullFields, toPopulateString } from '../utils/miscUtils';
 import Link from '../link/link.model';
 import { reorderItems } from '../utils/arrayUtils';
+import { uploadToS3 } from '../utils/awsS3Utils';
 
 /**
  * Query for rooms
@@ -83,13 +84,27 @@ export const createRoom = async (roomBody: NewCreatedRoom): Promise<IRoomDoc> =>
  */
 export const updateRoomById = async (
   roomId: mongoose.Types.ObjectId,
-  roomBody: UpdateRoomBody
+  roomBody: UpdateRoomBody,
+  files?: any
 ): Promise<IRoomDoc | null> => {
+  const body: any = { ...roomBody };
   const room = await getRoomById(roomId);
   if (!room) {
     throw new ApiError(httpStatus.NOT_FOUND, 'Room not found');
   }
-  Object.assign(room, roomBody);
+
+  // Handle file uploads for popup[image]
+  if (files && files['popup[image]'] && files['popup[image]'][0]) {
+    const uploadedImageUrl = await uploadToS3(files['popup[image]'][0], 'room/popup');
+
+    // Ensure popup object exists in body
+    if (!body.popup) {
+      body.popup = {};
+    }
+    body.popup.image = uploadedImageUrl;
+  }
+
+  Object.assign(room, body);
   await room.save().then((t) => t.populate(roomPopulate));
   return room;
 };

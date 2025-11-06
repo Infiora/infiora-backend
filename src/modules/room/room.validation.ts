@@ -75,6 +75,8 @@ export const updateRoom = {
         buttonText: Joi.string().allow(null, ''),
         link: Joi.string().allow(null, ''),
         color: Joi.string().allow(null, ''),
+        imageType: Joi.string().valid('none', 'icon', 'image', 'url'),
+        image: Joi.any(),
         isActive: Joi.boolean(),
       })
       .allow(null, ''),

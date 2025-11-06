@@ -66,7 +66,7 @@ export const createRoom = catchAsync(async (req: Request, res: Response) => {
 
 export const updateRoom = catchAsync(async (req: Request, res: Response) => {
   const roomId = toObjectId(req.params['roomId']);
-  const room = await roomService.updateRoomById(roomId, req.body);
+  const room = await roomService.updateRoomById(roomId, req.body, req.files);
   res.send(room);
 });
 
