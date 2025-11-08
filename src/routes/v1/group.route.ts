@@ -3,6 +3,7 @@ import { validate } from '../../modules/validate';
 import { auth } from '../../modules/auth';
 import { groupController, groupValidation } from '../../modules/group';
 import { isGroupOwner } from '../../modules/middleware';
+import multerUpload from '../../modules/utils/multerUpload';
 
 const router: Router = express.Router();
 
@@ -17,7 +18,13 @@ router
 router
   .route('/:groupId')
   .get(auth(), validate(groupValidation.getGroup), isGroupOwner, groupController.getGroup)
-  .patch(auth(), validate(groupValidation.updateGroup), isGroupOwner, groupController.updateGroup)
+  .patch(
+    auth(),
+    validate(groupValidation.updateGroup),
+    isGroupOwner,
+    multerUpload.fields([{ name: 'popup[image]', maxCount: 1 }]),
+    groupController.updateGroup
+  )
   .delete(auth(), validate(groupValidation.deleteGroup), isGroupOwner, groupController.deleteGroup);
 
 export default router;

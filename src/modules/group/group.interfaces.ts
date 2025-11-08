@@ -51,6 +51,8 @@ export interface IGroup {
     buttonText?: string;
     link?: string;
     color?: string;
+    image?: string;
+    imageType?: 'none' | 'image' | 'icon' | 'url';
     isActive?: boolean;
   };
   newsletter?: INewsletter;

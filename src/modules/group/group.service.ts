@@ -6,6 +6,7 @@ import { NewCreatedGroup, UpdateGroupBody, IGroupDoc, groupPopulate } from './gr
 import { IOptions, QueryResult } from '../paginate/paginate';
 import { toPopulateString } from '../utils/miscUtils';
 import { Link } from '../link';
+import { uploadToS3 } from '../utils/awsS3Utils';
 
 /**
  * Query for groups
@@ -44,13 +45,27 @@ export const createGroup = async (groupBody: NewCreatedGroup): Promise<IGroupDoc
  */
 export const updateGroupById = async (
   groupId: mongoose.Types.ObjectId,
-  groupBody: UpdateGroupBody
+  groupBody: UpdateGroupBody,
+  files?: any
 ): Promise<IGroupDoc | null> => {
+  const body: any = { ...groupBody };
   const group = await getGroupById(groupId);
   if (!group) {
     throw new ApiError(httpStatus.NOT_FOUND, 'Group not found');
   }
-  Object.assign(group, groupBody);
+
+  // Handle file uploads for popup[image]
+  if (files && files['popup[image]'] && files['popup[image]'][0]) {
+    const uploadedImageUrl = await uploadToS3(files['popup[image]'][0], 'group/popup');
+
+    // Ensure popup object exists in body
+    if (!body.popup) {
+      body.popup = {};
+    }
+    body.popup.image = uploadedImageUrl;
+  }
+
+  Object.assign(group, body);
   await group.save().then((t) => t.populate(groupPopulate));
   return group;
 };

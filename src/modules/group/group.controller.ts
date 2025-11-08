@@ -30,7 +30,7 @@ export const createGroup = catchAsync(async (req: Request, res: Response) => {
 
 export const updateGroup = catchAsync(async (req: Request, res: Response) => {
   const groupId = toObjectId(req.params['groupId']);
-  const group = await groupService.updateGroupById(groupId, req.body);
+  const group = await groupService.updateGroupById(groupId, req.body, req.files);
   res.send(group);
 });
 
