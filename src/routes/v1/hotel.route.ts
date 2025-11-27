@@ -23,6 +23,10 @@ router
 router.route('/:hotelId/insights').get(auth(), isHotelOwner, hotelController.getInsights);
 
 router
+  .route('/:hotelId/dupicate-group')
+  .post(auth(), validate(hotelValidation.duplicateGroup), hotelController.duplicateGroup);
+
+router
   .route('/:hotelId')
   .get(auth(), isHotelOwner, validate(hotelValidation.getHotel), hotelController.getHotel)
   .post(hotelController.socialLinkTap)

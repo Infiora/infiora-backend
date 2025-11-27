@@ -89,14 +89,14 @@ export const deleteGroupById = async (groupId: mongoose.Types.ObjectId): Promise
  * @param {mongoose.Types.ObjectId} groupId
  * @returns {Promise<any | null>}
  */
-export const duplicateGroup = async (groupId: mongoose.Types.ObjectId) => {
+export const duplicateGroup = async (groupId: mongoose.Types.ObjectId, hotel?: mongoose.Types.ObjectId) => {
   const group = await Group.findById(groupId).select('-createdAt -updatedAt');
   if (!group) throw new ApiError(httpStatus.NOT_FOUND, 'Group not found');
 
   const groupData = group.toObject();
   delete groupData._id;
 
-  const newGroup = await Group.create(groupData);
+  const newGroup = await Group.create({ ...groupData, hotel });
   const links = await Link.find({ group: groupId });
 
   const newLinks = links.map((link) => {

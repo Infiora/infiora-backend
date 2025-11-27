@@ -11,6 +11,7 @@ router
   .route('/')
   .post(auth(), validate(groupValidation.createGroup), groupController.createGroup)
   .get(auth(), validate(groupValidation.getGroups), groupController.getGroups);
+
 router
   .route('/duplicate/:groupId')
   .post(auth(), validate(groupValidation.duplicateGroup), isGroupOwner, groupController.duplicateGroup);

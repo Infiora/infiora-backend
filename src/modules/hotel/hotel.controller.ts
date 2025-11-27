@@ -9,6 +9,7 @@ import { toObjectId } from '../utils/mongoUtils';
 import { Activity } from '../activity';
 import * as insightService from '../insight/insight.service';
 import { roomService } from '../room';
+import { groupService } from '../group';
 import { emailService } from '../email';
 
 export const getHotels = catchAsync(async (req: Request, res: Response) => {
@@ -93,4 +94,15 @@ export const getInsights = catchAsync(async (req: Request, res: Response) => {
   }
   const insights = await insightService.getHotelInsights({ hotel, startDate, endDate, language, device });
   res.send(insights);
+});
+
+export const duplicateGroup = catchAsync(async (req: Request, res: Response) => {
+  const hotelId = toObjectId(req.params['hotelId']);
+  const { group } = pick(req.query, ['group']);
+  const hotel = await hotelService.getHotelById(hotelId);
+  if (!hotel) {
+    throw new ApiError(httpStatus.NOT_FOUND, 'Hotel not found');
+  }
+  await groupService.duplicateGroup(group, hotelId);
+  res.status(httpStatus.NO_CONTENT).send();
 });

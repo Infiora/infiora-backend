@@ -57,3 +57,12 @@ export const deleteHotel = {
     hotelId: Joi.required().custom(objectId),
   }),
 };
+
+export const duplicateGroup = {
+  params: Joi.object().keys({
+    hotelId: Joi.required().custom(objectId),
+  }),
+  query: Joi.object().keys({
+    group: Joi.custom(objectId),
+  }),
+};
